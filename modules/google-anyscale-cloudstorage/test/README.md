@@ -7,7 +7,7 @@ Requirements:
 More info can be found [here](https://terratest.gruntwork.io/docs/getting-started/quick-start/)
 
 #### Manual execution
-Manully running the go tests can save time during initial development. Requires active aws credentials.
+Manully running the go tests can save time during initial development. Requires active google credentials.
 ```
 cd test
 go mod init "<module_name>"
@@ -25,7 +25,7 @@ Where `<module_name>` is the name of the terraform module (can also be `github.c
 
 These tests require environment variables to be set for `GOOGLE_BILLING_ACCOUNT_ID` and `GOOGLE_FOLDER_ID`
 ```bash
-export GOOGLE_BILLING_ACCOUNT_ID="01D34E-9FCF25-2A378C"
-export GOOGLE_FOLDER_ID="503482899572"
-export GOOGLE_PROJECT_ID="terraform-test-project-381523"
+export GOOGLE_BILLING_ACCOUNT_ID="012345-012345-012345"
+export GOOGLE_FOLDER_ID="555444888555"
+export GOOGLE_PROJECT_ID="terraform-test-project-333555"
 ```

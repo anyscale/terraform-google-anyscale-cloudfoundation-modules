@@ -1,6 +1,6 @@
 name: Security Issue
 description: General security issue
-title: '[Security]: '
+title: "[Security]: "
 labels: ["security", "P0", "terraform-modules"]
 assignees: ["brent-anyscale"]
 
@@ -23,9 +23,10 @@ body:
       description: "Please select which module(s) this issue impacts."
       options:
         - label: Root Anyscale Module
-        - label: aws-anyscale-efs
-        - label: aws-anyscale-iam
-        - label: aws-anyscale-s3
-        - label: aws-anyscale-s3-policy
-        - label: aws-anyscale-securitygroups
-        - label: aws-anyscale-vpc
+        - label: google-anyscale-cloudapis
+        - label: google-anyscale-cloudstorage
+        - label: google-anyscale-filestore
+        - label: google-anyscale-iam
+        - label: google-anyscale-project
+        - label: google-anyscale-vpc
+        - label: google-anyscale-vpc-firewall

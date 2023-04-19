@@ -7,7 +7,7 @@ Requirements:
 More info can be found [here](https://terratest.gruntwork.io/docs/getting-started/quick-start/)
 
 #### Manual execution
-Manully running the go tests can save time during initial development. Requires active aws credentials.
+Manully running the go tests can save time during initial development. Requires active google credentials.
 ```
 cd test
 go mod init "<module_name>"

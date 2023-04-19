@@ -99,9 +99,9 @@ variable "random_char_length" {
   description = <<-EOT
     (Optional)
     Determines the random suffix length that is used to generate a common name.
-    Certain AWS resources have a hard limit on name lengths and this will allow
+    Certain Google resources have a hard limit on name lengths and this will allow
     the ability to control how many characters are added as a suffix.
-    Many AWS resources have a limit of 28 characters in length.
+    Many Google resources have a limit of 28 characters in length.
     Keep that in mind while setting this value.
     Must be >= 2 and <= 12.
     Default is `4`
