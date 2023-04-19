@@ -1,0 +1,31 @@
+name: Security Issue
+description: General security issue
+title: '[Security]: '
+labels: ["security", "P0", "terraform-modules"]
+assignees: ["brent-anyscale"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a security issue.
+        If this is a critical security issue that needs to be addressed immediately, email security-911@anyscale.com
+  - type: textarea
+    attributes:
+      label: What is the security issue?
+      description: Please provide a detailed explanation of the security issue.
+      value: "<<SECURITY ISSUE>>"
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Which module(s)?
+      description: "Please select which module(s) this issue impacts."
+      options:
+        - label: Root Anyscale Module
+        - label: aws-anyscale-efs
+        - label: aws-anyscale-iam
+        - label: aws-anyscale-s3
+        - label: aws-anyscale-s3-policy
+        - label: aws-anyscale-securitygroups
+        - label: aws-anyscale-vpc

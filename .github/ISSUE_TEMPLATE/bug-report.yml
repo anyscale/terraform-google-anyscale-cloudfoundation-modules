@@ -1,0 +1,79 @@
+name: Bug Report
+description: Issue/Bug with the Terraform Modules. Please include repro steps!
+title: "[bug]: "
+labels: ["bug", "P1", "terraform-modules"]
+assignees: ["brent-anyscale"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report.
+        Please make sure to search for existing issues before filing a new one.
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A clear description of what the bug is and how it manifests.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Please explain the steps required to duplicate this issue.
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Which module(s)?
+      description: "Please select which module(s) this issue impacts."
+      options:
+        - label: Root Anyscale Module
+        - label: aws-anyscale-efs
+        - label: aws-anyscale-iam
+        - label: aws-anyscale-s3
+        - label: aws-anyscale-s3-policy
+        - label: aws-anyscale-securitygroups
+        - label: aws-anyscale-vpc
+  - type: dropdown
+    attributes:
+      label: Anyscale Terraform Module version
+      description: What version of the modules are you using?
+      multiple: false
+      options:
+        - v0.2.x (Default)
+        - v0.1.x
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Terraform version
+      description: What version of Terraform are you using?
+      multiple: false
+      options:
+        - 1.3.x (Default)
+        - 1.2.x
+        - 1.1.x
+        - 1.0.x
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Is it blocking work?
+      description: Please choose one?
+      multiple: false
+      options:
+        - "no"
+        - "yes"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: List any other information that is relevant to your issue.
