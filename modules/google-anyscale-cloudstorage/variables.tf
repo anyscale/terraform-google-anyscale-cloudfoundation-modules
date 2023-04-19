@@ -1,0 +1,323 @@
+# ------------------------------------------------------------------------------
+# REQUIRED PARAMETERS
+# These variables must be set when using this module.
+# ------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# OPTIONAL PARAMETERS
+# These variables have defaults, but may be overridden.
+# ------------------------------------------------------------------------------
+variable "anyscale_cloud_id" {
+  description = "(Optional) Anyscale Cloud ID. Default is `null`."
+  type        = string
+  default     = null
+  validation {
+    condition = (
+      var.anyscale_cloud_id == null ? true : (
+        length(var.anyscale_cloud_id) > 4 &&
+        substr(var.anyscale_cloud_id, 0, 4) == "cld_"
+      )
+    )
+    error_message = "The anyscale_cloud_id value must start with \"cld_\"."
+  }
+}
+
+variable "module_enabled" {
+  description = "(Optional) Whether to create the resources inside this module. Default is `true`."
+  type        = bool
+  default     = true
+}
+
+variable "anyscale_project_id" {
+  description = "(Optional) The ID of the project to create the resource in. If not provided, the provider project is used. Default is `null`."
+  type        = string
+  default     = null
+}
+
+variable "labels" {
+  description = "(Optional) A map of labels to all resources that accept labels. Default is an empty map."
+  type        = map(string)
+  default     = {}
+}
+
+variable "anyscale_bucket_name" {
+  description = <<-EOF
+    (Optional - forces new resource)
+    The name of the bucket.
+    Changing this forces creating a new bucket.
+    This overrides the `anyscale_bucket_name_prefix` parameter.
+    Default is `null`.
+  EOF
+  type        = string
+  default     = null
+}
+
+variable "anyscale_bucket_name_prefix" {
+  description = <<-EOF
+    (Optional - forces new resource)
+    Creates a unique bucket name beginning with the specified prefix.
+    Changing this forces creating a new bucket.
+    If `anyscale_bucket_name` is provided, it overrides this parameter.
+    Default is `anyscale-`.
+  EOF
+  type        = string
+  default     = "anyscale-"
+}
+
+variable "enable_random_name_suffix" {
+  description = <<-EOF
+    (Optional) Determines if a suffix of random characters will be added to the `anyscale_bucket_prefix` or `anyscale_bucket_name`.
+    Default is `true`
+  EOF
+  type        = bool
+  default     = true
+}
+variable "random_char_length" {
+  description = <<-EOF
+    (Optional) Sets the length of random characters to be appended as a suffix.
+    Depends on `random_bucket_suffix` being set to `true`.
+    Must be an even number, and must be at least 4.
+    Default is `4`.
+  EOF
+  type        = number
+  default     = 4
+  validation {
+    condition     = var.random_char_length % 2 == 0 || var.random_char_length < 4
+    error_message = "`random_char_length` must be an even number and greater than or equal to 4."
+  }
+}
+
+variable "bucket_location" {
+  description = "(Optional) A valid GCS location to create the bucket in. Default is `US`."
+  type        = string
+  default     = "US"
+}
+
+variable "bucket_storage_class" {
+  description = <<-EOF
+    (Optional)
+    The bucket storage class.
+    Must be one of: STANDARD, MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE
+    Default is `STANDARD`
+  EOF
+  type        = string
+  default     = "STANDARD"
+  validation {
+    condition = contains(
+      [
+        "STANDARD",
+        "MULTI_REGIONAL",
+        "REGIONAL",
+        "NEARLINE",
+        "COLDLINE",
+        "ARCHIVE"
+      ],
+      var.bucket_storage_class
+    )
+    error_message = "`bucket_storage_class` must be one of: STANDARD, MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE."
+  }
+}
+
+variable "bucket_public_access_prevention" {
+  description = "(Optional) Determines if public access prevention is `enforced` or `inherited`. Default is `enforced`."
+  type        = string
+  default     = "enforced"
+  validation {
+    condition = contains(
+      [
+        "enforced",
+        "inherited"
+      ],
+      var.bucket_public_access_prevention
+    )
+    error_message = "`bucket_public_access_prevention` must be either `enforced` or `inherited`."
+  }
+}
+
+variable "bucket_force_destroy" {
+  description = "(Optional) Determines if the contents of the bucket will be deleted when a `terraform destroy` command is issued. Default is `false`."
+  type        = bool
+  default     = false
+}
+
+variable "bucket_uniform_level_access" {
+  description = "(Optional) Determines if the bucket will have uniform bucket-level access. Default is `true`."
+  type        = bool
+  default     = true
+}
+
+variable "bucket_versioning" {
+  description = <<-EOT
+    (Optional) Determines if object versioning is enabled on the bucket.
+    If enabled, consider also using a object lifecycle to remove older versions after a period of time.
+    Default is `false`.
+  EOT
+  type        = bool
+  default     = false
+}
+
+variable "bucket_encryption_key_name" {
+  description = "(Optional) The encryption key name that should be used to encrypt this bucket. Default is `null`."
+  type        = string
+  default     = null
+}
+
+variable "cors_rules" {
+  description = <<-EOT
+    (Optional) List of CORS rules to configure.
+    Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#cors except max_age_seconds should be a number.
+    Default is:
+    [
+      {
+        origins          = ["https://console.anyscale.com"]
+        methods          = ["GET"]
+        response_headers = ["*"]
+        max_age_seconds  = 3600
+      }
+    ]
+  EOT
+
+  type = set(object({
+    # Object with keys:
+    # - origins - (Required) List of values, with wildcards, of the Origin header in the request that an incoming OPTIONS request will be matched against.
+    # - methods - (Required) Lilst of values, with wildcards, of the Access-Control-Request-Method header in the request that an incoming OPTIONS request will be matched against.
+    # - response_headers - (Required) List of values, with wildcards, of the Access-Control-Request-Headers header in the request that an incoming OPTIONS request will be matched against.
+    # - max_age_seconds - (Optional) The value, in seconds, to return in the Access-Control-Max-Age header used in preflight responses.
+    origins          = list(string)
+    methods          = list(string)
+    response_headers = list(string)
+    max_age_seconds  = number
+  }))
+  default = [
+    {
+      origins          = ["https://console.anyscale.com"]
+      methods          = ["GET"]
+      response_headers = ["*"]
+      max_age_seconds  = 3600
+    }
+  ]
+}
+
+# Example:
+#
+# retention_policy = {
+#   is_locked = false
+#   retention_period = 40000000
+# }
+variable "retention_policy" {
+  description = <<-EOT
+  (Optional)
+  Object containing a retention policy including `is_locked` and `retention_period`.
+  Default is an empty map.
+  EOT
+  type        = map(string)
+  default     = {}
+}
+
+# Example:
+#
+# lifecycle_rules = [
+#   Change storage clas to NEARLINE for all objects older than 10 days
+#   {
+#     action = {
+#       type = "SetStorageClass"
+#       storage_class = "NEARLINE"
+#     }
+#     condition = {
+#       age = "10"
+#       matches_storage_class = "MULTI_REGIONAL"
+#     }
+#   },
+#   Delete all objects older than 120 days
+#   {
+#     action = {
+#       type = "Delete"
+#     }
+#     condition = {
+#       age = "120"
+#     }
+#   },
+#   Delete all versions of objects with more then 10 newer versions
+#   {
+#     action = {
+#       type = "Delete"
+#     }
+#     condition = {
+#       numNewerVersions = "10"
+#       isLive = false
+#     }
+#   }
+# ]
+variable "lifecycle_rules" {
+  description = <<-EOT
+    (Optional) List of lifecycle rules to configure.
+    Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#lifecycle_rule except condition.matches_storage_class should be a comma delimited string.
+    Default is an empty list.
+  EOT
+
+  type = set(object({
+    # Object with keys:
+    # - type - The type of the action of this Lifecycle Rule. Supported values: Delete and SetStorageClass.
+    # - storage_class - (Required if action type is SetStorageClass) The target Storage Class of objects affected by this Lifecycle Rule.
+    action = map(string)
+
+    # Object with keys:
+    # - age - (Optional) Minimum age of an object in days to satisfy this condition.
+    # - created_before - (Optional) Creation date of an object in RFC 3339 (e.g. 2017-06-13) to satisfy this condition.
+    # - with_state - (Optional) Match to live and/or archived objects. Supported values include: "LIVE", "ARCHIVED", "ANY".
+    # - matches_storage_class - (Optional) Comma delimited string for storage class of objects to satisfy this condition. Supported values include: MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, STANDARD, DURABLE_REDUCED_AVAILABILITY.
+    # - matches_prefix - (Optional) One or more matching name prefixes to satisfy this condition.
+    # - matches_suffix - (Optional) One or more matching name suffixes to satisfy this condition.
+    # - num_newer_versions - (Optional) Relevant only for versioned objects. The number of newer versions of an object to satisfy this condition.
+    # - custom_time_before - (Optional) A date in the RFC 3339 format YYYY-MM-DD. This condition is satisfied when the customTime metadata for the object is set to an earlier date than the date used in this lifecycle condition.
+    # - days_since_custom_time - (Optional) The number of days from the Custom-Time metadata attribute after which this condition becomes true.
+    # - days_since_noncurrent_time - (Optional) Relevant only for versioned objects. Number of days elapsed since the noncurrent timestamp of an object.
+    # - noncurrent_time_before - (Optional) Relevant only for versioned objects. The date in RFC 3339 (e.g. 2017-06-13) when the object became nonconcurrent.
+    condition = map(string)
+  }))
+  default = []
+}
+
+# example:
+#
+# bucket_logging = {
+#   log_bucket = "logging_bucket_name",
+#   log_object_prefix = "/prefix/"
+# }
+variable "bucket_logging" {
+  description = <<-EOT
+    (Optional) Map of bucket logging config object.
+    Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#logging
+    Default is an empty map.
+  EOT
+  type        = any
+  default     = {}
+}
+
+variable "bucket_iam_binding_members" {
+  description = <<-EOT
+    (Optional) List of members to add to the bucket IAM binding.
+    Default is an empty list.
+  EOT
+  type        = list(string)
+  default     = []
+}
+
+variable "bucket_iam_binding_roles" {
+  description = <<-EOT
+    (Optional) List of roles to add to the bucket IAM binding.
+    Default is `["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]`
+  EOT
+  type        = list(string)
+  default     = ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
+}
+
+variable "bucket_iam_binding_override_roles" {
+  description = <<-EOT
+    (Optional) List of roles to override in the bucket IAM binding.
+    Default is an empty list.
+  EOT
+  type        = list(string)
+  default     = []
+}
