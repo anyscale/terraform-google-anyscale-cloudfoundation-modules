@@ -45,11 +45,11 @@ resource "google_service_account" "anyscale_access_role" {
 }
 
 #tfsec:ignore:google-iam-no-project-level-service-account-impersonation
-resource "google_project_iam_binding" "anyscale_access_role" {
+resource "google_project_iam_member" "anyscale_access_role" {
   for_each = local.anyscale_access_role_enabled ? toset(var.anyscale_access_role_project_permissions) : []
   role     = each.key
   project  = var.anyscale_project_id
-  members  = ["serviceAccount:${google_service_account.anyscale_access_role[0].email}"]
+  member   = "serviceAccount:${google_service_account.anyscale_access_role[0].email}"
 }
 
 #tfsec:ignore:google-iam-no-project-level-service-account-impersonation

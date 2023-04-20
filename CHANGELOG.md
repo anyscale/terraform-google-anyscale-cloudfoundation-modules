@@ -1,3 +1,12 @@
+## 0.2.1 (Released)
+
+FEATURES:
+
+BUG FIXES:
+- Change project permission from binding to member
+
+BREAKING CHANGES:
+
 ## 0.2.0 (Released)
 
 FEATURES:
