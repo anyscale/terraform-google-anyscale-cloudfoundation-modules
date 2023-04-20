@@ -27,12 +27,15 @@ variable "anyscale_deploy_env" {
   }
 }
 
-variable "labels" {
-  description = "(Optional) A map of labels to all resources that accept labels."
-  type        = map(string)
-  default = {
-    "test" : true,
-    "environment" : "test"
+variable "anyscale_org_id" {
+  description = "(Required) Anyscale Organization ID"
+  type        = string
+  validation {
+    condition = (
+      length(var.anyscale_org_id) > 4 &&
+      substr(var.anyscale_org_id, 0, 4) == "org_"
+    )
+    error_message = "The anyscale_org_id value must start with \"org_\"."
   }
 }
 
@@ -71,5 +74,14 @@ variable "anyscale_cloud_id" {
       )
     )
     error_message = "The anyscale_cloud_id value must start with \"cld_\"."
+  }
+}
+
+variable "labels" {
+  description = "(Optional) A map of labels to all resources that accept labels."
+  type        = map(string)
+  default = {
+    "test" : true,
+    "environment" : "test"
   }
 }

@@ -1,17 +1,4 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# CREATE Anyscale Google VPC Resources
-# This template creates VPC resources for Anyscale
-# ---------------------------------------------------------------------------------------------------------------------
-# locals {
-#   full_labels = merge(tomap({
-#     anyscale-cloud-id           = var.anyscale_cloud_id,
-#     anyscale-deploy-environment = var.anyscale_deploy_env
-#     }),
-#     var.labels
-#   )
-# }
-
-# ---------------------------------------------------------------------------------------------------------------------
 # all_defaults
 #   Create IAM Roles with minimal optional parameters
 # ---------------------------------------------------------------------------------------------------------------------
@@ -20,6 +7,7 @@ module "all_defaults" {
   module_enabled = true
 
   anyscale_project_id = var.google_project_id
+  anyscale_org_id     = var.anyscale_organization_id
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -32,11 +20,11 @@ module "iam_cluster_node_only_role" {
   source         = "../"
   module_enabled = true
 
+  anyscale_org_id                        = var.anyscale_organization_id
   anyscale_project_id                    = var.google_project_id
   create_anyscale_access_role            = false
   create_anyscale_cluster_node_role      = true
   anyscale_cluster_node_role_name_prefix = "cluster-node-only-"
-
 
   random_char_length = 8
 }
@@ -50,6 +38,7 @@ module "kitchen_sink" {
   module_enabled = true
 
   random_char_length  = 6
+  anyscale_org_id     = var.anyscale_organization_id
   anyscale_project_id = var.google_project_id
 
   enable_random_name_suffix                = false
@@ -78,5 +67,6 @@ module "test_no_resources" {
   source         = "../"
   module_enabled = false
 
+  anyscale_org_id     = var.anyscale_organization_id
   anyscale_project_id = var.google_project_id
 }

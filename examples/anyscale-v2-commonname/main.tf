@@ -23,8 +23,9 @@ module "google_anyscale_v2_commonname" {
   source = "../.."
   labels = local.full_labels
 
-  anyscale_deploy_env = var.anyscale_deploy_env
-  anyscale_cloud_id   = var.anyscale_cloud_id
+  anyscale_deploy_env      = var.anyscale_deploy_env
+  anyscale_cloud_id        = var.anyscale_cloud_id
+  anyscale_organization_id = var.anyscale_org_id
 
   common_prefix   = "anyscale-tf-"
   use_common_name = true

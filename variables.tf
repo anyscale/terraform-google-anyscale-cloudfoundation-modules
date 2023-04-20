@@ -13,6 +13,25 @@ variable "anyscale_deploy_env" {
   }
 }
 
+variable "anyscale_organization_id" {
+  description = <<-EOT
+    (Required) Anyscale Organization ID.
+    This is the ID of the Anyscale Organization. This is not the same as the GCP Organization ID.
+    The Organization ID will be used to lock down the cross account access from Anyscale.
+    You can find the Anyscale Organization ID by going to the Anyscale UI while logged in as an Organization Owner,
+    and clicking on you're username, then clicking on Organization.
+    This is required.
+  EOT
+  type        = string
+  validation {
+    condition = (
+      length(var.anyscale_organization_id) > 4 &&
+      substr(var.anyscale_organization_id, 0, 4) == "org_"
+    )
+    error_message = "The anyscale_organization_id value must start with \"org_\"."
+  }
+}
+
 # variable "firewall_ingress_allow_access_from_cidr_range" {
 #   description = <<-EOT
 #     (Required) Comma delimited string of IPv4 CIDR ranges to allow access to anyscale resources.

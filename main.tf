@@ -133,7 +133,8 @@ module "google_anyscale_vpc_firewall_policy" {
   source         = "./modules/google-anyscale-vpc-firewall"
   module_enabled = local.execute_vpc_firewall_sub_module
   depends_on = [
-    module.google_anyscale_cloudapis
+    module.google_anyscale_cloudapis,
+    module.google_anyscale_vpc
   ]
   anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
 
@@ -199,9 +200,11 @@ locals {
   iam_cluster_node_role_name_prefix = coalesce(var.anyscale_cluster_node_role_name_prefix, var.common_prefix, "anyscale-cluster-")
 }
 module "google_anyscale_iam" {
-  source              = "./modules/google-anyscale-iam"
-  module_enabled      = local.execute_iam_submodule
+  source         = "./modules/google-anyscale-iam"
+  module_enabled = local.execute_iam_submodule
+
   anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
+  anyscale_org_id     = var.anyscale_organization_id
 
   enable_random_name_suffix = local.enable_module_random_name_suffix
 
