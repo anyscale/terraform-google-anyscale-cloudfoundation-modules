@@ -19,6 +19,17 @@ variable "anyscale_deploy_env" {
   }
 }
 
+variable "anyscale_organization_id" {
+  description = "(Required) Anyscale Organization ID"
+  type        = string
+  validation {
+    condition = (
+      length(var.anyscale_organization_id) > 4 &&
+      substr(var.anyscale_organization_id, 0, 4) == "org_"
+    )
+    error_message = "The anyscale_organization_id value must start with \"org_\"."
+  }
+}
 # variable "google_region" {
 #   description = "The Google region in which all resources will be created."
 #   type        = string

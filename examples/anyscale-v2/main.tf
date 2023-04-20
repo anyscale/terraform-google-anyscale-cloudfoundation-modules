@@ -25,6 +25,8 @@ module "google_anyscale_v2" {
   anyscale_deploy_env = var.anyscale_deploy_env
   anyscale_cloud_id   = var.anyscale_cloud_id
 
+  anyscale_organization_id = var.anyscale_org_id
+
   # Project Related
   anyscale_project_billing_account = var.billing_account_id
   anyscale_project_folder_id       = var.root_project_id

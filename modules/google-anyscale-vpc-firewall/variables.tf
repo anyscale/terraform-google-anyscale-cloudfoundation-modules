@@ -8,12 +8,6 @@ variable "vpc_name" {
   EOT
   type        = string
 }
-# variable "vpc_self_link" {
-#   description = <<-EOT
-#     (Required) The self_link of the VPC to apply the Firewall Policy to.
-#   EOT
-#   type        = string
-# }
 
 # ------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS

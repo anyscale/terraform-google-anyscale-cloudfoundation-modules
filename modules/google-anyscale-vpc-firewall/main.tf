@@ -41,8 +41,7 @@ resource "google_compute_network_firewall_policy_association" "anyscale_firewall
 
   name              = "${var.vpc_name}-association"
   attachment_target = data.google_compute_network.anyscale_vpc[0].self_link
-  # attachment_target = var.vpc_self_link
-  firewall_policy = google_compute_network_firewall_policy.anyscale_firewall_policy[0].name
+  firewall_policy   = google_compute_network_firewall_policy.anyscale_firewall_policy[0].name
 }
 
 # ----------------

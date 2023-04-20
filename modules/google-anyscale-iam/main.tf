@@ -17,6 +17,7 @@ locals {
     random_id.random_char_suffix.hex,
   ) : local.anyscale_access_role_name
 
+  workload_identity_pool_crossacct_rolename     = "gcp_if_${var.anyscale_org_id}"
   workload_identity_pool_name_computed          = coalesce(var.workload_identity_pool_name, local.access_role_name_computed)
   workload_identity_pool_provider_name_computed = coalesce(var.workload_identity_pool_provider_name, local.access_role_name_computed)
 }
@@ -79,11 +80,13 @@ resource "google_iam_workload_identity_pool_provider" "anyscale_pool" {
   display_name = var.workload_identity_pool_display_name
   description  = var.workload_identity_pool_description
 
-  # attribute_condition = "attribute.aws_role==\"arn:aws:sts::999999999999:assumed-role/stack-eu-central-1-lambdaRole\""
   attribute_mapping = {
     "google.subject"     = "assertion.arn"
     "attribute.aws_role" = "assertion.arn.contains('assumed-role') ? assertion.arn.extract('{account_arn}assumed-role/') + 'assumed-role/' + assertion.arn.extract('assumed-role/{role_name}/') : assertion.arn"
+    "attribute.arn"      = "assertion.arn"
   }
+
+  attribute_condition = "google.subject.startsWith(\"arn:aws:sts::${local.anyscale_aws_account_id}:assumed-role/${local.workload_identity_pool_crossacct_rolename}\")"
 
   aws {
     account_id = local.anyscale_aws_account_id
