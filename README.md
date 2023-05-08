@@ -41,18 +41,19 @@ Additional examples can be requested via an [issues] ticket.
 
 Example Cloud Register command for GCP:
 ```
-anyscale cloud register --provider gcp  -n gce-anyscale-tf-test-1 \
+anyscale cloud register --provider gcp \
+--name gce-anyscale-tf-test-1 \
 --vpc-name anyscale-tf-test-1 \
 --subnet-names anyscale-tf-test-1-subnet-uscentral1 \
 --filestore-instance-id anyscale-tf-test-1  \
 --filestore-location us-central1-a \
---anyscale-service-account-email anyscale-tf-test-1-crossacc@gcp-register-cloud-dogfood-1.iam.gserviceaccount.com \
---instance-service-account-email anyscale-tf-test-1-cluster@gcp-register-cloud-dogfood-1.iam.gserviceaccount.com \
+--anyscale-service-account-email anyscale-tf-test-1-crossacc@gcp-register-cloud-1.iam.gserviceaccount.com \
+--instance-service-account-email anyscale-tf-test-1-cluster@gcp-register-cloud-1.iam.gserviceaccount.com \
 --firewall-policy-names anyscale-tf-test-1-fw  \
 --cloud-storage-bucket-name anyscale-tf-test-1 \
 --region us-central1 \
 --project-id gcp-register-cloud-dogfood-1 \
---provider-id projects/859081514944/locations/global/workloadIdentityPools/anyscale-tf-test-1/providers/private-cloud
+--provider-name projects/123456789012/locations/global/workloadIdentityPools/anyscale-tf-test-1/providers/private-cloud
 ```
 
 ## Reporting Issues
@@ -75,7 +76,7 @@ None
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.62.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.64.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
 
 ## Modules

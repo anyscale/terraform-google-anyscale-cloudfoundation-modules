@@ -29,7 +29,7 @@ module "google_anyscale_v2" {
 
   # Project Related
   anyscale_project_billing_account = var.billing_account_id
-  anyscale_project_folder_id       = var.root_project_id
+  anyscale_project_folder_id       = var.root_folder_id
 
   # VPC Related
   anyscale_vpc_public_subnet_cidr = "172.24.100.0/22"
