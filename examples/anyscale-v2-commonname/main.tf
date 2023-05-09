@@ -23,7 +23,7 @@ module "google_anyscale_v2_commonname" {
   source = "../.."
   labels = local.full_labels
 
-  anyscale_deploy_env      = var.anyscale_deploy_env
+  anyscale_deploy_env      = "production"
   anyscale_cloud_id        = var.anyscale_cloud_id
   anyscale_organization_id = var.anyscale_org_id
 
@@ -31,7 +31,7 @@ module "google_anyscale_v2_commonname" {
   use_common_name = true
   # Project Related
   anyscale_project_billing_account = var.billing_account_id
-  anyscale_project_folder_id       = var.root_project_id
+  anyscale_project_folder_id       = var.root_folder_number
 
   # VPC Related
   anyscale_vpc_public_subnet_cidr = "172.25.100.0/22"

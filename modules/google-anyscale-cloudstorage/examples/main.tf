@@ -29,6 +29,7 @@ module "kitchen_sink_iam" {
   module_enabled = true
 
   anyscale_project_id = var.google_project_id
+  anyscale_org_id     = var.anyscale_organization_id
 }
 module "kitchen_sink" {
   source         = "../"

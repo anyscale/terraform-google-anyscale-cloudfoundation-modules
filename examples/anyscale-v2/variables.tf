@@ -40,8 +40,8 @@ variable "anyscale_org_id" {
 }
 
 # Project Related Required Variables
-variable "root_project_id" {
-  description = "(Required) Google project ID to deploy Anyscale resources. Will create a new sub-project by default."
+variable "root_folder_id" {
+  description = "(Required) Google Folder ID to deploy Anyscale resources. Will create a new sub-project by default."
   type        = string
 }
 variable "billing_account_id" {

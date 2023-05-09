@@ -25,6 +25,7 @@ variable "anyscale_deploy_env" {
     )
     error_message = "The anyscale_deploy_env only allows `production`, `test`, or `development`"
   }
+
 }
 
 variable "anyscale_org_id" {
@@ -40,8 +41,8 @@ variable "anyscale_org_id" {
 }
 
 # Project Related Required Variables
-variable "root_project_id" {
-  description = "(Required) Google project ID to deploy Anyscale resources. Will create a new sub-project by default."
+variable "root_folder_number" {
+  description = "(Required) Google Folder number to deploy Anyscale resources. Will create a new sub-project by default."
   type        = string
 }
 variable "billing_account_id" {
