@@ -1,3 +1,25 @@
+## 0.2.3 (Released)
+
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Examples updated to change var `anyscale_deploy_env` to have a default of `production`
+- Examples updated to call out the ability to override the bucket location via `anyscale_bucket_location`
+- Getting-started cleanup and fixed broken links
+
+## 0.2.2 (Released)
+
+FEATURES:
+- Add getting started documentation
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
 ## 0.2.1 (Released)
 
 FEATURES:

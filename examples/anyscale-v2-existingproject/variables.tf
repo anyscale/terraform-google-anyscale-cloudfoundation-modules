@@ -16,16 +16,6 @@ variable "anyscale_google_zone" {
   description = "(Required) Google zone to deploy Anyscale resources."
   type        = string
 }
-variable "anyscale_deploy_env" {
-  description = "(Required) Anyscale deploy environment. Used in resource names and tags."
-  type        = string
-  validation {
-    condition = (
-      var.anyscale_deploy_env == "production" || var.anyscale_deploy_env == "development" || var.anyscale_deploy_env == "test"
-    )
-    error_message = "The anyscale_deploy_env only allows `production`, `test`, or `development`"
-  }
-}
 
 variable "anyscale_org_id" {
   description = "(Required) Anyscale Organization ID"
@@ -62,6 +52,18 @@ variable "customer_ingress_cidr_ranges" {
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
+variable "anyscale_deploy_env" {
+  description = "(Required) Anyscale deploy environment. Used in resource names and tags."
+  type        = string
+  validation {
+    condition = (
+      var.anyscale_deploy_env == "production" || var.anyscale_deploy_env == "development" || var.anyscale_deploy_env == "test"
+    )
+    error_message = "The anyscale_deploy_env only allows `production`, `test`, or `development`"
+  }
+  default = "production"
+}
+
 variable "anyscale_cloud_id" {
   description = "(Optional) Anyscale Cloud ID. Default is `null`."
   type        = string

@@ -1,7 +1,16 @@
 # A Beginner's Guide to Using Terraform with Google Cloud Provider and Anyscale Google Cloudfoundation Module
 
 ## Introduction
-In this guide, we will walk through setting up and using Terraform with the Google Cloud Provider from your local laptop. We will be using the Anyscale Google Cloudfoundation module found in the Terraform Registry. We will create a basic example based on the Anyscale-v2-commonname example from the registry.
+In this guide, we will walk through setting up and using Terraform with the Google Cloud Provider from your local laptop. We will be using the Anyscale Google Cloudfoundation module found in the Terraform Registry. We will create a basic example based on the anyscale-v2-commonname example from the registry.
+
+The anyscale-v2-commonname example builds the following Google Cloud resources:
+- Project
+- Enabling Cloud APIs on the Project
+- Cloud Storage Bucket - Standard
+- IAM Roles
+- VPC with publicly routed subnets (no internal)
+- VPC Firewall
+- FileStore
 
 ## Prerequisites
 1. A Google Cloud account with billing enabled
@@ -19,6 +28,7 @@ To successfully run the Terraform commands in this guide, your Google Cloud user
 2. **Compute Instance Admin**: This role allows the user to create and manage Compute Engine instances.
 3. **Service Account User**: This role enables the user to run operations as the service account.
 4. **Compute Network Admin**: This role is required for managing networking resources such as VPCs, subnets, and firewall rules.
+5. **Billing Account User**: This role is required for the common name example as it creates a new project - when a project is created, you must be able to tie the project to a Google Billing Account ID. This particular permission is only required if you are using the common name example.
 
 **Note**: If you're using a Service Account to run the Terraform commands, make sure it has the required permissions mentioned above. You can follow the same steps to assign roles to the Service Account.
 
@@ -33,13 +43,13 @@ gcloud auth application-default login
 ### 2. Clone the Anyscale examples repository:
 Clone the Anyscale examples repository to your local laptop to access the example configuration files:
 ```
-git clone https://github.com/anyscale/anyscale-cloudfoundation-modules
+git clone https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules
 ```
 
 ### 3. Navigate to the example directory:
 Navigate to the example directory (anyscale-v2-commonname) within the cloned repository:
 ```
-cd anyscale-cloudfoundation-modules/examples/anyscale-v2-commonname
+cd terraform-google-anyscale-cloudfoundation-modules/examples/anyscale-v2-commonname
 ```
 
 ### 4. Initialize Terraform:
@@ -49,7 +59,8 @@ terraform init
 ```
 
 ### 5. Modify the `main.tf` file:
-In the `main.tf` file, modify the configuration to fit your needs. You may need to update the variables for you're needs. Some common variables to update are listed below. Additionally, customize the resources created by the Anyscale module. An example of this is to change the `anyscale_filestore_tier` from STANDARD to ENTERPRISE.
+In the `main.tf` file, modify the configuration to fit your needs. You may need to update the variables for you're needs. Some common variables to update are listed below. Additionally, customize the resources created by the Anyscale module. An example of this is to change the `anyscale_filestore_tier` from STANDARD to ENTERPRISE. You can also update
+the region that resources are created in. In the examples, resources are created in US regions, but these regions and AZ's can be changed.
 
 #### Variables to modify
 - `anyscale_vpc_public_subnet_cidr` - This is the Public Subnet CIDR range you wish to create.

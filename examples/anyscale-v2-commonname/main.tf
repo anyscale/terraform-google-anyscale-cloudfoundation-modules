@@ -23,7 +23,7 @@ module "google_anyscale_v2_commonname" {
   source = "../.."
   labels = local.full_labels
 
-  anyscale_deploy_env      = "production"
+  anyscale_deploy_env      = var.anyscale_deploy_env
   anyscale_cloud_id        = var.anyscale_cloud_id
   anyscale_organization_id = var.anyscale_org_id
 
@@ -43,4 +43,7 @@ module "google_anyscale_v2_commonname" {
   anyscale_filestore_tier        = "STANDARD"
   anyscale_filestore_location    = "us-central1-a"
   anyscale_filestore_capacity_gb = 3000
+
+  # Cloud Storage (Bucket) Related
+  anyscale_bucket_location = "US"
 }
