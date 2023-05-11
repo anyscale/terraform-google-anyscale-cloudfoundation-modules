@@ -54,7 +54,7 @@ variable "anyscale_activate_apis" {
     "compute.googleapis.com",
     # "monitoring.googleapis.com",
     # "iam.googleapis.com",
-    "sts.googleapis.com",
+    # "sts.googleapis.com",
     "file.googleapis.com",
     "storage-component.googleapis.com",
     "storage.googleapis.com",

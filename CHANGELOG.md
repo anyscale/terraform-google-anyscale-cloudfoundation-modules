@@ -1,3 +1,14 @@
+## 0.3.0 (Released)
+
+FEATURES:
+
+BUG FIXES:
+- Removed STS API from the list of APIs to enable as it's not required for Anyscale to work.
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.2.3 (Released)
 
 FEATURES:
