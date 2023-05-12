@@ -50,14 +50,11 @@ variable "anyscale_activate_apis" {
   EOT
   type        = list(string)
   default = [
-    # "logging.googleapis.com",
     "compute.googleapis.com",
-    # "monitoring.googleapis.com",
-    # "iam.googleapis.com",
-    # "sts.googleapis.com",
     "file.googleapis.com",
     "storage-component.googleapis.com",
     "storage.googleapis.com",
+    "certificatemanager.googleapis.com",
   ]
 }
 

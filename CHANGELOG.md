@@ -1,3 +1,13 @@
+## 0.4.0 (Released)
+FEATURES:
+- Add certificate manager API to the list of APIs to enable. This is to support Anyscale Services v2.
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.3.0 (Released)
 
 FEATURES:
