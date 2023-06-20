@@ -55,6 +55,9 @@ variable "anyscale_activate_apis" {
     "storage-component.googleapis.com",
     "storage.googleapis.com",
     "certificatemanager.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "serviceusage.googleapis.com",
+    "deploymentmanager.googleapis.com"
   ]
 }
 
