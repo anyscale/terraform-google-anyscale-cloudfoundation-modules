@@ -20,7 +20,7 @@ See the examples folder for how to use.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.64.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.70.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
 
 ## Modules
