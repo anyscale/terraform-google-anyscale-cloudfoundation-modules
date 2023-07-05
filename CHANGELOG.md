@@ -1,3 +1,36 @@
+## 0.6.1 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- End to end unit tests for root module
+
+## 0.6.0 (Released)
+FEATURES:
+- Change the default filestore capacity size.
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.5.0 (Released)
+FEATURES:
+- CloudAPIs submodule - add additional APIs to match the APIs enabled by `anyscale cloud setup`:
+  - cloudresourcemanager.googleapis.com
+  - serviceusage.googleapis.com
+  - deploymentmanager.googleapis.com
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.4.0 (Released)
 FEATURES:
 - Add certificate manager API to the list of APIs to enable. This is to support Anyscale Services v2.
