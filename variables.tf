@@ -676,14 +676,14 @@ variable "anyscale_filestore_location" {
 variable "anyscale_filestore_capacity_gb" {
   description = <<-EOT
     (Optional) The capacity of the fileshare in GB.
-    This must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier.
+    This must be at least 1024 GiB for the standard or enterprise tiers, or 2560 GiB for the premium tier.
     Default is `1024`.
   EOT
   type        = number
   default     = 1024
   validation {
     condition     = var.anyscale_filestore_capacity_gb >= 1024
-    error_message = "The `anyscale_filestore_capacity_gb` must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier."
+    error_message = "The `anyscale_filestore_capacity_gb` must be at least 1024 GiB for the standard or enterprise tiers, or 2560 GiB for the premium tier."
   }
 }
 # --------------------------------------------
