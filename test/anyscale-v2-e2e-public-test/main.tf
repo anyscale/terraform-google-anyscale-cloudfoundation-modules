@@ -41,11 +41,6 @@ module "google_anyscale_v2_commonname" {
   # Firewall Related
   anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges
 
-  # Filestore Related
-  anyscale_filestore_tier        = "STANDARD"
-  anyscale_filestore_location    = "us-central1-a"
-  anyscale_filestore_capacity_gb = 3000
-
   # Cloud Storage (Bucket) Related
   anyscale_bucket_location = "US"
 }

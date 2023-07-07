@@ -1,3 +1,13 @@
+## 0.7.0 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Changed defaults for File Store tier and size to match `anyscale cloud setup` defaults of STANDARD and 1TB.
+
 ## 0.6.1 (Released)
 FEATURES:
 

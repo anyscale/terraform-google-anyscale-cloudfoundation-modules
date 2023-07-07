@@ -42,6 +42,11 @@ variable "google_region" {
   type        = string
   default     = null
 }
+variable "google_zone" {
+  description = "(Optional) The Google zone in which all resources will be created. If not provided, the provider zone is used. Default is `null`."
+  type        = string
+  default     = null
+}
 
 variable "labels" {
   description = "(Optional) A map of labels to add to all resources that accept labels."
@@ -112,9 +117,9 @@ variable "filestore_description" {
 }
 
 variable "filestore_tier" {
-  description = "(Optional) The tier of the filestore to create. Default is `ENTERPRISE`."
+  description = "(Optional) The tier of the filestore to create. Default is `STANDARD`."
   type        = string
-  default     = "ENTERPRISE"
+  default     = "STANDARD"
   validation {
     condition     = contains(["STANDARD", "PREMIUM", "BASIC_HDD", "BASIC_SSD", "HIGH_SCALE_SSD", "ENTERPRISE"], var.filestore_tier)
     error_message = "The `filestore_tier` must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`."
@@ -123,9 +128,10 @@ variable "filestore_tier" {
 
 variable "filestore_location" {
   description = <<-EOT
-    (Optional) The name of the location region in which the filestore resource will be created.
-    This can be a region for `ENTERPRISE` tier instances.
-    If it is not provided, the provider region is used.
+    (Optional) The name of the Google Region or Availability Zone in which the filestore resource will be created.
+    For `ENTERPRISE` tier instances, this should be Region.
+    For `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, and `HIGH_SCALE_SSD` tier instances, this should be Zone.
+    If it is not provided, `google_region`, `google_zone` or provider configuration is used.
     Default is `null`.
   EOT
   type        = string

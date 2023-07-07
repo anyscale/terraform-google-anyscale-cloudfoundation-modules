@@ -162,7 +162,15 @@ locals {
   # fileshare_name_prefix = coalesce(var.anyscale_filestore_fileshare_name_prefix, try(replace(var.common_prefix, "-", "_"), null), "anyscale_")
 
   filestore_vpc_name = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
-  filestore_location = coalesce(var.anyscale_filestore_location, module.google_anyscale_vpc.private_subnet_region, module.google_anyscale_vpc.public_subnet_region, data.google_client_config.current.region)
+
+  # Using the following to determine a default zone for the filestore instance if not ENTERPRISE tier.
+  # This matches `anyscale cloud setup` logic - setting default to -b zones
+  filestore_private_subnet_zone = module.google_anyscale_vpc.private_subnet_region != "" ? "${module.google_anyscale_vpc.private_subnet_region}-b" : null
+  filestore_public_subnet_zone  = module.google_anyscale_vpc.public_subnet_region != "" ? "${module.google_anyscale_vpc.public_subnet_region}-b" : null
+
+  filestore_location_zone   = coalesce(var.anyscale_filestore_location, local.filestore_private_subnet_zone, local.filestore_public_subnet_zone, data.google_client_config.current.zone)
+  filestore_location_region = coalesce(var.anyscale_filestore_location, module.google_anyscale_vpc.private_subnet_region, module.google_anyscale_vpc.public_subnet_region, data.google_client_config.current.region)
+  filestore_location        = var.anyscale_filestore_tier == "ENTERPRISE" ? local.filestore_location_region : local.filestore_location_zone
 }
 module "google_anyscale_filestore" {
   source         = "./modules/google-anyscale-filestore"

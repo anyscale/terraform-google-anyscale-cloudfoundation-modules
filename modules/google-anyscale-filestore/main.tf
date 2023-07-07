@@ -13,13 +13,15 @@ locals {
     var.anyscale_cloud_id,
   ) : var.filestore_description
 
-  filestore_location = coalesce(var.filestore_location, var.google_region, data.google_client_config.current.region)
+  filestore_location_zone   = coalesce(var.filestore_location, var.google_zone, data.google_client_config.current.zone)
+  filestore_location_region = coalesce(var.filestore_location, var.google_region, data.google_client_config.current.region)
+  filestore_location        = var.filestore_tier == "ENTERPRISE" ? local.filestore_location_region : local.filestore_location_zone
 
   # fileshare_name          = coalesce(var.anyscale_filestore_fileshare_name, "anyscale")
   fileshare_name_computed = coalesce(var.anyscale_filestore_fileshare_name, "anyscale")
 
   module_labels = tomap({
-    tf_sub_module = "google-anyscale-project"
+    tf_sub_module = "google-anyscale-filestore"
   })
 }
 
