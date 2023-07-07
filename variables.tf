@@ -651,10 +651,10 @@ variable "anyscale_filestore_tier" {
   description = <<-EOT
     (Optional) The tier of the filestore to create.
     Must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`.
-    Default is `ENTERPRISE`.
+    Default is `STANDARD`.
   EOT
   type        = string
-  default     = "ENTERPRISE"
+  default     = "STANDARD"
   validation {
     condition     = contains(["STANDARD", "PREMIUM", "BASIC_HDD", "BASIC_SSD", "HIGH_SCALE_SSD", "ENTERPRISE"], var.anyscale_filestore_tier)
     error_message = "The `anyscale_filestore_tier` must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`."
@@ -677,10 +677,10 @@ variable "anyscale_filestore_capacity_gb" {
   description = <<-EOT
     (Optional) The capacity of the fileshare in GB.
     This must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier.
-    Default is `2560`.
+    Default is `1024`.
   EOT
   type        = number
-  default     = 2560
+  default     = 1024
   validation {
     condition     = var.anyscale_filestore_capacity_gb >= 1024
     error_message = "The `anyscale_filestore_capacity_gb` must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier."
