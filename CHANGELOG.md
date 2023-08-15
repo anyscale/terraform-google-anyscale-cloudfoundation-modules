@@ -1,3 +1,13 @@
+## 0.7.1 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Doc updates, pre-commit update
+
 ## 0.7.0 (Released)
 FEATURES:
 
