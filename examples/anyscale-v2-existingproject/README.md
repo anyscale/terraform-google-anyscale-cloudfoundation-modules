@@ -9,7 +9,7 @@ Creates a v2 stack including:
 - IAM Roles
 - VPC with publicly routed subnets (no internal)
 - VPC Firewall
-- FileStore
+- FileStore (ENTERPRISE Tier)
 
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
