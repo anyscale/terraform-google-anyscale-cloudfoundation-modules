@@ -3,7 +3,7 @@
 # -------------------------------------------
 output "enabled_apis" {
   description = "Enabled APIs in the project"
-  value       = try([for api in google_project_service.anyscale_apis : api.service], "")
+  value       = try([for api in google_project_service.anyscale_required_apis : api.service], "")
 }
 
 # output "enabled_api_identities" {

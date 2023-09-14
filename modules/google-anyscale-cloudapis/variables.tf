@@ -43,7 +43,7 @@ variable "anyscale_project_id" {
 # ------------------------------------------------------------------------------
 # API Module Parameters
 # ------------------------------------------------------------------------------
-variable "anyscale_activate_apis" {
+variable "anyscale_activate_required_apis" {
   description = <<-EOT
     (Optional) The list of apis to activate within the project.
     Default enables APIs for compute, filestore, and storage.
@@ -59,6 +59,27 @@ variable "anyscale_activate_apis" {
     "serviceusage.googleapis.com",
     "deploymentmanager.googleapis.com"
   ]
+}
+
+variable "anyscale_activate_optional_apis" {
+  description = <<-EOT
+    (Optional) Optional APIs to activate.
+
+    A list of optional apis to activate within the project.
+
+    ex:
+    ```
+    anyscale_activate_optional_apis = [
+      "cloudkms.googleapis.com",
+      "containerregistry.googleapis.com",
+      "logging.googleapis.com",
+      "monitoring.googleapis.com",
+      "redis.googleapis.com",
+    ]
+    ```
+  EOT
+  type        = list(string)
+  default     = []
 }
 
 # variable "activate_api_identities" {

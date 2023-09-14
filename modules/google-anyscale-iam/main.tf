@@ -122,6 +122,12 @@ locals {
     local.anyscale_cluster_node_role_name,
     random_id.random_char_suffix.hex,
   ) : local.anyscale_cluster_node_role_name
+
+  cluster_node_logging_monitoring_enabled = var.module_enabled && var.enable_anyscale_cluster_logging_monitoring ? true : false
+  cluster_node_roles = local.cluster_node_logging_monitoring_enabled ? concat([
+    "roles/logging.logWriter",
+    "roles/monitoring.metricWriter",
+  ], var.anyscale_cluster_node_role_permissions) : var.anyscale_cluster_node_role_permissions
 }
 
 resource "google_service_account" "anyscale_cluster_node_role" {
@@ -133,7 +139,7 @@ resource "google_service_account" "anyscale_cluster_node_role" {
 }
 
 resource "google_project_iam_binding" "anyscale_cluster_node_role" {
-  for_each = local.cluster_node_role_enabled ? toset(var.anyscale_cluster_node_role_permissions) : []
+  for_each = local.cluster_node_role_enabled ? toset(local.cluster_node_roles) : []
   role     = each.key
   project  = var.anyscale_project_id
   # service_account_id = google_service_account.anyscale_cluster_node_role[0].name

@@ -34,6 +34,7 @@ resource "random_id" "random_char_suffix" {
 # Google Project Resource
 #-------------------------------
 resource "google_project" "anyscale_project" {
+  #checkov:skip=CKV2_GCP_5:Cloud Audit Logging is managed via a variable
   count = var.module_enabled ? 1 : 0
 
   name       = local.computed_project_name

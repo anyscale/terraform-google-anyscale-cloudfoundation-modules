@@ -18,7 +18,7 @@ This sub-module builds Google VPC Firewalls that will work with Anyscale.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.78.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.82.0 |
 
 ## Modules
 

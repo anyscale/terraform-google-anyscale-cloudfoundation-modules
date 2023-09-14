@@ -165,13 +165,29 @@ variable "workload_anyscale_aws_account_id" {
 # Anyscale Cluster Node Role
 # --------------------------------------------------------------
 variable "create_anyscale_cluster_node_role" {
-  description = "(Optional) Determines whether to create the Anyscale cluster role. Default is `true`."
+  description = <<-EOT
+    (Optional) Determines whether to create the Anyscale cluster role.
+
+    ex:
+    ```
+    create_anyscale_cluster_node_role = true
+    ```
+  EOT
   type        = bool
   default     = true
 }
 
 variable "anyscale_cluster_node_role_name" {
-  description = "(Optional, forces creation of new resource) The name of the Anyscale IAM cluster node role. Conflicts with anyscale_cluster_node_role_name_prefix. Default is `null`."
+  description = <<-EOT
+    (Optional, forces creation of new resource) The name of the Anyscale IAM cluster node role.
+
+    Overrides `anyscale_cluster_node_role_name_prefix`.
+
+    ex:
+    ```
+    anyscale_cluster_node_role_name = "anyscale-cluster-node-role"
+    ```
+  EOT
   type        = string
   default     = null
   validation {
@@ -183,7 +199,16 @@ variable "anyscale_cluster_node_role_name" {
 }
 
 variable "anyscale_cluster_node_role_name_prefix" {
-  description = "(Optional, forces creation of new resource) The prefix of the Anyscale IAM access role. Conflicts with anyscale_cluster_role_node_name. Default is `anyscale-cluster-`."
+  description = <<-EOT
+    (Optional, forces creation of new resource) The prefix of the Anyscale IAM access role.
+
+    If `anyscale_cluster_role_node_name` is provided, it will override this variable.
+
+    ex:
+    ```
+    anyscale_cluster_node_role_name_prefix = "anyscale-cluster-"
+    ```
+  EOT
   type        = string
   default     = "anyscale-cluster-"
   validation {
@@ -195,16 +220,42 @@ variable "anyscale_cluster_node_role_name_prefix" {
 }
 
 variable "anyscale_cluster_node_role_description" {
-  description = "(Optional) IAM cluster node role description. If this is `null` the description will be set to \"Anyscale cluster node role\". Default is `null`."
+  description = <<-EOT
+    (Optional) IAM cluster node role description.
+
+    If this is `null` the description will be set to `Anyscale cluster node role` in a local variable.
+
+    ex:
+    ```
+    anyscale_cluster_node_role_description = "Anyscale cluster node role for cloud"
+    ```
+  EOT
   type        = string
   default     = null
 }
 
 variable "anyscale_cluster_node_role_permissions" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) A list of permission roles to grant to the Anyscale IAM cluster node role.
-    Default is `["roles/artifactregistry.reader"]`.
-  EOF
+
+    ex:
+    ```
+    anyscale_cluster_node_role_permissions = ["roles/artifactregistry.reader"]
+    ```
+  EOT
   type        = list(string)
   default     = ["roles/artifactregistry.reader"]
+}
+
+variable "enable_anyscale_cluster_logging_monitoring" {
+  description = <<-EOF
+    (Optional) Determines whether to grant the Cluster Node access to the monitoring and logging.
+
+    ex:
+    ```
+    enable_anyscale_cluster_logging_monitoring = true
+    ```
+  EOF
+  type        = bool
+  default     = false
 }

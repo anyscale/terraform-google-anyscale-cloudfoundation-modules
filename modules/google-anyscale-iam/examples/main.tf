@@ -56,6 +56,8 @@ module "kitchen_sink" {
   anyscale_cluster_node_role_name        = "kitchen-sink-cluster-node-role"
   anyscale_cluster_node_role_description = "Anyscale cluster node role for kitchen sink test"
   anyscale_cluster_node_role_permissions = ["roles/compute.instanceAdmin.v1"]
+
+  enable_anyscale_cluster_logging_monitoring = true
 }
 
 

@@ -15,7 +15,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.78.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.82.0 |
 
 ## Modules
 
@@ -26,13 +26,15 @@ No modules.
 | Name | Type |
 |------|------|
 | [google_project_service.anycale_compute_api](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
-| [google_project_service.anyscale_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project_service.anyscale_optional_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [google_project_service.anyscale_required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_anyscale_activate_apis"></a> [anyscale\_activate\_apis](#input\_anyscale\_activate\_apis) | (Optional) The list of apis to activate within the project.<br>Default enables APIs for compute, filestore, and storage. | `list(string)` | <pre>[<br>  "compute.googleapis.com",<br>  "file.googleapis.com",<br>  "storage-component.googleapis.com",<br>  "storage.googleapis.com",<br>  "certificatemanager.googleapis.com",<br>  "cloudresourcemanager.googleapis.com",<br>  "serviceusage.googleapis.com",<br>  "deploymentmanager.googleapis.com"<br>]</pre> | no |
+| <a name="input_anyscale_activate_optional_apis"></a> [anyscale\_activate\_optional\_apis](#input\_anyscale\_activate\_optional\_apis) | (Optional) Optional APIs to activate.<br><br>A list of optional apis to activate within the project.<br><br>ex:<pre>anyscale_activate_optional_apis = [<br>  "cloudkms.googleapis.com",<br>  "containerregistry.googleapis.com",<br>  "logging.googleapis.com",<br>  "monitoring.googleapis.com",<br>  "redis.googleapis.com",<br>]</pre> | `list(string)` | `[]` | no |
+| <a name="input_anyscale_activate_required_apis"></a> [anyscale\_activate\_required\_apis](#input\_anyscale\_activate\_required\_apis) | (Optional) The list of apis to activate within the project.<br>Default enables APIs for compute, filestore, and storage. | `list(string)` | <pre>[<br>  "compute.googleapis.com",<br>  "file.googleapis.com",<br>  "storage-component.googleapis.com",<br>  "storage.googleapis.com",<br>  "certificatemanager.googleapis.com",<br>  "cloudresourcemanager.googleapis.com",<br>  "serviceusage.googleapis.com",<br>  "deploymentmanager.googleapis.com"<br>]</pre> | no |
 | <a name="input_anyscale_cloud_id"></a> [anyscale\_cloud\_id](#input\_anyscale\_cloud\_id) | (Required) Anyscale Cloud ID | `string` | `null` | no |
 | <a name="input_anyscale_project_id"></a> [anyscale\_project\_id](#input\_anyscale\_project\_id) | (Optional) The ID of the project to create the resource in. If not provided, the provider project is used. Default is `null`. | `string` | `null` | no |
 | <a name="input_disable_dependent_services"></a> [disable\_dependent\_services](#input\_disable\_dependent\_services) | (Optional) Determines if services that are enabled and which depend on this service should also be disabled when this service is destroyed.<br>More information in the [terraform documentation](https://www.terraform.io/docs/providers/google/r/google_project_service.html#disable_dependent_services). | `bool` | `true` | no |
