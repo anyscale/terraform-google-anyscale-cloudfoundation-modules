@@ -164,3 +164,31 @@ output "iam_anyscale_cluster_node_role_unique_id" {
   description = "The Google IAM Anyscale Cluster Node Role unique id."
   value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_role_unique_id, "")
 }
+
+# ------------------------------------
+# Memorystore Resource Outputs
+# ------------------------------------
+output "memorystore_id" {
+  description = "The memorystore instance ID."
+  value       = try(module.google_anyscale_memorystore.anyscale_memorystore_id, "")
+}
+
+output "memorystore_host" {
+  description = "The IP address of the instance."
+  value       = try(module.google_anyscale_memorystore.anyscale_memorystore_host, "")
+}
+
+output "memorystore_port" {
+  description = "The port number of the exposed Redis endpoint."
+  value       = try(module.google_anyscale_memorystore.anyscale_memorystore_port, "")
+}
+
+output "memorystore_region" {
+  description = "The region the instance lives in."
+  value       = try(module.google_anyscale_memorystore.anyscale_memorystore_region, "")
+}
+
+output "memorystore_current_location_id" {
+  description = "The current zone where the Redis endpoint is placed."
+  value       = try(module.google_anyscale_memorystore.anyscale_memorystore[0].current_location_id, "")
+}

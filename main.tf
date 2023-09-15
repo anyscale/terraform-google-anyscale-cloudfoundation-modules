@@ -12,6 +12,8 @@ locals {
   common_name_prefix               = var.use_common_name ? coalesce(var.common_prefix, "anyscale-") : null
   enable_module_random_name_suffix = var.use_common_name ? false : true
   enable_root_random_name_suffix   = var.use_common_name ? true : false
+
+  enable_cloud_logging_monitoring = var.enable_cloud_logging_monitoring ? true : false
 }
 
 # ------------------------------
@@ -59,19 +61,26 @@ module "google_anyscale_project" {
 # ------------------------------
 locals {
   execute_api_submodule = var.enable_google_apis ? true : false
+
+  memorystore_api = local.execute_memorystore_submodule ? ["redis.googleapis.com"] : []
+  monitoring_api  = local.enable_cloud_logging_monitoring ? ["monitoring.googleapis.com", "logging.googleapis.com"] : []
+
+  additional_apis = concat(local.memorystore_api, local.monitoring_api)
 }
 module "google_anyscale_cloudapis" {
   source         = "./modules/google-anyscale-cloudapis"
   module_enabled = local.execute_api_submodule
 
   anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
+
+  anyscale_activate_optional_apis = local.additional_apis
 }
 
 # ------------------------------
 # VPC (Networking) Module
 # ------------------------------
 locals {
-  vpc_name        = var.anyscale_vpc_name != null ? var.anyscale_vpc_name : local.common_name
+  vpc_name        = var.anyscale_vpc_name != null ? var.anyscale_vpc_name : var.anyscale_vpc_name_prefix != null ? null : local.common_name
   vpc_name_prefix = coalesce(var.anyscale_vpc_name_prefix, var.common_prefix, "anyscale-vpc-")
 
   anyscale_private_subnet_count = var.anyscale_vpc_private_subnet_cidr != null ? 1 : 0
@@ -173,12 +182,13 @@ locals {
   filestore_location        = var.anyscale_filestore_tier == "ENTERPRISE" ? local.filestore_location_region : local.filestore_location_zone
 }
 module "google_anyscale_filestore" {
-  source         = "./modules/google-anyscale-filestore"
-  module_enabled = local.execute_filestore_submodule
+  source              = "./modules/google-anyscale-filestore"
+  module_enabled      = local.execute_filestore_submodule
+  labels              = merge(local.full_labels, var.anyscale_filestore_labels)
+  anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
   depends_on = [
     module.google_anyscale_cloudapis
   ]
-  anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
 
   enable_random_name_suffix = local.enable_module_random_name_suffix
 
@@ -192,7 +202,6 @@ module "google_anyscale_filestore" {
   filestore_location    = local.filestore_location
   filestore_vpc_name    = local.filestore_vpc_name
   filestore_tier        = var.anyscale_filestore_tier
-  labels                = local.full_labels
 }
 
 # ------------------------------
@@ -226,9 +235,10 @@ module "google_anyscale_iam" {
   workload_identity_pool_provider_name = var.anyscale_workload_identity_pool_provider_name
   workload_anyscale_aws_account_id     = var.anyscale_workload_identity_account_id
 
-  anyscale_cluster_node_role_name        = local.iam_cluster_node_role_name
-  anyscale_cluster_node_role_name_prefix = local.iam_cluster_node_role_name_prefix
-  anyscale_cluster_node_role_description = var.anyscale_cluster_node_role_description
+  anyscale_cluster_node_role_name            = local.iam_cluster_node_role_name
+  anyscale_cluster_node_role_name_prefix     = local.iam_cluster_node_role_name_prefix
+  anyscale_cluster_node_role_description     = var.anyscale_cluster_node_role_description
+  enable_anyscale_cluster_logging_monitoring = local.enable_cloud_logging_monitoring
 
   anyscale_cloud_id = var.anyscale_cloud_id
 }
@@ -264,4 +274,32 @@ module "google_anyscale_cloudstorage" {
 
   bucket_iam_binding_members        = local.bucket_iam_binding_members
   bucket_iam_binding_override_roles = var.bucket_iam_binding_override_roles
+}
+
+# ------------------------------
+# Google Memorystore Module
+# ------------------------------
+locals {
+  execute_memorystore_submodule = var.enable_anyscale_memorystore && var.existing_memorystore_instance_name == null ? true : false
+  memorystore_vpc_name          = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
+
+  memorystore_name   = var.anyscale_memorystore_name != null ? var.anyscale_memorystore_name : var.anyscale_memorystore_name_prefix != null ? null : try(replace(local.common_name, "_", "-"), null)
+  memorystore_prefix = coalesce(var.anyscale_memorystore_name_prefix, try(replace(var.common_prefix, "_", "-"), null), "anyscale-")
+}
+module "google_anyscale_memorystore" {
+  source              = "./modules/google-anyscale-memorystore"
+  module_enabled      = local.execute_memorystore_submodule
+  labels              = merge(local.full_labels, var.anyscale_memorystore_labels)
+  anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
+  depends_on = [
+    module.google_anyscale_cloudapis
+  ]
+
+  enable_random_name_suffix = local.enable_module_random_name_suffix
+
+  anyscale_memorystore_name        = local.memorystore_name
+  anyscale_memorystore_name_prefix = local.memorystore_prefix
+  memorystore_display_name         = var.anyscale_memorystore_display_name
+
+  memorystore_vpc_name = local.memorystore_vpc_name
 }

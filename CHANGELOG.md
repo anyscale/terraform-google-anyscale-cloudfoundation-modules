@@ -1,3 +1,24 @@
+## 0.8.0 (Released)
+FEATURES:
+- New integration for Anyscale Service Head Node fault tolerance.
+  - New optional submodule: `google-anyscale-memorystore`
+    - This sub-module can be used to create a Memorystore Redis instance which is then used with Anyscale Services to enable head node fault tolerance.
+  - Updates to `google-anyscale-cloudapis` to optionally enable memorystore api (redis.googleapis.com)
+  - To see how this module can be enabled and used, please look in the `examples/anyscale-v2-kitchensink` or the `anyscale-v2-privatenetwork` folders
+- New logging integration via [Vector](https://vector.dev/) with GCP Logging and Cloud Monitoring.
+  - Updates to `google-anyscale-iam` to optionally grant access to GCP Logging and Cloud Monitoring
+  - Updates to `google-anyscale-cloudapis` to optionally enable GCP Logging (logging.googleapis.com) and Cloud Monitoring (monitoring.googleapis.com)
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- General doc updates and cleanup
+- Root module variables cleanup with better descriptions and examples
+- tflint and changelog updates
+- Initial pass at End to End testing integration
+
 ## 0.7.1 (Released)
 FEATURES:
 

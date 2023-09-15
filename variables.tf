@@ -2,17 +2,6 @@
 # REQUIRED VARIABLES
 # These variables must be set when using this module.
 # ------------------------------------------------------------------------------
-variable "anyscale_deploy_env" {
-  description = "(Required) Anyscale deploy environment. Used in resource names and tags."
-  type        = string
-  validation {
-    condition = (
-      var.anyscale_deploy_env == "production" || var.anyscale_deploy_env == "development" || var.anyscale_deploy_env == "test"
-    )
-    error_message = "The anyscale_deploy_env only allows `production`, `test`, or `development`"
-  }
-}
-
 variable "anyscale_organization_id" {
   description = <<-EOT
     (Required) Anyscale Organization ID.
@@ -32,23 +21,57 @@ variable "anyscale_organization_id" {
   }
 }
 
-# variable "firewall_ingress_allow_access_from_cidr_range" {
-#   description = <<-EOT
-#     (Required) Comma delimited string of IPv4 CIDR ranges to allow access to anyscale resources.
-#     This should be the list of CIDR ranges that have access to Anyscale Clusters.
-#     Public or private IPs are supported. SSH and HTTPs
-#     ports will be opened to these CIDR ranges.
-#     ex: "10.0.1.0/24,24.1.24.24/32"
-#   EOT
-#   type        = string
-# }
+variable "anyscale_vpc_firewall_allow_access_from_cidrs" {
+  description = <<-EOT
+    (Required) Comma delimited string of IPv4 CIDRs
+
+    CIDR ranges to allow access to Anyscale resources. This should be the list of CIDR ranges that have access to the clusters. Public or private IPs are supported.
+    SSH and HTTPs ports will be opened to these CIDR ranges.
+
+    ex:
+    ```
+    anyscale_vpc_firewall_allow_access_from_cidrs = "10.0.1.0/24,24.1.24.24/32"
+    ```
+  EOT
+  type        = string
+}
 
 # ------------------------------------------------------------------------------
 # OPTIONAL VARIABLES
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
+variable "anyscale_deploy_env" {
+  description = <<-EOT
+    (Optional) Anyscale deploy environment.
+
+    Used in resource names and tags.
+
+    ex:
+    ```
+    anyscale_deploy_env = "production"
+    ```
+  EOT
+  type        = string
+  validation {
+    condition = (
+      var.anyscale_deploy_env == "production" || var.anyscale_deploy_env == "development" || var.anyscale_deploy_env == "test"
+    )
+    error_message = "The anyscale_deploy_env only allows `production`, `test`, or `development`"
+  }
+  default = "production"
+}
+
 variable "anyscale_cloud_id" {
-  description = "(Optional) Anyscale Cloud ID. Default is `null`."
+  description = <<-EOT
+    (Optional) Anyscale Cloud ID.
+
+    This is the ID of the Anyscale Cloud. This is not the same as the GCP Project ID. Used in labels.
+
+    ex:
+    ```
+    anyscale_cloud_id = "cld_1234567890"
+    ```
+  EOT
   type        = string
   default     = null
   validation {
@@ -64,9 +87,11 @@ variable "anyscale_cloud_id" {
 
 variable "labels" {
   description = <<-EOT
-    (Optional)
-    A map of default labels to be added to all resources that accept labels.
+    (Optional) A map of labels.
+
+    Labels to be added to all resources that accept labels.
     Resource dependent labels will be appended to this list.
+
     ex:
     ```
     labels = {
@@ -82,7 +107,8 @@ variable "labels" {
 
 variable "common_prefix" {
   description = <<-EOT
-    (Optional)
+    (Optional) Common Prefix for all resources.
+
     A common prefix to add to resources created (where prefixes are allowed).
     If paired with `use_common_name`, this will apply to all resources.
     If this is not paired with `use_common_name`, this applies to:
@@ -91,7 +117,11 @@ variable "common_prefix" {
       - Security Groups
     Resource specific prefixes override this variable.
     Max length is 30 characters.
-    Default is `null`
+
+    ex:
+    ```
+    common_prefix = "anyscale-"
+    ```
   EOT
   type        = string
   default     = null
@@ -103,12 +133,16 @@ variable "common_prefix" {
 
 variable "use_common_name" {
   description = <<-EOT
-    (Optional)
-    Determines if a standard name should be used across all resources.
-    If set to true and `common_prefix` is also provided, the `common_prefix` will be used prefixed to a common name.
-    If set to true and `common_prefix` is not provided, the prefix will be `anyscale-`
-    If set to true, this will also use a random suffix to avoid name collisions.
-    Default is `false`
+    (Optional) Determines if a standard name should be used across all resources.
+
+    - If set to true and `common_prefix` is also provided, the `common_prefix` will be used and prefixed to a common name.
+    - If set to true and `common_prefix` is not provided, the prefix will be `anyscale-`
+    - If set to true, this will also use a random suffix to avoid name collisions.
+
+    ex:
+    ```
+    use_common_name = true
+    ```
   EOT
   type        = bool
   default     = false
@@ -116,14 +150,20 @@ variable "use_common_name" {
 
 variable "random_char_length" {
   description = <<-EOT
-    (Optional)
+    (Optional) Random suffix character length
+
     Determines the random suffix length that is used to generate a common name.
+
     Certain Google resources have a hard limit on name lengths and this will allow
     the ability to control how many characters are added as a suffix.
     Many Google resources have a limit of 28 characters in length.
     Keep that in mind while setting this value.
     Must be >= 2 and <= 12.
-    Default is `4`
+
+    ex:
+    ```
+    random_char_length = 4
+    ```
   EOT
   type        = number
   default     = 4
@@ -137,22 +177,46 @@ variable "random_char_length" {
 # Project Variables
 # --------------------------------------------
 variable "existing_project_id" {
-  description = "(Optional) An existing GCP Project ID. If provided, this will skip creating resources with the Anyscale Project module. Default is `null`."
+  description = <<-EOT
+    (Optional) An existing GCP Project ID.
+
+    If provided, this will skip creating resources with the Anyscale Project module.
+
+    ex:
+    ```
+    existing_project_id = "my-project-id"
+    ```
+  EOT
   type        = string
   default     = null
 }
 variable "anyscale_project_name" {
-  description = "(Optional) Google Project name. Default is `null`."
+  description = <<-EOT
+    (Optional) Google Project name.
+
+    Google Project Name to create.
+
+    ex:
+    ```
+    anyscale_project_name = "anyscale-project"
+    ```
+  EOT
   type        = string
   default     = null
 }
 variable "anyscale_project_name_prefix" {
   description = <<-EOT
     (Optional) The name prefix for the project.
+
     If `anyscale_project_name` is provided, it will override this variable.
     The variable `general_prefix` is a fall-back prefix if this is not provided.
 
     Default is `null` but is set to `anyscale-project-` in a local variable.
+
+    ex:
+    ```
+    anyscale_project_name_prefix = "anyscale-project-"
+    ```
   EOT
   type        = string
   default     = null
@@ -160,37 +224,58 @@ variable "anyscale_project_name_prefix" {
 variable "anyscale_project_billing_account" {
   description = <<-EOT
     (Optional) Google Billing Account ID.
+
     This is required if creating a new project.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_project_billing_account = "123456-123456-123456"
+    ```
   EOT
   type        = string
   default     = null
 }
+
 variable "anyscale_project_organization_id" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) Google Cloud Organization ID.
+
     Conflicts with `anyscale_project_folder_id`. If `anyscale_project_folder_id` is provided, it will be used and `organization_id` will be ignored.
+
     Changing this forces the project to be migrated to the newly specified organization.
-    Default is `null`.
-  EOF
+
+    ex:
+    ```
+    anyscale_project_organization_id = "1234567890"
+    ```
+  EOT
   type        = string
   default     = null
 }
+
 variable "anyscale_project_folder_id" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) The ID of a Google Cloud Folder.
+
     Conflicts with `anyscale_project_organization_id`. If `anyscale_project_folder_id` is provided, it will be used and `anyscale_project_organization_id` will be ignored.
+
     Changing this forces the project to be migrated to the newly specified folder.
-    Default is `null`.
-  EOF
+
+    ex:
+    ```
+    anyscale_project_folder_id = "1234567890"
+    ```
+  EOT
   type        = string
   default     = null
 }
 
 variable "anyscale_project_labels" {
   description = <<-EOT
-    (Optional)
+    (Optional) Project labels.
+
     A map of labels to be added to the Anyscale Project.
+
     ex:
     ```
     anyscale_project_labels = {
@@ -210,10 +295,36 @@ variable "anyscale_project_labels" {
 variable "enable_google_apis" {
   description = <<-EOT
     (Optional) Determines if the required Google APIs are enabled.
-    Default is `true`.
+
+    ex:
+    ```
+    enable_google_apis = true
+    ```
   EOT
   type        = bool
   default     = true
+}
+
+variable "enable_cloud_logging_monitoring" {
+  description = <<-EOT
+    (Optional) Determines if the Google Cloud Logging and Monitoring APIs are enabled.
+
+    If this is set to `true`, the following APIs will be enabled:
+      - logging.googleapis.com
+      - monitoring.googleapis.com
+
+    Additionally, the Anyscale Cluster Role will be granted access to the following roles:
+      - logging.logWriter
+      - monitoring.metricWriter
+      - monitoring.viewer
+
+    ex:
+    ```
+    enable_cloud_logging_monitoring = true
+    ```
+  EOT
+  type        = bool
+  default     = false
 }
 
 # --------------------------------------------
@@ -222,9 +333,14 @@ variable "enable_google_apis" {
 variable "existing_vpc_name" {
   description = <<-EOT
     (Optional) An existing VPC Name.
+
     If provided, this module will skip creating a new VPC with the Anyscale VPC module.
-    A Subnet ID (`existing_vpc_subnet_id`) is also required if this is provided.
-    Default is `null`.
+    An existing VPC Subnet Name (`existing_vpc_subnet_name`) is also required if this is provided.
+
+    ex:
+    ```
+    existing_vpc_name = "anyscale-vpc"
+    ```
   EOT
   type        = string
   default     = null
@@ -232,9 +348,14 @@ variable "existing_vpc_name" {
 variable "existing_vpc_subnet_name" {
   description = <<-EOT
     (Optional) Existing subnet name to create Anyscale resources in.
+
     If provided, this will skip creating resources with the Anyscale VPC module.
-    VPC ID is also required if this is provided.
-    Default is `null`.
+    An existing VPC Name (`existing_vpc_name`) is also required if this is provided.
+
+    ex:
+    ```
+    existing_vpc_subnet_name = "anyscale-subnet"
+    ```
   EOT
   type        = string
   default     = null
@@ -260,24 +381,48 @@ variable "existing_vpc_subnet_name" {
 # }
 
 variable "anyscale_vpc_name" {
-  description = "(Optional) VPC name. Default is `null`."
+  description = <<-EOT
+    (Optional) VPC name.
+
+    The name of the VPC to create.
+    - If left `null`, will default to `anyscale_vpc_name_prefix`.
+    - If provided, overrides the `anyscale_vpc_name_prefix` variable.
+
+    ex:
+    ```
+    anyscale_vpc_name = "anyscale-vpc"
+    ```
+  EOT
   type        = string
   default     = null
 }
 variable "anyscale_vpc_name_prefix" {
   description = <<-EOT
     (Optional) The prefix of the VPC name.
-    Creates a unique VPC name beginning with the specified prefix.
-    If `anyscale_vpc_name` is provided, it will override this variable.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
 
-    Default is `null` but is set to `anyscale-vpc-` in a local variable.
+    Creates a unique VPC name beginning with the specified prefix.
+    - If `anyscale_vpc_name` is provided, it will override this variable.
+    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - Default is `null` but is set to `anyscale-vpc-` in a local variable.
+
+    ex:
+    ```
+    anyscale_vpc_name_prefix = "anyscale-vpc-"
+    ```
   EOT
   type        = string
   default     = null
 }
+
 variable "anyscale_vpc_description" {
-  description = "(Optional) The description of the VPC. Default is `VPC for Anyscale Resources`."
+  description = <<-EOT
+    (Optional) The description of the VPC.
+
+    ex:
+    ```
+    anyscale_vpc_description = "Anyscale VPC"
+    ```
+  EOT
   type        = string
   default     = "VPC for Anyscale Resources"
 }
@@ -285,10 +430,13 @@ variable "anyscale_vpc_description" {
 variable "anyscale_vpc_public_subnet_cidr" {
   description = <<-EOT
     (Optional) The public subnet to create.
+
     This VPC terraform will only create one public subnet in one region.
-    example:
-      anyscale_vpc_public_subnet_cidr = "10.100.0.0/20"
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_vpc_public_subnet_cidr = "10.100.0.0/20"
+    ```
   EOT
   type        = string
   default     = null
@@ -320,11 +468,13 @@ variable "anyscale_vpc_public_subnet_cidr" {
 variable "anyscale_vpc_private_subnet_cidr" {
   description = <<-EOT
     (Optional) The private subnet to create.
-    The Anyscale VPC module will only create one private subnet in one region.
-    example:
-      anyscale_vpc_private_subnet_cidr = "10.100.0.0/20"
-    We recommend a /20 or larger CIDR block, but will accept a /24 or larger with a warning.
-    Default is `null`.
+
+    Anyscale recommends a /20 or larger CIDR block, but will accept a /24 or larger with a warning. The Anyscale VPC module will only create one private subnet in one region.
+
+    ex:
+    ```
+    anyscale_vpc_private_subnet_cidr = "10.100.0.0/20"
+    ```
   EOT
   type        = string
   default     = null
@@ -357,8 +507,13 @@ variable "anyscale_vpc_private_subnet_cidr" {
 variable "anyscale_vpc_create_natgw" {
   description = <<-EOT
     (Optional) Determines if a NAT Gateway is created.
+
     `anyscale_vpc_private_subnet_cidr` must also be specified for this resource to be created.
-    Default is `true`.
+
+    ex:
+    ```
+    anyscale_vpc_create_natgw = true
+    ```
   EOT
   type        = bool
   default     = true
@@ -370,7 +525,11 @@ variable "anyscale_vpc_create_natgw" {
 variable "enable_anyscale_vpc_firewall" {
   description = <<-EOT
     (Optional) Determines if the Anyscale VPC Firewall is created.
-    Default is `true`.
+
+    ex:
+    ```
+    enable_anyscale_vpc_firewall = true
+    ```
   EOT
   type        = bool
   default     = true
@@ -378,7 +537,11 @@ variable "enable_anyscale_vpc_firewall" {
 variable "anyscale_vpc_firewall_policy_name" {
   description = <<-EOT
     (Optional) The name of the Anyscale VPC Firewall Policy.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_vpc_firewall_policy_name = "anyscale-vpc-firewall-policy"
+    ```
   EOT
   type        = string
   default     = null
@@ -387,7 +550,11 @@ variable "anyscale_vpc_firewall_policy_name" {
 variable "anyscale_vpc_firewall_policy_description" {
   description = <<-EOT
     (Optional) The description of the Anyscale VPC Firewall Policy.
-    Default is `Anyscale VPC Firewall Policy`.
+
+    ex:
+    ```
+    anyscale_vpc_firewall_policy_description = "Anyscale VPC Firewall Policy"
+    ```
   EOT
   type        = string
   default     = "Anyscale VPC Firewall Policy"
@@ -396,20 +563,16 @@ variable "anyscale_vpc_firewall_policy_description" {
 variable "allow_ssh_from_google_ui" {
   description = <<-EOT
     (Optional) Determines if SSH access is allowed from the Google UI.
-    Default is `true`.
+
+    ex:
+    ```
+    allow_ssh_from_google_ui = true
+    ```
   EOT
   type        = bool
   default     = true
 }
-variable "anyscale_vpc_firewall_allow_access_from_cidrs" {
-  description = <<-EOT
-    (Required) Comma delimited string of IPv4 CIDR range to allow access to anyscale resources.
-    This should be the list of CIDR ranges that have access to the clusters. Public or private IPs are supported.
-    SSH and HTTPs ports will be opened to these CIDR ranges.
-    ex: "10.0.1.0/24,24.1.24.24/32"
-  EOT
-  type        = string
-}
+
 
 # --------------------------------------------
 # Anyscale Cloud Storage Variables
@@ -417,7 +580,11 @@ variable "anyscale_vpc_firewall_allow_access_from_cidrs" {
 variable "enable_anyscale_gcs" {
   description = <<-EOT
     (Optional) Determines if the Anyscale Cloud Storage bucket is created.
-    Default is `true`.
+
+    ex:
+    ```
+    enable_anyscale_gcs = true
+    ```
   EOT
   type        = bool
   default     = true
@@ -425,13 +592,19 @@ variable "enable_anyscale_gcs" {
 
 variable "existing_cloudstorage_bucket_name" {
   description = <<-EOT
-    (Optional)
-    The name of an existing S3 bucket that you'd like to use.
-    Please make sure that it meets the minimum requirements for Anyscale including:
+    (Optional) Existing Cloud Storage Bucket Name.
+
+    The name of an existing Cloud Storage bucket that you'd like to use. Please make sure that it meets the minimum requirements for Anyscale including:
       - Bucket Policy
       - CORS Policy
       - Encryption configuration
-    Default is `null`
+
+    If provided, this will skip creating a new Cloud Storage bucket with the Anyscale Cloud Storage module.
+
+    ex:
+    ```
+    existing_cloudstorage_bucket_name = "anyscale-bucket"
+    ```
   EOT
   type        = string
   default     = null
@@ -439,12 +612,16 @@ variable "existing_cloudstorage_bucket_name" {
 
 variable "anyscale_bucket_name" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) Cloudstorage bucket name.
+
     The name of the bucket used to store Anyscale related logs and other shared resources.
-    If left `null`, will default to anyscale_bucket_prefix.
-    If provided, overrides the anyscale_bucket_prefix variable.
-    Conflicts with anyscale_bucket_prefix.
-    Default is `null`.
+    - If left `null`, will default to `anyscale_bucket_prefix`.
+    - If provided, overrides the `anyscale_bucket_prefix` variable.
+
+    ex:
+    ```
+    anyscale_bucket_name = "anyscale-bucket"
+    ```
   EOT
   type        = string
   default     = null
@@ -452,11 +629,17 @@ variable "anyscale_bucket_name" {
 
 variable "anyscale_bucket_prefix" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) Cloudstorage bucket name prefix.
+
     Creates a unique bucket name beginning with the specified prefix.
-    If `anyscale_bucket_name` is provided, it will override this variable.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
-    Default is `null` but is set to `anyscale-` in a local variable.
+    - If `anyscale_bucket_name` is provided, it will override this variable.
+    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - Default is `null` but is set to `anyscale-` in a local variable.
+
+    ex:
+    ```
+    anyscale_bucket_prefix = "anyscale-bucket-"
+    ```
   EOT
   type        = string
   default     = null
@@ -465,7 +648,11 @@ variable "anyscale_bucket_prefix" {
 variable "anyscale_bucket_location" {
   description = <<-EOT
     (Optional) The location of the bucket.
-    Default is `US`.
+
+    ex:
+    ```
+    anyscale_bucket_location = "US"
+    ```
   EOT
   type        = string
   default     = "US"
@@ -473,10 +660,14 @@ variable "anyscale_bucket_location" {
 
 variable "anyscale_bucket_storage_class" {
   description = <<-EOF
-    (Optional)
-    The bucket storage class.
+    (Optional) Bucket storage class.
+
     Must be one of: STANDARD, MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE
-    Default is `STANDARD`
+
+    ex:
+    ```
+    anyscale_bucket_storage_class = "STANDARD"
+    ```
   EOF
   type        = string
   default     = "STANDARD"
@@ -499,8 +690,23 @@ variable "anyscale_bucket_storage_class" {
 variable "anyscale_bucket_lifecycle_rules" {
   description = <<-EOT
     (Optional) List of lifecycle rules to configure.
+
     Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#lifecycle_rule except condition.matches_storage_class should be a comma delimited string.
-    Default is an empty list.
+
+    ex:
+    ```
+    anyscale_bucket_lifecycle_rules = [
+      {
+        action = {
+          type          = "Delete"
+          storage_class = "MULTI_REGIONAL"
+        }
+        condition = {
+          age = 30
+        }
+      }
+    ]
+    ```
   EOT
 
   type = set(object({
@@ -529,9 +735,12 @@ variable "anyscale_bucket_lifecycle_rules" {
 variable "anyscale_bucket_cors_rules" {
   description = <<-EOT
     (Optional) List of CORS rules to configure.
+
     Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#cors except max_age_seconds should be a number.
-    Default is:
-    [
+
+    ex:
+    ```
+    anyscale_bucket_cors_rules = [
       {
         origins          = ["https://console.anyscale.com"]
         methods          = ["GET"]
@@ -539,8 +748,8 @@ variable "anyscale_bucket_cors_rules" {
         max_age_seconds  = 3600
       }
     ]
+    ```
   EOT
-
   type = set(object({
     # Object with keys:
     # - origins - (Required) List of values, with wildcards, of the Origin header in the request that an incoming OPTIONS request will be matched against.
@@ -565,8 +774,15 @@ variable "anyscale_bucket_cors_rules" {
 variable "bucket_iam_binding_override_roles" {
   description = <<-EOT
     (Optional) List of roles to grant to the Anyscale Service Accounts.
-    This allows you to override the defaults in the google-anyscale-cloudstorage module.
+
+    This allows you to override the defaults in the `google-anyscale-cloudstorage` module.
+
     Default is an empty list but will be populated with the following roles via the module: ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
+
+    ex:
+    ```
+    bucket_iam_binding_override_roles = ["roles/storage.objectAdmin"]
+    ```
   EOT
   type        = list(string)
   default     = []
@@ -578,7 +794,11 @@ variable "bucket_iam_binding_override_roles" {
 variable "enable_anyscale_filestore" {
   description = <<-EOT
     (Optional) Determines if the Anyscale Filestore is created.
-    Default is `true`.
+
+    ex:
+    ```
+    enable_anyscale_filestore = true
+    ```
   EOT
   type        = bool
   default     = true
@@ -586,9 +806,15 @@ variable "enable_anyscale_filestore" {
 
 variable "existing_filestore_instance_name" {
   description = <<-EOT
-    (Optional)
+    (Optional) Existing Filestore Instance Name.
+
     The name of an existing Filestore instance that you'd like to use.
-    Default is `null`
+    If provided, this will skip creating a new Filestore instance with the Anyscale Filestore module.
+
+    ex:
+    ```
+    existing_filestore_instance_name = "anyscale-filestore"
+    ```
   EOT
   type        = string
   default     = null
@@ -596,12 +822,16 @@ variable "existing_filestore_instance_name" {
 
 variable "anyscale_filestore_name" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) Filestore instance name.
+
     The name of the filestore instance used to store Anyscale related logs and other shared resources.
-    If left `null`, will default to anyscale_filestore_name_prefix.
-    If provided, overrides the anyscale_filestore_name_prefix variable.
-    Conflicts with anyscale_filestore_name_prefix.
-    Default is `null`.
+    - If left `null`, will default to `anyscale_filestore_name_prefix`.
+    - If provided, overrides the `anyscale_filestore_name_prefix` variable.
+
+    ex:
+    ```
+    anyscale_filestore_name = "anyscale-filestore"
+    ```
   EOT
   type        = string
   default     = null
@@ -609,11 +839,17 @@ variable "anyscale_filestore_name" {
 
 variable "anyscale_filestore_name_prefix" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) Filestore instance name prefix.
+
     Creates a unique filestore instance name beginning with the specified prefix.
-    If `anyscale_filestore_name` is provided, it will override this variable.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
-    Default is `null` but is set to `anyscale-` in a local variable.
+    - If `anyscale_filestore_name` is provided, it will override this variable.
+    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - Default is `null` but is set to `anyscale-` in a local variable.
+
+    ex:
+    ```
+    anyscale_filestore_name_prefix = "anyscale-filestore-"
+    ```
   EOT
   type        = string
   default     = null
@@ -621,11 +857,18 @@ variable "anyscale_filestore_name_prefix" {
 
 variable "anyscale_filestore_fileshare_name" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) Filestore fileshare name.
+
     The name of the fileshare to create.
-    If left `null`, will default to `common_name`.
-    If `common_name` is null or over 16 chars, will default to `anyscale`.
-    Default is `null`.
+    - If left `null`, will default to `common_name`.
+    - If `common_name` is null or over 16 chars, will default to `anyscale`.
+    - Must start with a letter, followed by letters, numbers, or underscores, and cannot end with an underscore.
+    - Can not be longer than 16 characters.
+
+    ex:
+    ```
+    anyscale_filestore_fileshare_name = "anyscale-fileshare"
+    ```
   EOT
   type        = string
   default     = null
@@ -641,7 +884,11 @@ variable "anyscale_filestore_fileshare_name" {
 variable "anyscale_filestore_description" {
   description = <<-EOT
     (Optional) The description of the filestore instance.
-    Default is `Anyscale Filestore Instance`.
+
+    ex:
+    ```
+    anyscale_filestore_description = "Anyscale Filestore Instance"
+    ```
   EOT
   type        = string
   default     = "Anyscale Filestore Instance"
@@ -650,8 +897,13 @@ variable "anyscale_filestore_description" {
 variable "anyscale_filestore_tier" {
   description = <<-EOT
     (Optional) The tier of the filestore to create.
+
     Must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`.
-    Default is `STANDARD`.
+
+    ex:
+    ```
+    anyscale_filestore_tier = "STANDARD"
+    ```
   EOT
   type        = string
   default     = "STANDARD"
@@ -664,10 +916,15 @@ variable "anyscale_filestore_tier" {
 variable "anyscale_filestore_location" {
   description = <<-EOT
     (Optional) The name of the location region in which the filestore resource will be created.
+
     This can be a region for `ENTERPRISE` tier instances.
     If it is not provided, the region for the VPC network will be used
     If a VPC network was not created, provider region is used.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_filestore_location = "us-central1"
+    ```
   EOT
   type        = string
   default     = null
@@ -686,13 +943,37 @@ variable "anyscale_filestore_capacity_gb" {
     error_message = "The `anyscale_filestore_capacity_gb` must be at least 1024 GiB for the standard or enterprise tiers, or 2560 GiB for the premium tier."
   }
 }
+
+variable "anyscale_filestore_labels" {
+  description = <<-EOT
+    (Optional) Filestore Labels
+
+    A map of labels to be added to the Filestore instance.
+    Duplicate labels in `labels` will be overwritten by labels in `anyscale_filestore_labels`.
+
+    ex:
+    ```
+    anyscale_filestore_labels = {
+      application = "Anyscale",
+      environment = "prod"
+    }
+    ```
+  EOT
+  type        = map(string)
+  default     = {}
+}
+
 # --------------------------------------------
 # Anyscale IAM Variables
 # --------------------------------------------
 variable "enable_anyscale_iam" {
   description = <<-EOT
     (Optional) Determines if the Anyscale IAM resources are created.
-    Default is `true`.
+
+    ex:
+    ```
+    enable_anyscale_iam = true
+    ```
   EOT
   type        = bool
   default     = true
@@ -700,31 +981,59 @@ variable "enable_anyscale_iam" {
 
 variable "anyscale_iam_access_role_name" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) IAM Access Role Name
+
     The name of the IAM role that will be created for Anyscale access.
-    If left `null`, will default to anyscale_iam_access_role_name_prefix.
-    If provided, overrides the anyscale_iam_access_role_name_prefix variable.
-    Conflicts with anyscale_iam_access_role_name_prefix.
-    Default is `null`.
+    - If left `null`, will default to `anyscale_iam_access_role_name_prefix`.
+    - If provided, overrides the `anyscale_iam_access_role_name_prefix` variable.
+    - It needs to be > 4 chars and < 28 chars.
+
+    ex:
+    ```
+    anyscale_iam_access_role_name = "anyscale-crossacct-access"
+    ```
   EOT
   type        = string
   default     = null
+  validation {
+    condition = var.anyscale_iam_access_role_name == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,28}[a-z0-9])?)$", var.anyscale_iam_access_role_name))
+    )
+    error_message = "`anyscale_iam_access_role_name` must start with a lowercase letter followed by up to 28 lowercase letters, numbers, or hyphens."
+  }
 }
 variable "anyscale_iam_access_role_name_prefix" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) IAM Access Role Name Prefix
+
     Creates a unique IAM role name beginning with the specified prefix.
-    If `anyscale_iam_access_role_name` is provided, it will override this variable.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
-    Default is `null` but is set to `anyscale-crossacct-` in a local variable.
+    - If `anyscale_iam_access_role_name` is provided, it will override this variable.
+    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - Default is `null` but is set to `anyscale-crossacct-` in a local variable.
+    - It needs to be > 4 chars and < 20 chars.
+
+    ex:
+    ```
+    anyscale_iam_access_role_name_prefix = "anyscale-crossacct-"
+    ```
   EOT
   type        = string
   default     = null
+  validation {
+    condition = var.anyscale_iam_access_role_name_prefix == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,20})?)$", var.anyscale_iam_access_role_name_prefix))
+    )
+    error_message = "`anyscale_iam_access_role_name_prefix` must start with a lowercase letter followed by up to 20 lowercase letters, numbers, or hyphens."
+  }
 }
 variable "anyscale_iam_access_role_description" {
   description = <<-EOT
     (Optional) The description of the IAM role that will be created for Anyscale access.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_iam_access_role_description = "Anyscale Cross Account Access"
+    ```
   EOT
   type        = string
   default     = null
@@ -732,17 +1041,33 @@ variable "anyscale_iam_access_role_description" {
 variable "anyscale_workload_identity_pool_name" {
   description = <<-EOT
     (Optional) The name of the workload identity pool.
+
     If it is not provided, the Anyscale Access role name is used.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_workload_identity_pool_name = "anyscale-identitypool-access"
+    ```
   EOT
   type        = string
   default     = null
+  validation {
+    condition = var.anyscale_workload_identity_pool_name == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{0,32}[a-z0-9])?)$", var.anyscale_workload_identity_pool_name))
+    )
+    error_message = "`anyscale_workload_identity_pool_name` must start with a lowercase letter followed by up to 32 lowercase letters, numbers, or hyphens, and cannot end with a hyphen."
+  }
 }
 variable "anyscale_workload_identity_pool_display_name" {
   description = <<-EOT
     (Optional) The display name of the workload identity pool.
+
     Must be less than or equal to 32 chars.
-    Default is `Anyscale Cross Account AWS Access`.
+
+    ex:
+    ```
+    anyscale_workload_identity_pool_display_name = "Anyscale Cross Account Access"
+    ```
   EOT
   type        = string
   default     = "Anyscale Cross Account Access"
@@ -750,7 +1075,11 @@ variable "anyscale_workload_identity_pool_display_name" {
 variable "anyscale_workload_identity_pool_description" {
   description = <<-EOT
     (Optional) The description of the workload identity pool.
-    Default is `Used to provide Anyscale access from AWS.`.
+
+    ex:
+    ```
+    anyscale_workload_identity_pool_description = "Used to provide Anyscale access from AWS."
+    ```
   EOT
   type        = string
   default     = "Used to provide Anyscale access from AWS."
@@ -758,8 +1087,13 @@ variable "anyscale_workload_identity_pool_description" {
 variable "anyscale_workload_identity_pool_provider_name" {
   description = <<-EOT
     (Optional) The name of the workload identity pool provider.
+
     If it is not provided, the Anyscale Access role name is used.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_workload_identity_pool_provider_name = "anyscale-identitypool-access"
+    ```
   EOT
   type        = string
   default     = null
@@ -767,8 +1101,13 @@ variable "anyscale_workload_identity_pool_provider_name" {
 variable "anyscale_workload_identity_account_id" {
   description = <<-EOT
     (Optional) The AWS Account ID for Anyscale. Only use this if you are instructed to do so.
+
     This will override the sub-module variable: `anyscale_aws_account_id`
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_workload_identity_account_id = "123456789012"
+    ```
   EOT
   type        = string
   default     = null
@@ -776,32 +1115,177 @@ variable "anyscale_workload_identity_account_id" {
 
 variable "anyscale_cluster_node_role_name" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) IAM Cluster Node Role Name
+
     The name of the IAM role that will be created for Anyscale cluster nodes.
-    If left `null`, will default to anyscale_cluster_node_role_name_prefix.
-    If provided, overrides the anyscale_cluster_node_role_name_prefix variable.
-    Conflicts with anyscale_cluster_node_role_name_prefix.
-    Default is `null`.
+    - If left `null`, will default to anyscale_cluster_node_role_name_prefix.
+    - If provided, overrides the anyscale_cluster_node_role_name_prefix variable.
+    - It needs to be > 4 chars and < 28 chars.
+
+    ex:
+    ```
+    anyscale_cluster_node_role_name = "anyscale-cluster-node"
+    ```
   EOT
   type        = string
   default     = null
+  validation {
+    condition = var.anyscale_cluster_node_role_name == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,28}[a-z0-9])?)$", var.anyscale_cluster_node_role_name))
+    )
+    error_message = "`anyscale_cluster_node_role_name` must start with a lowercase letter followed by up to 28 lowercase letters, numbers, or hyphens."
+  }
+
 }
 variable "anyscale_cluster_node_role_name_prefix" {
   description = <<-EOT
-    (Optional - forces new resource)
+    (Optional - forces new resource) IAM Cluster Node Role Name Prefix
+
     Creates a unique IAM role name beginning with the specified prefix.
-    If `anyscale_cluster_node_role_name` is provided, it will override this variable.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
-    Default is `null` but is set to `anyscale-cluster-` in a local variable.
+    - If `anyscale_cluster_node_role_name` is provided, it will override this variable.
+    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - Default is `null` but is set to `anyscale-cluster-` in a local variable.
+    - It needs to be > 4 chars and < 20 chars.
+
+    ex:
+    ```
+    anyscale_cluster_node_role_name_prefix = "anyscale-cluster-"
+    ```
   EOT
   type        = string
   default     = null
+  validation {
+    condition = var.anyscale_cluster_node_role_name_prefix == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,20})?)$", var.anyscale_cluster_node_role_name_prefix))
+    )
+    error_message = "`anyscale_cluster_node_role_name_prefix` must start with a lowercase letter followed by up to 20 lowercase letters, numbers, or hyphens."
+  }
 }
 variable "anyscale_cluster_node_role_description" {
   description = <<-EOT
     (Optional) The description of the IAM role that will be created for Anyscale access.
-    Default is `null`.
+
+    ex:
+    ```
+    anyscale_cluster_node_role_description = "Anyscale Cluster Node"
+    ```
   EOT
   type        = string
   default     = null
+}
+
+# --------------------------------------------
+# Anyscale Memorystore Variables
+# --------------------------------------------
+variable "enable_anyscale_memorystore" {
+  description = <<-EOT
+    (Optional) Determines if the Anyscale Memorystore is created.
+
+    ex:
+    ```
+    enable_anyscale_memorystore = true
+    ```
+  EOT
+  type        = bool
+  default     = false
+}
+
+variable "existing_memorystore_instance_name" {
+  description = <<-EOT
+    (Optional) The name of an existing Memorystore instance.
+
+    If this is provided, the Anyscale Memorystore module will skip creating a new Memorystore instance.
+
+    ex:
+    ```
+    existing_memorystore_instance_name = "anyscale-memorystore"
+    ```
+
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "anyscale_memorystore_name" {
+  description = <<-EOT
+    (Optional - forces new resource) Memorystore Name
+
+    The name of the Memorystore instance used for Anyscale Services Head Node HA.
+
+    If left `null`, will default to `anyscale_memorystore_name_prefix`.
+    If provided, overrides the `anyscale_memorystore_name_prefix` variable.
+
+    ex:
+    ```
+    anyscale_memorystore_name = "anyscale-memorystore"
+    ```
+  EOT
+  type        = string
+  default     = null
+  validation {
+    condition = var.anyscale_memorystore_name == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{0,61}[a-z0-9])?)$", var.anyscale_memorystore_name))
+    )
+    error_message = "`anyscale_memorystore_name` must start with a lowercase letter followed by up to 62 lowercase letters, numbers, or hyphens, and cannot end with a hyphen."
+  }
+}
+
+variable "anyscale_memorystore_name_prefix" {
+  description = <<-EOT
+    (Optional - forces new resource) Memorystore Name Prefix
+
+    Creates a unique Memorystore instance name beginning with the specified prefix.
+    If `anyscale_memorystore_name` is provided, it will override this variable.
+
+    Because it is the prefix, it can end in a hyphen as it will have a random suffix appended to it.
+    The variable `general_prefix` is a fall-back prefix if this is not provided.
+
+    ex:
+    ```
+    anyscale_memorystore_name_prefix = "anyscale-memorystore"
+    ```
+  EOT
+  type        = string
+  default     = null
+  validation {
+    condition = var.anyscale_memorystore_name_prefix == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{0,47})?)$", var.anyscale_memorystore_name_prefix))
+    )
+    error_message = "`anyscale_memorystore_name_prefix` must start with a lowercase letter followed by up to 48 lowercase letters, numbers, or hyphens."
+  }
+}
+
+variable "anyscale_memorystore_display_name" {
+  description = <<-EOT
+    (Optional) Memorystore Display Name
+
+    The display name of the Memorystore instance used for Anyscale Services Head Node HA.
+    Must start with a lowercase letter followed by up to 62 lowercase letters, numbers, or hyphens, and cannot end with a hyphen.
+
+    ex:
+    ```
+    anyscale_memorystore_display_name = "Anyscale Memorystore"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "anyscale_memorystore_labels" {
+  description = <<-EOT
+    (Optional) Memorystore Labels
+
+    A map of labels to be added to the Memorystore instance.
+    Duplicate labels in `labels` will be overwritten by labels in `anyscale_memorystore_labels`.
+
+    ex:
+    ```
+    anyscale_memorystore_labels = {
+      application = "Anyscale",
+      environment = "prod"
+    }
+    ```
+  EOT
+  type        = map(string)
+  default     = {}
 }

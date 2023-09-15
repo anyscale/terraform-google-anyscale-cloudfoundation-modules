@@ -29,21 +29,17 @@ module "kitchen_sink" {
   module_enabled = true
 
   anyscale_project_id = var.google_project_id
-  anyscale_activate_apis = [
+  anyscale_activate_required_apis = [
+    "compute.googleapis.com",
+    "bigquery.googleapis.com",
+    "certificatemanager.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "serviceusage.googleapis.com",
+    "deploymentmanager.googleapis.com"
+  ]
+  anyscale_activate_optional_apis = [
     "monitoring.googleapis.com",
   ]
-
-  # activate_api_identities = [
-  #   {
-  #     api = "bigquery.googleapis.com"
-  #     roles = [
-  #       "roles/bigquery.admin",
-  #       "roles/bigquery.dataEditor",
-  #       "roles/bigquery.dataViewer",
-  #       "roles/bigquery.jobUser",
-  #     ]
-  #   }
-  # ]
 
   disable_services_on_destroy = false
   disable_dependent_services  = false

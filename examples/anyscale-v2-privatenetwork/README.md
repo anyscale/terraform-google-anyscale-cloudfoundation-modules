@@ -11,6 +11,7 @@ Creates a v2 stack including:
 - VPC with publicly routed subnets (no internal)
 - VPC Firewall
 - FileStore
+- Memorystore
 
 This requires either a jumpbox in the environment, a VPN into the GCE environment, or some alternative
 method to route traffic from end user computers to the clusters that Anyscale creates. Testing was done
@@ -64,6 +65,7 @@ No resources.
 | <a name="output_filestore_instance_id"></a> [filestore\_instance\_id](#output\_filestore\_instance\_id) | The Google Filestore instance id. |
 | <a name="output_filestore_location"></a> [filestore\_location](#output\_filestore\_location) | The Google Filestore location. |
 | <a name="output_firewall_policy_name"></a> [firewall\_policy\_name](#output\_firewall\_policy\_name) | The Google VPC firewall policy name. |
+| <a name="output_memorystore_id"></a> [memorystore\_id](#output\_memorystore\_id) | The memorystore instance ID. |
 | <a name="output_project_name"></a> [project\_name](#output\_project\_name) | The Google Project name. |
 | <a name="output_registration_command"></a> [registration\_command](#output\_registration\_command) | The Anyscale registration command. |
 | <a name="output_subnet_name"></a> [subnet\_name](#output\_subnet\_name) | The Google VPC public subnet name. |

@@ -1,7 +1,8 @@
 locals {
   # activate_compute_identity = 0 != length([for i in var.activate_api_identities : i if i.api == "compute.googleapis.com"])
-  compute_enabled = contains(var.anyscale_activate_apis, "compute.googleapis.com") ? true : false
-  apis_to_enable  = var.module_enabled ? toset(concat(var.anyscale_activate_apis)) : toset([])
+  compute_enabled = contains(var.anyscale_activate_required_apis, "compute.googleapis.com") ? true : false
+  required_apis   = var.module_enabled ? toset(concat(var.anyscale_activate_required_apis)) : toset([])
+  optional_apis   = var.module_enabled && length(var.anyscale_activate_optional_apis) > 0 ? toset(var.anyscale_activate_optional_apis) : toset([])
   # api_identities = flatten([
   #   for i in var.activate_api_identities : [
   #     for r in i.roles :
@@ -12,9 +13,9 @@ locals {
 # --------------------------------------------------------------
 # Anyscale Google Cloud APIs Resource
 # --------------------------------------------------------------
-resource "google_project_service" "anyscale_apis" {
+resource "google_project_service" "anyscale_required_apis" {
   for_each = {
-    for i in local.apis_to_enable :
+    for i in local.required_apis :
     i => i
     if i != "compute.googleapis.com"
   }
@@ -30,6 +31,17 @@ resource "google_project_service" "anycale_compute_api" {
   service                    = "compute.googleapis.com"
   disable_on_destroy         = false
   disable_dependent_services = false
+}
+
+resource "google_project_service" "anyscale_optional_apis" {
+  for_each = {
+    for i in local.optional_apis :
+    i => i
+  }
+  project                    = var.anyscale_project_id
+  service                    = each.value
+  disable_on_destroy         = var.disable_services_on_destroy
+  disable_dependent_services = var.disable_dependent_services
 }
 
 # **************************************************

@@ -8,6 +8,7 @@
 #     - VPC with private subnets (no public IPs) and NAT
 #     - VPC Firewall
 #     - FileStore (Standard)
+#     - MemoryStore (Redis)
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   full_labels = merge(tomap({
@@ -46,4 +47,7 @@ module "google_anyscale_v2_privatenetwork" {
 
   # Cloud Storage (Bucket) Related
   anyscale_bucket_location = "US"
+
+  # Memorystore Related
+  enable_anyscale_memorystore = true
 }
