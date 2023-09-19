@@ -1,3 +1,15 @@
+## 0.8.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- Fix to the `google-anyscale-iam` submodule when `anyscale_cloud_id` is provided
+  - When `anyscale_cloud_id` is provided, the IAM submodule should update descriptions of the roles/resources created, however the way it was working was looking for a variable that was always null and thus causing a terraform error. This has been replaced with a try to see if the additional variable is populated.
+
+BREAKING CHANGES:
+
+OTHER:
+
+
 ## 0.8.0 (Released)
 FEATURES:
 - New integration for Anyscale Service Head Node fault tolerance.
