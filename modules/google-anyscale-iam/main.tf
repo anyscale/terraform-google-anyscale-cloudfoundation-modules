@@ -4,7 +4,7 @@ locals {
   anyscale_aws_account_id      = var.workload_anyscale_aws_account_id != null ? var.workload_anyscale_aws_account_id : var.anyscale_access_aws_account_id
   anyscale_access_role_enabled = var.module_enabled && var.create_anyscale_access_role ? true : false
 
-  anyscale_access_role_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale access role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}" : null
+  anyscale_access_role_desc_cloud = try("Anyscale access role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}", "Anyscale access role for cloud ${var.anyscale_cloud_id}", null)
   anyscale_access_role_desc = coalesce(
     var.anyscale_access_role_description,
     local.anyscale_access_role_desc_cloud,
@@ -110,7 +110,7 @@ resource "google_service_account_iam_binding" "anyscale_workload_identity_user" 
 locals {
   cluster_node_role_enabled = var.module_enabled && var.create_anyscale_cluster_node_role ? true : false
 
-  anyscale_cluster_node_role_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale cluster node role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}" : null
+  anyscale_cluster_node_role_desc_cloud = try("Anyscale cluster node role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}", "Anyscale cluster node role for cloud ${var.anyscale_cloud_id}", null)
   anyscale_cluster_node_role_desc = coalesce(
     var.anyscale_cluster_node_role_description,
     local.anyscale_cluster_node_role_desc_cloud,
