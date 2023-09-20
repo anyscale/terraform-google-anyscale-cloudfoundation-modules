@@ -36,18 +36,19 @@ module "google_anyscale_v2_privatenetwork" {
 
   # VPC Related
   anyscale_vpc_private_subnet_cidr = "172.26.100.0/22"
+  anyscale_vpc_proxy_subnet_cidr   = "172.26.104.0/22"
 
   # Firewall Related
   anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges
 
   # Filestore Related
-  anyscale_filestore_tier        = "STANDARD"
-  anyscale_filestore_location    = "us-central1-a"
-  anyscale_filestore_capacity_gb = 3000
+  # anyscale_filestore_tier        = "STANDARD"
+  # anyscale_filestore_location    = "us-central1-a"
+  # anyscale_filestore_capacity_gb = 3000
 
   # Cloud Storage (Bucket) Related
   anyscale_bucket_location = "US"
 
   # Memorystore Related
-  enable_anyscale_memorystore = true
+  # enable_anyscale_memorystore = true
 }

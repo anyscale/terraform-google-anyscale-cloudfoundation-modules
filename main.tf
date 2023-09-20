@@ -84,10 +84,11 @@ locals {
   vpc_name_prefix = coalesce(var.anyscale_vpc_name_prefix, var.common_prefix, "anyscale-vpc-")
 
   anyscale_private_subnet_count = var.anyscale_vpc_private_subnet_cidr != null ? 1 : 0
+  anyscale_proxy_subnet_count   = var.anyscale_vpc_proxy_subnet_cidr != null ? 1 : 0
   anyscale_public_subnet_count  = var.anyscale_vpc_public_subnet_cidr != null ? 1 : 0
 
   create_new_vpc         = var.existing_vpc_name == null ? true : false
-  create_vpc_subnets     = local.anyscale_private_subnet_count > 0 || local.anyscale_public_subnet_count > 0 ? true : false
+  create_vpc_subnets     = local.anyscale_proxy_subnet_count > 0 || local.anyscale_private_subnet_count > 0 || local.anyscale_public_subnet_count > 0 ? true : false
   create_nat_gw          = local.create_new_vpc && var.anyscale_vpc_create_natgw && local.anyscale_private_subnet_count > 0 ? true : false
   execute_vpc_sub_module = local.create_new_vpc || local.create_vpc_subnets ? true : false
 }
@@ -106,6 +107,7 @@ module "google_anyscale_vpc" {
 
   public_subnet_cidr  = var.anyscale_vpc_public_subnet_cidr
   private_subnet_cidr = var.anyscale_vpc_private_subnet_cidr
+  proxy_subnet_cidr   = var.anyscale_vpc_proxy_subnet_cidr
 
   create_nat = local.create_nat_gw
 }
@@ -115,6 +117,8 @@ module "google_anyscale_vpc" {
 # ------------------------------
 locals {
   execute_vpc_firewall_sub_module = local.create_new_vpc || var.enable_anyscale_vpc_firewall ? true : false
+
+  vpc_project_id = coalesce(var.shared_vpc_project_id, var.existing_project_id, module.google_anyscale_project.project_id)
 
   google_ui_cidr          = "35.235.240.0/20"
   allow_access_from_cidrs = "${var.anyscale_vpc_firewall_allow_access_from_cidrs}${var.allow_ssh_from_google_ui ? ",${local.google_ui_cidr}" : ""}"
@@ -145,7 +149,7 @@ module "google_anyscale_vpc_firewall_policy" {
     module.google_anyscale_cloudapis,
     module.google_anyscale_vpc
   ]
-  anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
+  anyscale_project_id = local.vpc_project_id
 
   vpc_name = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
 
@@ -170,7 +174,8 @@ locals {
   fileshare_name        = coalesce(var.anyscale_filestore_fileshare_name, local.fileshare_common_name)
   # fileshare_name_prefix = coalesce(var.anyscale_filestore_fileshare_name_prefix, try(replace(var.common_prefix, "-", "_"), null), "anyscale_")
 
-  filestore_vpc_name = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
+  filestore_shared_vpc = var.shared_vpc_project_id != null && var.existing_vpc_name != null ? "projects/${var.shared_vpc_project_id}/global/networks/${var.existing_vpc_name}" : null
+  filestore_vpc_name   = coalesce(local.filestore_shared_vpc, var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
 
   # Using the following to determine a default zone for the filestore instance if not ENTERPRISE tier.
   # This matches `anyscale cloud setup` logic - setting default to -b zones
@@ -180,6 +185,7 @@ locals {
   filestore_location_zone   = coalesce(var.anyscale_filestore_location, local.filestore_private_subnet_zone, local.filestore_public_subnet_zone, data.google_client_config.current.zone)
   filestore_location_region = coalesce(var.anyscale_filestore_location, module.google_anyscale_vpc.private_subnet_region, module.google_anyscale_vpc.public_subnet_region, data.google_client_config.current.region)
   filestore_location        = var.anyscale_filestore_tier == "ENTERPRISE" ? local.filestore_location_region : local.filestore_location_zone
+
 }
 module "google_anyscale_filestore" {
   source              = "./modules/google-anyscale-filestore"
@@ -200,8 +206,10 @@ module "google_anyscale_filestore" {
 
   filestore_description = var.anyscale_filestore_description
   filestore_location    = local.filestore_location
-  filestore_vpc_name    = local.filestore_vpc_name
   filestore_tier        = var.anyscale_filestore_tier
+
+  filestore_vpc_name            = local.filestore_vpc_name
+  filestore_network_conect_mode = var.anyscale_filestore_network_conect_mode
 }
 
 # ------------------------------

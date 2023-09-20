@@ -1,3 +1,21 @@
+## 0.8.2 (Released)
+FEATURES:
+
+BUG FIXES:
+- Improved support for Anyscale Services on Private VPCs
+  - We've added an additional VPC proxy subnet to support load balancers on GCP when utilizing private VPCs.
+  - To utilize this feature, we've included a new root module optional variable: `anyscale_vpc_proxy_subnet_cidr`
+  - See the example in `/examples/anyscale-v2-privatenetwork`
+
+BREAKING CHANGES:
+
+OTHER:
+- General doc updates and cleanup
+- Root module variables cleanup with better descriptions and examples
+- tflint and changelog updates
+- Initial pass at End to End testing integration
+
+
 ## 0.8.1 (Released)
 FEATURES:
 
