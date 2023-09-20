@@ -1,3 +1,32 @@
+## 0.8.2 (Released)
+FEATURES:
+
+BUG FIXES:
+- Improved support for Anyscale Services on Private VPCs
+  - We've added an additional VPC proxy subnet to support load balancers on GCP when utilizing private VPCs.
+  - To utilize this feature, we've included a new root module optional variable: `anyscale_vpc_proxy_subnet_cidr`
+  - See the example in `/examples/anyscale-v2-privatenetwork`
+
+BREAKING CHANGES:
+
+OTHER:
+- General doc updates and cleanup
+- Root module variables cleanup with better descriptions and examples
+- tflint and changelog updates
+- Initial pass at End to End testing integration
+
+## 0.8.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- Fix to the `google-anyscale-iam` submodule when `anyscale_cloud_id` is provided
+  - When `anyscale_cloud_id` is provided, the IAM submodule should update descriptions of the roles/resources created, however the way it was working was looking for a variable that was always null and thus causing a terraform error. This has been replaced with a try to see if the additional variable is populated.
+
+BREAKING CHANGES:
+
+OTHER:
+
+
 ## 0.8.0 (Released)
 FEATURES:
 - New integration for Anyscale Service Head Node fault tolerance.

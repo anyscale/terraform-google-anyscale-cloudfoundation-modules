@@ -2,17 +2,10 @@
 # Firewalls
 # ----------------
 locals {
-  # random_id_enabled   = var.module_enabled && var.random_char_length != 0 ? true : false
-  # random_char_length  = var.random_char_length >= 4 && var.random_char_length % 2 == 0 ? var.random_char_length / 2 : 0
-  # firewall_policyname = var.firewall_policy_name != null ? var.firewall_policy_name : var.firewall_policy_name_prefix
   firewall_policyname_computed = coalesce(var.firewall_policy_name, var.vpc_name, "anyscale-firewall-policy")
 
-  # firewall_allow_external = var.external_allow != null && length(var.external_allow) > 0
   ingress_with_self_enabled        = var.module_enabled && length(var.ingress_with_self_map) > 0 && length(var.ingress_with_self_cidr_range) > 0 ? true : false
   ingress_from_cidr_blocks_enabled = var.module_enabled && var.ingress_from_cidr_map != null && length(var.ingress_from_cidr_map) > 0 ? true : false
-
-  # firewall_allow_all_egress = var.module_enabled && var.allow_all_egress
-  # firewall_deny_all_ingress = var.module_enabled
 }
 
 #-------------------------------
@@ -148,49 +141,3 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
   }
 
 }
-
-# resource "google_compute_network_firewall_policy_rule" "ingress_deny_all" {
-#   count = local.firewall_deny_all_ingress ? 1 : 0
-
-#   # name          = "${local.computed_anyscale_vpcname}-ingress-deny-all"
-#   description     = "Block all ingress traffic from all destinations"
-#   direction       = "INGRESS"
-#   action          = "deny(403)"
-#   priority        = 2147483647
-#   project         = var.anyscale_project_id
-#   enable_logging  = var.enable_firewall_rule_logging
-#   firewall_policy = google_compute_network_firewall_policy.anyscale_firewall_policy[0].name
-#   disabled        = false
-
-#   match {
-#     src_ip_ranges = ["0.0.0.0/0"]
-#     layer4_configs {
-#       ip_protocol = "all"
-#     }
-#   }
-# }
-
-# # ----------------
-# # Egress Rules
-# # ----------------
-# #tfsec:ignore:google-compute-no-public-egress
-# resource "google_compute_network_firewall_policy_rule" "egress_all_allowed" {
-#   count = local.firewall_allow_all_egress ? 1 : 0
-
-#   # name               = "${local.computed_anyscale_vpcname}-egress-all-allowed"
-#   description     = "Allow egress traffic to all destinations"
-#   direction       = "EGRESS"
-#   action          = "allow"
-#   priority        = 2147483647
-#   project         = var.anyscale_project_id
-#   enable_logging  = var.enable_firewall_rule_logging
-#   firewall_policy = google_compute_network_firewall_policy.anyscale_firewall_policy[0].name
-#   disabled        = false
-
-#   match {
-#     dest_ip_ranges = ["0.0.0.0/0"]
-#     layer4_configs {
-#       ip_protocol = "all"
-#     }
-#   }
-# }

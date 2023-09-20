@@ -5,6 +5,11 @@
 variable "vpc_name" {
   description = <<-EOT
     (Required) The name of the VPC to apply the Firewall Policy to.
+
+    ex:
+    ```
+    vpc_name = "anyscale-vpc"
+    ```
   EOT
   type        = string
 }
@@ -14,7 +19,14 @@ variable "vpc_name" {
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
 variable "anyscale_cloud_id" {
-  description = "(Optional) Anyscale Cloud ID. Default is `null`."
+  description = <<-EOT
+    (Optional) Anyscale Cloud ID.
+
+    ex:
+    ```
+    anyscale_cloud_id = "cld_1234567890"
+    ```
+  EOT
   type        = string
   default     = null
   validation {
@@ -29,34 +41,61 @@ variable "anyscale_cloud_id" {
 }
 
 variable "module_enabled" {
-  description = "(Optional) Whether to create the resources inside this module. Default is `true`."
+  description = <<-EOT
+    (Optional) Determines whether to create the resources inside this module.
+
+    ex:
+    ```
+    module_enabled = true
+    ```
+  EOT
   type        = bool
   default     = true
 }
 
 variable "anyscale_project_id" {
-  description = "(Optional) The ID of the project to create the resource in. If it is not provided, the provider project is used. Default is `null`."
+  description = <<-EOT
+    (Optional) The ID of the project to create the resource in.
+
+    If it is not provided, the provider project is used.
+
+    ex:
+    ```
+    anyscale_project_id = "project-1234567890"
+    ```
+  EOT
   type        = string
   default     = null
 }
-# variable "google_region" {
-#   description = "The Google region in which all resources will be created. If not provided, the provider region will be used. Default is `null`."
-#   type        = string
-#   default     = null
-# }
 
 # --------------------------------------------------------------
 # Firewall Policy
 # --------------------------------------------------------------
 variable "firewall_policy_name" {
-  description = "(Optional) The name of the firewall policy. If not provided, the firewall name will default to the vpc name. Default is `null`."
+  description = <<-EOT
+    (Optional) The name of the firewall policy.
+
+    If left `null`, the firewall name will default to the vpc name.
+
+    ex:
+    ```
+    firewall_policy_name = "anyscale-vpc-firewall-policy"
+    ```
+  EOT
   type        = string
   default     = null
 }
 
 
 variable "firewall_policy_description" {
-  description = "(Optional) The description of the firewall policy. Default is `Anyscale VPC Firewall Policy`."
+  description = <<-EOT
+    (Optional) The description of the firewall policy.
+
+    ex:
+    ```
+    firewall_policy_description = "Anyscale VPC Firewall Policy"
+    ```
+  EOT
   type        = string
   default     = "Anyscale VPC Firewall Policy"
 }
@@ -65,25 +104,68 @@ variable "firewall_policy_description" {
 # Firewall Rules
 #------------------------------------------------------------------------------
 variable "enable_firewall_rule_logging" {
-  description = "(Optional) Determines whether to enable logging for firewall rules. Default is `true`."
+  description = <<-EOT
+    (Optional) Determines whether to enable logging for firewall rules.
+
+    ex:
+    ```
+    enable_firewall_rule_logging = true
+    ```
+  EOT
   type        = bool
   default     = true
 }
 
 variable "ingress_with_self_cidr_range" {
-  description = "(Optional) List of CIDR range to default to if a specific mapping isn't provided. Default is an empty list."
+  description = <<-EOT
+    (Optional) List of CIDR range to default to if a specific mapping isn't provided.
+
+    ex:
+    ```
+    ingress_with_self_cidr_range = ["10.10.0.0/16","10.20.0.0/16"]
+    ```
+  EOT
   type        = list(string)
   default     = []
 }
 variable "ingress_with_self_map" {
-  description = "(Optional) List of ingress rules to create where 'self' is defined. Default rule is `all-all` as this firewall rule is used for all Anyscale resources."
+  description = <<-EOT
+    (Optional) List of ingress rules to create where 'self' is defined.
+
+    Default rule is `all-all` as this firewall rule is used for all Anyscale resources.
+
+    ex:
+    ```
+    ingress_with_self_map = [
+      {
+        rule        = "https-443-tcp"
+      },
+      {
+        rule        = "http-80-tcp"
+      },
+      {
+        rule        = "ssh-tcp"
+      },
+      {
+        rule        = "nfs-tcp"
+      }
+    ]
+    ```
+  EOT
   type        = list(map(string))
   default     = [{ rule = "all-all" }]
 }
 
 
 variable "default_ingress_cidr_range" {
-  description = "(Optional) List of IPv4 cidr ranges to default to if a specific mapping isn't provided (see below example). Default is an empty list."
+  description = <<-EOT
+    (Optional) List of IPv4 cidr ranges to default to if a specific mapping isn't provided.
+
+    ex:
+    ```
+    default_ingress_cidr_range = ["32.0.10.0/24","32.32.10.9/32"]
+    ```
+  EOT
   type        = list(string)
   default     = []
 }
@@ -132,12 +214,6 @@ variable "ingress_from_cidr_map" {
   default     = []
 }
 
-# variable "allow_all_egress" {
-#   description = "(Optional) Determines of egress to all on cidr range 0.0.0.0/0 is allowed. If set to `false` then additional changes need to be made to the Firewall for Anyscale to work. Default is `true`"
-#   type        = bool
-#   default     = true
-# }
-
 # --------------------
 # Pre-defined rules
 #   These are reuqired
@@ -159,8 +235,3 @@ variable "predefined_firewall_rules" {
     nfs-tcp = [2049, "tcp", "NFS/EFS", 1004]
   }
 }
-# variable "labels" {
-#   description = "(Optional) A map of labels to all resources that accept labels. Default is an empty map."
-#   type        = map(string)
-#   default     = {}
-# }

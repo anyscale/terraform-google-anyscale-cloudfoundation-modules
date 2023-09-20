@@ -155,22 +155,6 @@ variable "anyscale_filestore_fileshare_name" {
   }
 }
 
-# variable "anyscale_filestore_fileshare_name_prefix" {
-#   description = <<-EOT
-#     (Optional) The prefix of the fileshare to create.
-#     Conflicts with `anyscale_filestore_fileshare_name`.
-#     Must start with a letter, followed by letters, numbers, or underscores.
-#     Because it is the prefix, it can end in an underscore as it will have a random suffix appended to it.
-#     Default is `anyscale_fileshare_`.
-#   EOT
-#   type        = string
-#   default     = "anyscale_fileshare_"
-#   validation {
-#     condition     = can(regex("^[a-zA-Z][a-zA-Z0-9_]*$", var.anyscale_filestore_fileshare_name_prefix))
-#     error_message = "`anyscale_filestore_fileshare_name_prefix` must start with a letter, followed by letters, numbers, or underscores. Because this is the prefix, it can end in an underscore as it will have a random suffix appended to it."
-#   }
-# }
-
 variable "anyscale_filestore_fileshare_capacity_gb" {
   description = "(Optional) The capacity of the fileshare to create. This must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier. Default is `2560`."
   type        = number
@@ -190,7 +174,16 @@ variable "filestore_network_modes" {
 }
 
 variable "filestore_network_conect_mode" {
-  description = "(Optional) The connect modes in which the filestore will be created. Default is `DIRECT_PEERING`."
+  description = <<-EOT
+    (Optional) The connect modes in which the filestore will be created.
+
+    If using a shared VPC, this should be set to `PRIVATE_SERVICE_ACCESS`, otherwise it should be set to `DIRECT_PEERING`.
+
+    ex:
+    ```
+    filestore_network_conect_mode = "DIRECT_PEERING"
+    ```
+  EOT
   type        = string
   default     = "DIRECT_PEERING"
   validation {

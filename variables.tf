@@ -360,25 +360,22 @@ variable "existing_vpc_subnet_name" {
   type        = string
   default     = null
 }
-# variable "existing_vpc_private_route_table_ids" {
-#   description = <<-EOT
-#     (Optional)
-#     Existing VPC Private Route Table IDs.
-#     If provided, this will map new private subnets to these route table IDs.
-#     If no new subnets are created, these route tables will be used to create VPC Endpoint(s).
-#   EOT
-#   type        = list(string)
-#   default     = []
-# }
-# variable "existing_vpc_public_route_table_ids" {
-#   description = <<-EOT
-#     (Optional)
-#     Existing VPC Public Route Table IDs.
-#     If provided, these route tables will be used to create VPC Endpoint(s).
-#   EOT
-#   type        = list(string)
-#   default     = []
-# }
+
+variable "shared_vpc_project_id" {
+  description = <<-EOT
+    (Optional) The ID of the project that hosts the shared VPC.
+
+    If provided, this will set the Project ID to the Shared VPC for the `google-anyscale-vpc-firewall` submodule.
+    An existing VPC Name (`existing_vpc_name`) and VPC Subnet Name (`existing_vpc_subnet_name`) are also required if this is provided.
+
+    ex:
+    ```
+    shared_vpc_project_id = "anyscale-sharedvpc"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
 
 variable "anyscale_vpc_name" {
   description = <<-EOT
@@ -504,6 +501,46 @@ variable "anyscale_vpc_private_subnet_cidr" {
   }
 }
 
+variable "anyscale_vpc_proxy_subnet_cidr" {
+  description = <<-EOT
+    (Optional) The proxy subnet to create.
+
+    Anyscale recommends a /22 or larger CIDR block. The Anyscale VPC module will only create one proxy subnet in one region.
+    Anyscale uses Proxy Subnets for the load balancer as part of Anyscale Services.
+
+    ex:
+    ```
+    anyscale_vpc_proxy_subnet_cidr = "10.100.0.0/20"
+    ```
+  EOT
+  type        = string
+  default     = null
+
+  validation {
+    condition = (
+      var.anyscale_vpc_proxy_subnet_cidr == null ||
+      (
+        try(length(regexall("/[0-9]+", var.anyscale_vpc_proxy_subnet_cidr)), 0) > 0 &&
+        can(cidrsubnet(var.anyscale_vpc_proxy_subnet_cidr, 0, 0))
+      )
+    )
+    error_message = "The `anyscale_vpc_proxy_subnet_cidr` CIDR block is invalid."
+  }
+
+  validation {
+    condition = (
+      var.anyscale_vpc_proxy_subnet_cidr == null ||
+      (
+        try(length(regexall("/[0-9]+", var.anyscale_vpc_proxy_subnet_cidr)), 0) > 0 &&
+        can(cidrsubnet(var.anyscale_vpc_proxy_subnet_cidr, 0, 0)) &&
+        try(length(cidrnetmask(var.anyscale_vpc_proxy_subnet_cidr)), 0) <= 24 &&
+        try(length(cidrnetmask(var.anyscale_vpc_proxy_subnet_cidr)), 0) >= 8
+      )
+    )
+    error_message = "The `anyscale_vpc_proxy_subnet_cidr` CIDR block must have a prefix length between /8 and /24."
+  }
+}
+
 variable "anyscale_vpc_create_natgw" {
   description = <<-EOT
     (Optional) Determines if a NAT Gateway is created.
@@ -518,6 +555,7 @@ variable "anyscale_vpc_create_natgw" {
   type        = bool
   default     = true
 }
+
 
 # --------------------------------------------
 # Anyscale VPC Firewall Variables
@@ -534,6 +572,7 @@ variable "enable_anyscale_vpc_firewall" {
   type        = bool
   default     = true
 }
+
 variable "anyscale_vpc_firewall_policy_name" {
   description = <<-EOT
     (Optional) The name of the Anyscale VPC Firewall Policy.
@@ -572,7 +611,6 @@ variable "allow_ssh_from_google_ui" {
   type        = bool
   default     = true
 }
-
 
 # --------------------------------------------
 # Anyscale Cloud Storage Variables
@@ -961,6 +999,25 @@ variable "anyscale_filestore_labels" {
   EOT
   type        = map(string)
   default     = {}
+}
+
+variable "anyscale_filestore_network_conect_mode" {
+  description = <<-EOT
+    (Optional) The network connect mode of the filestore instance.
+
+    Must be one of `DIRECT_PEERING` or `PRIVATE_SERVICE_ACCESS`. If using a Shared VPC, this must be set to `PRIVATE_SERVICE_ACCESS`.
+
+    ex:
+    ```
+    anyscale_filestore_network_conect_mode = "DIRECT_PEERING"
+    ```
+  EOT
+  type        = string
+  default     = "DIRECT_PEERING"
+  validation {
+    condition     = contains(["DIRECT_PEERING", "PRIVATE_SERVICE_ACCESS"], var.anyscale_filestore_network_conect_mode)
+    error_message = "The `anyscale_filestore_network_conect_mode` must be one of `DIRECT_PEERING` or `PRIVATE_SERVICE_ACCESS`"
+  }
 }
 
 # --------------------------------------------
