@@ -1095,6 +1095,26 @@ variable "anyscale_iam_access_role_description" {
   type        = string
   default     = null
 }
+
+variable "existing_workload_identity_provider_name" {
+  description = <<-EOF
+    (Optional) The name of an existing workload identity provider to use.
+
+    If provided, will skip creating the workload identity pool and provider. The Workload Identity Provider can be in a different project.
+
+    You can retrieve the name of an existing Workload Identity Provider by running the following command:
+    ```
+    gcloud iam workload-identity-pools providers list --location global --workload-identity-pool anyscale-access-pool
+    ```
+
+    ex:
+    ```
+    existing_workload_identity_provider_name = "projects/1234567890/locations/global/workloadIdentityPools/anyscale-access-pool/providers/anyscale-access-provider"
+    ```
+  EOF
+  type        = string
+  default     = null
+}
 variable "anyscale_workload_identity_pool_name" {
   description = <<-EOT
     (Optional) The name of the workload identity pool.

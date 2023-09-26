@@ -1,3 +1,18 @@
+## 0.9.0 (Released)
+FEATURES:
+- Support for existing Workload Identify Federation pool and provider
+  - This allows for following of [Google's best practice](https://cloud.google.com/iam/docs/best-practices-for-using-workload-identity-federation#dedicated-project) of creating all WIF/WIP in a dedicated project.
+  - In this situation, the IAM submodule will NOT create a Workload Identity Federation Pool or Provider
+  - Additional example for Existing Identity Federation built and tested in /examples/anyscale-v2-existingidentityfederation
+  - If using this, please follow the Anyscale Documentation for [GCP Workload Identity Federation](https://docs.anyscale.com/cloud-deployment/gcp/manage-clouds#workload-identity-federation)
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Updates to End to End testing python script
+
 ## 0.8.2 (Released)
 FEATURES:
 

@@ -47,11 +47,12 @@ module "kitchen_sink" {
   anyscale_access_role_project_permissions = ["roles/editor"]
   anyscale_access_role_binding_permissions = ["roles/iam.serviceAccountUser"]
 
-  workload_identity_pool_name          = "anyscale-kitchen-sink-pool"
-  workload_identity_pool_display_name  = "Anyscale kitchen sink pool"
-  workload_identity_pool_description   = "Anyscale kitchen sink pool for kitchen sink test"
-  workload_identity_pool_provider_name = "anyscale-kitchen-sink-provider"
-  anyscale_access_aws_account_id       = "623395924981"
+  existing_workload_identity_provider_name = var.existing_workload_identity_provider_name
+  # workload_identity_pool_name          = "anyscale-kitchen-sink-pool"
+  # workload_identity_pool_display_name  = "Anyscale kitchen sink pool"
+  # workload_identity_pool_description   = "Anyscale kitchen sink pool for kitchen sink test"
+  # workload_identity_pool_provider_name = "anyscale-kitchen-sink-provider"
+  # anyscale_access_aws_account_id       = "623395924981"
 
   anyscale_cluster_node_role_name        = "kitchen-sink-cluster-node-role"
   anyscale_cluster_node_role_description = "Anyscale cluster node role for kitchen sink test"

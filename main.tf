@@ -237,11 +237,12 @@ module "google_anyscale_iam" {
   anyscale_access_role_name_prefix = local.iam_access_role_name_prefix
   anyscale_access_role_description = var.anyscale_iam_access_role_description
 
-  workload_identity_pool_name          = var.anyscale_workload_identity_pool_name
-  workload_identity_pool_display_name  = var.anyscale_workload_identity_pool_display_name
-  workload_identity_pool_description   = var.anyscale_workload_identity_pool_description
-  workload_identity_pool_provider_name = var.anyscale_workload_identity_pool_provider_name
-  workload_anyscale_aws_account_id     = var.anyscale_workload_identity_account_id
+  existing_workload_identity_provider_name = var.existing_workload_identity_provider_name
+  workload_identity_pool_name              = var.anyscale_workload_identity_pool_name
+  workload_identity_pool_display_name      = var.anyscale_workload_identity_pool_display_name
+  workload_identity_pool_description       = var.anyscale_workload_identity_pool_description
+  workload_identity_pool_provider_name     = var.anyscale_workload_identity_pool_provider_name
+  workload_anyscale_aws_account_id         = var.anyscale_workload_identity_account_id
 
   anyscale_cluster_node_role_name            = local.iam_cluster_node_role_name
   anyscale_cluster_node_role_name_prefix     = local.iam_cluster_node_role_name_prefix

@@ -25,9 +25,15 @@ from rich.progress import (
     TextColumn,
     TimeElapsedColumn,
 )
-from python_terraform import IsFlagged, IsNotFlagged, Terraform
-
+from rich.logging import RichHandler
+from rich.console import Group
+from rich.live import Live
+import logging
 from anyscale.controllers.cloud_controller import CloudController
+from python_terraform import Terraform, IsFlagged, IsNotFlagged
+
+logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=[RichHandler()])
+logger = logging.getLogger("rich")
 
 
 # Feel free to edit the following variables for AWS
@@ -37,12 +43,8 @@ def _get_terraform_anyscale_v2_e2e_public_vars_aws():
     """
     return {
         "aws_region": "us-east-2",
+        "common_prefix": "e2etest-tf-",
         "customer_ingress_cidr_ranges": "0.0.0.0/0",
-        "anyscale_access_role_trusted_role_arns": [
-            "arn:aws:iam::623395924981:root",  # staging
-            "arn:aws:iam::521861002309:root",  # predeploy
-            "arn:aws:iam::525325868955:root",  # production
-        ],
     }
 
 
@@ -63,71 +65,83 @@ def _get_terraform_anyscale_v2_e2e_public_vars_gcp(
     }
 
 
-def _terraform_init(working_dir: str):
+def _terraform_init(tf: Terraform):
     """Run terraform init."""
-    print("Running terraform init...")
+    logger.info("Running: terraform init")
     try:
-        result = subprocess.run(
-            ["terraform", "init", "--upgrade"],
-            capture_output=True,
-            cwd=working_dir,
-            text=True,
-        )
-        return result.returncode, result.stdout, result.stderr
+        return_code, stdout, stderr = tf.init()
+        logger.info("  Succesfull: terraform init")
+        return return_code, stdout, stderr
     except Exception as e:
-        print(f"Error running terraform init: {e}")
+        logger.error(f"Error running terraform init: {e}")
         raise e
 
 
-def _terraform_apply(working_dir: str, variables: dict):
+def _terraform_apply(tf: Terraform, expected_time: int, variables: dict):
     """Run terraform apply."""
-    print("Running terraform apply...")
+    logger.info(f"Running: terraform apply (approx. time: {expected_time} min)")
     try:
-        command = ["terraform", "apply", "-auto-approve"]
-        for key, value in variables.items():
-            command.append(f"-var={key}={value}")
-
-        result = subprocess.run(
-            command, capture_output=True, cwd=working_dir, text=True
+        return_code, stdout, stderr = tf.apply(
+            skip_plan=True,
+            capture_output=True,
+            var=variables,
         )
-        return result.returncode, result.stdout, result.stderr
+
+        logger.info("  Succesfull: terraform apply")
+        return return_code, stdout, stderr
     except Exception as e:
-        print(f"Error running terraform apply: {e}")
+        logger.error(f"Terraform apply failed: {e}")
         raise e
 
 
-def _terraform_destroy(working_dir: str, variables: dict):
+def _terraform_destroy(tf: Terraform, variables: dict):
     """Run terraform destroy."""
+    logger.info("Running: terraform destroy")
     try:
-        command = ["terraform", "destroy", "-auto-approve"]
-        for key, value in variables.items():
-            command.append(f"-var={key}={value}")
-
-        result = subprocess.run(
-            command,
+        return_code, stdout, stderr = tf.destroy(
             capture_output=True,
-            cwd=working_dir,
-            text=True,
+            auto_approve=IsFlagged,
+            force=IsNotFlagged,
+            var=variables,
         )
-        return result.returncode, result.stdout, result.stderr
+
+        logger.info("  Succesfull: terraform destroy")
+        return return_code, stdout, stderr
     except Exception as e:
-        print(f"Error running terraform destroy: {e}")
+        logger.error(f"Error running terraform destroy: {e}")
         raise e
 
 
-def _terraform_output(working_dir: str):
-    """Run terraform output."""
+def _anyscale_cloud_delete(cloud_controller: CloudController, cloud_name: str):
+    """Delete the cloud from anyscale."""
+    logger.info("Running: anyscale cloud delete")
     try:
-        result = subprocess.run(
-            ["terraform", "output", "-json"],
-            capture_output=True,
-            cwd=working_dir,
-            text=True,
+        cloud_controller.delete_cloud(
+            cloud_name=cloud_name,
+            cloud_id="",
+            skip_confirmation=True,
         )
-        return result.returncode, result.stdout, result.stderr
+        logger.info("  Cloud deleted successfully")
+        return 0
     except Exception as e:
-        print(f"Error running terraform output: {e}")
-        raise e
+        logger.info(f"Error deleting anyscale cloud: {e}")
+        return 1
+
+
+# def _terraform_output(tf: Terraform):
+#     """Run terraform output."""
+#     try:
+#         return_code, stdout, stderr = tf.output(capture_output=True)
+#         # result = subprocess.run(
+#         #     ["terraform", "output", "-json"],
+#         #     capture_output=True,
+#         #     cwd=working_dir,
+#         #     text=True,
+#         # )
+#         return return_code, stdout, stderr
+#     except Exception as e:
+#         logger.error(f"Error running terraform output: {e}")
+#         raise e
 
 
 def _parse_registration_command(input_string):
@@ -138,7 +152,7 @@ def _parse_registration_command(input_string):
         return None
 
     registration_command = match.group(1)
-    print(registration_command)
+    logger.debug(registration_command)
     return _parse_options(registration_command)
 
 
@@ -148,17 +162,29 @@ def _parse_options(input_string):
     return {key: value.strip() for key, value in matches}
 
 
+def _sleep_timer(seconds: int):
+    """Sleep for the given number of seconds."""
+    logger.info(f"Sleeping for {seconds} seconds")
+    step_task_id = step_progress.add_task(
+        f"Sleeping for {seconds} seconds", total=seconds
+    )
+    for i in range(seconds):
+        step_progress.update(step_task_id, advance=1)
+        time.sleep(1)
+    step_progress.stop_task(step_task_id)
+    step_progress.update(step_task_id, visible=False)
+
+
 def start_aws_test(branch_name: str, local_path: str):
     # If you have some error like "destination path 'terraform-aws-anyscale-cloudfoundation-modules' already exists and is not an empty directory",  # noqa: E501
     # remove the terraform-aws-anyscale-cloudfoundation-modules folder and run this script again.  # noqa: E501
     # "sudo rm -r terraform-aws-anyscale-cloudfoundation-modules"
-    print("Starting aws test...")
+    logger.info("Applying anyscale_v2_e2e_public aws terraform")
 
     if local_path:
-        print("Using local path...")
-        working_dir = local_path
+        logger.debug("Using local path...")
     else:
-        print("Cloning the repo...")
+        logger.info("Cloning the repo...")
         repo_url = "https://github.com/anyscale/terraform-aws-anyscale-cloudfoundation-modules/"
         subprocess.check_call(["git", "clone", repo_url])
         # Checkout to a specific branch
@@ -166,113 +192,166 @@ def start_aws_test(branch_name: str, local_path: str):
             ["git", "checkout", branch_name],
             cwd="terraform-aws-anyscale-cloudfoundation-modules",
         )
-        working_dir = "terraform-aws-anyscale-cloudfoundation-modules/test/anyscale-v2-e2e-public-test"  # noqa: E501
 
-    tf = Terraform(
-        working_dir=working_dir,
-        variables=_get_terraform_anyscale_v2_e2e_public_vars_aws(),
-    )
-    tf.init()
-    print(
-        "Applying anyscale_v2_e2e_public aws terraform... (It will take about 2~5 minutes)"  # noqa: E501
-    )
-    # To debug, we can add capture_output=False to see the stdout, in which case the stdout will be None.  # noqa: E501
-    return_code, stdout, stderr = tf.apply(skip_plan=True)
-    if return_code != 0:
-        raise RuntimeError(
-            f"Error applying anyscale_v2_e2e_public aws terraform: {stderr}"
+    tf = Terraform(working_dir=local_path)
+
+    with live:
+        task_id = e2e_progress.add_task("", total=100)
+
+        e2e_progress.update(task_id, description="Running: terraform init")
+        return_code, stdout, stderr = _terraform_init(tf)
+        if return_code != 0:
+            raise RuntimeError(f"Error initializing terraform: {stderr}")
+
+        e2e_progress.update(
+            task_id,
+            description="Running: terraform apply",
+            advance=20,
         )
-    print(f"Applied anyscale_v2_e2e_public aws result: {stdout}")
+        return_code, stdout, stderr = _terraform_apply(
+            tf,
+            5,
+            _get_terraform_anyscale_v2_e2e_public_vars_aws(),
+        )
+        if return_code != 0:
+            logger.error("Error running: terraform apply")
+            logger.error(stderr)
+        logger.debug(stdout)
 
-    ## Register the cloud.
-    cloud_name = (
-        f"test_terraform_anyscale_v2_e2e_public_aws_{datetime.now().isoformat()}"
-    )
-    stdout_dict = _parse_registration_command(stdout)
-    print(f"Parsed stdout_dict: {stdout_dict}")
-    s3_bucket_id = stdout_dict.get("s3-bucket-id")
-    print("Registering cloud...")
+        logger.info("Applied AWS Terraform: anyscale_v2_e2e_public")
+
+        ## Gather information for registration
+        cloud_name = (
+            f"test_terraform_anyscale_v2_e2e_public_aws_{datetime.now().isoformat()}"
+        )
+        stdout_dict = _parse_registration_command(stdout)
+        s3_bucket_id = stdout_dict.get("s3-bucket-id")
+
+        ## Register the cloud.
+        e2e_progress.update(
+            task_id,
+            description="Registering Anyscale AWS cloud...",
+            advance=40,
+        )
+        try:
+            cloud_controller = CloudController()
+            cloud_controller.register_aws_cloud(
+                region=stdout_dict.get("region"),
+                name=cloud_name,
+                vpc_id=stdout_dict.get("vpc-id"),
+                subnet_ids=stdout_dict.get("subnet-ids").split(","),
+                efs_id=stdout_dict.get("efs-id"),
+                anyscale_iam_role_id=stdout_dict.get("anyscale-iam-role-id"),
+                instance_iam_role_id=stdout_dict.get("instance-iam-role-id"),
+                security_group_ids=stdout_dict.get("security-group-ids").split(","),
+                s3_bucket_id=s3_bucket_id,
+                # Changed functional_verify to `None` to
+                # allow Anyscale resources time to be created.
+                functional_verify=None,
+                private_network=False,
+                cluster_management_stack_version="v2",
+                memorydb_cluster_id=None,
+                yes=True,
+            )
+            logger.info("  Cloud registered successfully")
+        except Exception as e:
+            logger.error(f"Error registering cloud: {e}")
+
+        e2e_progress.update(
+            task_id, description="Sleeping: Waiting for Anyscale resources", advance=30
+        )
+        # pause for 3 min to wait for Anyscale to be ready
+        _sleep_timer(60 * 3)
+        e2e_progress.update(
+            task_id,
+            description="Proceeding with Anyscale functional test",
+            completed=100,
+        )
+        e2e_progress.stop_task(task_id)
+
+    logger.info("Starting: Anyscale functional test")
     try:
-        cloud_controller = CloudController()
-        cloud_controller.register_aws_cloud(
-            region=stdout_dict.get("region"),
-            name=cloud_name,
-            vpc_id=stdout_dict.get("vpc-id"),
-            subnet_ids=stdout_dict.get("subnet-ids").split(","),
-            efs_id=stdout_dict.get("efs-id"),
-            anyscale_iam_role_id=stdout_dict.get("anyscale-iam-role-id"),
-            instance_iam_role_id=stdout_dict.get("instance-iam-role-id"),
-            security_group_ids=stdout_dict.get("security-group-ids").split(","),
-            s3_bucket_id=s3_bucket_id,
-            # change to functional_verify="workspace,service" once service is ready.
-            # For functional verify, the console will ask for your confirm to proceed.
+        cloud_controller.verify_cloud(
+            cloud_name=cloud_name,
+            cloud_id=None,
+            strict=True,
+            # Change functional_verify="workspace,service" once service is ready.
+            # Requires user confirmation to proceed or setting yes=True
             functional_verify="workspace",
-            private_network=False,
-            cluster_management_stack_version="v2",
-            memorydb_cluster_id=None,
             yes=True,
         )
-        print("Cloud registered successfully")
+        logger.info("  Completed: AWS Cloud verified successfully")
     except Exception as e:
-        print(f"Error registering cloud: {e}")
+        logger.error(f"Error verifying aws cloud: {e}")
 
-    ## Delete the cloud.
-    try:
-        print("Deleting cloud...")
-        cloud_controller.delete_cloud(
-            cloud_name=cloud_name,
-            cloud_id="",
-            skip_confirmation=True,
+    with live:
+        task_id = e2e_progress.add_task("", total=100)
+
+        ## Delete the cloud.
+        e2e_progress.update(task_id, description="Deleting Anyscale AWS cloud...")
+        _anyscale_cloud_delete(cloud_controller, cloud_name)
+
+        ## Emptying the bucket.
+        e2e_progress.update(
+            task_id,
+            description=f"Emptying bucket {s3_bucket_id}...",
+            advance=30,
         )
-        print("Cloud deleted successfully")
-    except Exception as e:
-        print(f"Error deleting cloud: {e}")
+        s3_client = boto3.client("s3")
+        object_response_paginator = s3_client.get_paginator("list_object_versions")
+        delete_marker_list = []
+        version_list = []
+        for object_response_itr in object_response_paginator.paginate(
+            Bucket=s3_bucket_id
+        ):
+            if "DeleteMarkers" in object_response_itr:
+                for delete_marker in object_response_itr["DeleteMarkers"]:
+                    delete_marker_list.append(
+                        {
+                            "Key": delete_marker["Key"],
+                            "VersionId": delete_marker["VersionId"],
+                        }
+                    )
 
-    ## Emptying the s3 bucket.
-    print(f"Emptying s3 bucket {s3_bucket_id}...")
-    s3_client = boto3.client("s3")
-    object_response_paginator = s3_client.get_paginator("list_object_versions")
-    delete_marker_list = []
-    version_list = []
-    for object_response_itr in object_response_paginator.paginate(Bucket=s3_bucket_id):
-        if "DeleteMarkers" in object_response_itr:
-            for delete_marker in object_response_itr["DeleteMarkers"]:
-                delete_marker_list.append(
-                    {
-                        "Key": delete_marker["Key"],
-                        "VersionId": delete_marker["VersionId"],
-                    }
-                )
+            if "Versions" in object_response_itr:
+                for version in object_response_itr["Versions"]:
+                    version_list.append(
+                        {"Key": version["Key"], "VersionId": version["VersionId"]}
+                    )
 
-        if "Versions" in object_response_itr:
-            for version in object_response_itr["Versions"]:
-                version_list.append(
-                    {"Key": version["Key"], "VersionId": version["VersionId"]}
-                )
+        for i in range(0, len(delete_marker_list), 1000):
+            response = s3_client.delete_objects(
+                Bucket=s3_bucket_id,
+                Delete={"Objects": delete_marker_list[i : i + 1000], "Quiet": True},
+            )
+            logger.debug(response)
 
-    for i in range(0, len(delete_marker_list), 1000):
-        response = s3_client.delete_objects(
-            Bucket=s3_bucket_id,
-            Delete={"Objects": delete_marker_list[i : i + 1000], "Quiet": True},
+        for i in range(0, len(version_list), 1000):
+            response = s3_client.delete_objects(
+                Bucket=s3_bucket_id,
+                Delete={"Objects": version_list[i : i + 1000], "Quiet": True},
+            )
+            logger.debug(response)
+
+        logger.info(f"S3 bucket {s3_bucket_id} emptied successfully")
+
+        ## Destroy the terraform.
+        e2e_progress.update(
+            task_id,
+            description="Running: terraform destroy",
+            advance=40,
         )
-        print(response)
-
-    for i in range(0, len(version_list), 1000):
-        response = s3_client.delete_objects(
-            Bucket=s3_bucket_id,
-            Delete={"Objects": version_list[i : i + 1000], "Quiet": True},
+        return_code, stdout, stderr = _terraform_destroy(
+            tf, variables=_get_terraform_anyscale_v2_e2e_public_vars_aws()
         )
-        print(response)
+        if return_code != 0:
+            logger.error("Error running: terraform destroy")
+            logger.error(stderr)
 
-    print(f"S3 bucket {s3_bucket_id} emptied successfully")
-    ## Destroy the terraform.
-    print("Destroying anyscale_v2_e2e_public aws terraform...")
-    return_code, stdout, stderr = tf.destroy(force=IsNotFlagged, auto_approve=IsFlagged)
-    if return_code != 0:
-        raise RuntimeError(
-            f"Error destroying anyscale_v2_e2e_public aws terraform: {stderr}"
-        )
-    print(f"Destroyed anyscale_v2_e2e_public aws terraform successfully {stdout}")
+        logger.info("Destroyed anyscale_v2_e2e_public aws terraform successfully")
+        logger.debug(stdout)
+
+        e2e_progress.update(task_id, description="E2E test complete!", completed=100)
 
 
 def start_gcp_test(
@@ -282,11 +361,12 @@ def start_gcp_test(
     anyscale_org_id: str,
     root_folder_number: str,
 ):
+    logger.info("Applying anyscale_v2_e2e_public gcp terraform")
+
     if local_path:
-        print("Using local path...")
-        working_dir = local_path
+        logger.debug("Using local path")
     else:
-        print("Cloning the repo...")
+        logger.info("Cloning the repo")
         repo_url = "https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/"
         subprocess.check_call(["git", "clone", repo_url])
         # Checkout to a specific branch
@@ -294,71 +374,54 @@ def start_gcp_test(
             ["git", "checkout", branch_name],
             cwd="terraform-aws-anyscale-cloudfoundation-modules",
         )
-        working_dir = "terraform-google-anyscale-cloudfoundation-modules/test/anyscale-v2-e2e-public-test"  # noqa: E501  # noqa: E501
 
-    overall_progress = Progress(
-        SpinnerColumn(),
-        TimeElapsedColumn(),
-        BarColumn(),
-        TextColumn("[bold blue]{task.description}"),
-    )
+    tf = Terraform(working_dir=local_path)
 
-    overall_progress.console.log("Applying anyscale_v2_e2e_public gcp terraform...")
+    with live:
+        task_id = e2e_progress.add_task("", total=100)
 
-    with overall_progress:
-        task_id = overall_progress.add_task("", total=100)
-        overall_progress.update(task_id, description="Running Terraform Init...")
-
-        return_code, stdout, stderr = _terraform_init(working_dir)
+        e2e_progress.update(task_id, description="Running: terraform init")
+        return_code, stdout, stderr = _terraform_init(tf)
         if return_code != 0:
             raise RuntimeError(f"Error initializing terraform: {stderr}")
 
-        overall_progress.update(
+        e2e_progress.update(
             task_id,
-            description="Running Terraform Apply (It will take about 10 minutes)...",
-            advance=10,
+            description="Running: terraform apply",
+            advance=20,
         )
         return_code, stdout, stderr = _terraform_apply(
-            working_dir,
+            tf,
+            10,
             _get_terraform_anyscale_v2_e2e_public_vars_gcp(
-                gcp_billing_id, anyscale_org_id, root_folder_number
+                billing_account_id=gcp_billing_id,
+                anyscale_org_id=anyscale_org_id,
+                root_folder_number=root_folder_number,
             ),
         )
         if return_code != 0:
-            raise RuntimeError(f"Error applying terraform: {stderr}")
+            logger.error("Error running: terraform apply")
+            logger.error(stderr)
 
-        overall_progress.console.log("Applied anyscale_v2_e2e_public gcp result")
-        print(stdout)
-
-        return_code, tf_output_json, stderr = _terraform_output(working_dir)
-        if return_code != 0:
-            raise RuntimeError(f"Error getting terraform output: {stderr}")
+        logger.info("Applied GCP Terraform: anyscale_v2_e2e_public")
 
         # pause for GCP to be ready
-        for i in range(60 * 1):
-            overall_progress.update(
-                task_id,
-                description="Waiting for GCP to be ready...",
-                advance=0.5,
-            )
-            time.sleep(1)
+        _sleep_timer(60)
+        e2e_progress.update(
+            task_id,
+            description="Registering Anyscale GCP cloud...",
+            completed=10,
+        )
 
-        ## Register the cloud.
+        ## Gather information for registration
         cloud_name = (
             f"test_terraform_anyscale_v2_e2e_public_gcp_{datetime.now().isoformat()}"
         )
         stdout_dict = _parse_registration_command(stdout)
-        print(f"Parsed stdout_dict: {stdout_dict}")
-        overall_progress.console.log("Registering gcp cloud...")
-
+        logger.debug(f"Parsed stdout_dict: {stdout_dict}")
+        logger.info("Registering gcp cloud...")
         bucket_name = stdout_dict.get("cloud-storage-bucket-name")
 
-        overall_progress.update(
-            task_id,
-            description="Registering Anyscale GCP cloud...",
-            advance=10,
-        )
-        stdout_dict.get("cloud-storage-bucket-name")
         try:
             cloud_controller = CloudController()
             cloud_controller.register_gcp_cloud(
@@ -380,91 +443,101 @@ def start_gcp_test(
                     ","
                 ),
                 cloud_storage_bucket_name=bucket_name,
-                # change to functional_verify="workspace,service" once service is ready.
-                # For functional verify, the console will ask for your confirm to proceed.
+                # Changed functional_verify=None to
+                # allow Anyscale Resources time to be created.
                 functional_verify=None,
                 private_network=False,
                 cluster_management_stack_version="v2",
                 memorystore_instance_name=None,
                 yes=True,
             )
-            overall_progress.console.log("Cloud registered successfully")
+            logger.info("Cloud registered successfully")
         except Exception as e:
-            overall_progress.console.log(f"Error registering gcp cloud: {e}")
+            logger.info(f"Error registering gcp cloud: {e}")
 
+        e2e_progress.update(
+            task_id, description="Sleeping: Waiting for Anyscale resources", advance=30
+        )
         # pause for 3 min to wait for Anyscale to be ready
-        for i in range(60 * 3):
-            overall_progress.update(
-                task_id,
-                description="Waiting for Anyscale to be ready...",
-                advance=0.05,
-            )
-            time.sleep(1)
+        _sleep_timer(60 * 3)
+        e2e_progress.update(
+            task_id,
+            description="Proceeding with Anyscale functional test",
+            completed=100,
+        )
+        e2e_progress.stop_task(task_id)
 
-        # ## Verify the cloud.
-        # print("Verifying gcp cloud...")
-        # try:
-        #     cloud_controller.verify_cloud(
-        #         cloud_name=cloud_name,
-        #         cloud_id=None,
-        #         strict=True,
-        #         functional_verify="workspace",
-        #         yes=True,
-        #     )
-        #     print("GCP Cloud verified successfully")
-        # except Exception as e:
-        #     print(f"Error verifying gcp cloud: {e}")
+    ## Verify the cloud.
+    logger.info("Starting: Anyscale functional test")
+    try:
+        cloud_controller.verify_cloud(
+            cloud_name=cloud_name,
+            cloud_id=None,
+            strict=True,
+            functional_verify="workspace",
+            yes=True,
+        )
+        logger.info("GCP Cloud verified successfully")
+    except Exception as e:
+        logger.info(f"Error verifying gcp cloud: {e}")
+
+    with live:
+        task_id = e2e_progress.add_task("", total=100)
 
         ## Delete the cloud.
-        try:
-            cloud_controller.delete_cloud(
-                cloud_name=cloud_name,
-                cloud_id="",
-                skip_confirmation=True,
-            )
-            overall_progress.console.log("GCP Cloud deleted successfully")
-        except Exception as e:
-            overall_progress.console.log(f"Error deleting gcp cloud: {e}")
+        e2e_progress.update(task_id, description="Deleting Anyscale AWS cloud...")
+        _anyscale_cloud_delete(cloud_controller, cloud_name)
 
         # ## Emptying bucket
-        overall_progress.console.log(f"Emptying bucket {bucket_name}...")
+        e2e_progress.update(
+            task_id,
+            description=f"Emptying bucket {bucket_name}...",
+            advance=30,
+        )
         try:
             storage_client = storage.Client()
             bucket = storage_client.bucket(bucket_name)
+
             # get all objects and delete them
-            blobs = bucket.list_blobs()
-            blobs_count = len(list(blobs))
+            blobs = list(bucket.list_blobs())
+            blobs_count = len(blobs)
+
+            step_task_id = step_progress.add_task(
+                f"Emptying bucket: {bucket_name}", total=blobs_count
+            )
+
             for blob in blobs:
                 blob.delete()
-                overall_progress.update(
-                    task_id,
-                    description=f"Emptying bucket {bucket_name}... {blobs_count} objects left",
-                    advance=1,
-                )
-                blobs_count -= 1
-            overall_progress.console.log(f"Bucket {bucket_name} emptied successfully")
+                step_progress.update(step_task_id, advance=1)
+
+            logger.info(f"Bucket {bucket_name} emptied successfully")
+            step_progress.stop_task(step_task_id)
+            step_progress.update(step_task_id, visible=False)
+
         except Exception as e:
-            overall_progress.console.log(f"Error emptying bucket {bucket_name}: {e}")
+            logger.info(f"Error emptying bucket {bucket_name}: {e}")
 
         # Destroy the terraform.
-        overall_progress.update(
+        e2e_progress.update(
             task_id,
-            description="Destroying anyscale_v2_e2e_public gcp terraform...",
-            advance=10,
+            description="Running: terraform destroy",
+            advance=40,
         )
-        return_code, std_out, stderr = _terraform_destroy(
-            working_dir,
+        return_code, stdout, stderr = _terraform_destroy(
+            tf,
             _get_terraform_anyscale_v2_e2e_public_vars_gcp(
-                gcp_billing_id, anyscale_org_id, root_folder_number
+                billing_account_id=gcp_billing_id,
+                anyscale_org_id=anyscale_org_id,
+                root_folder_number=root_folder_number,
             ),
         )
         if return_code != 0:
             raise RuntimeError(f"Error destroying terraform: {stderr}")
 
-        overall_progress.console.log(
-            "Destroyed anyscale_v2_e2e_public gcp terraform successfully"
-        )
-        print(stdout)
+        logger.info("Destroyed anyscale_v2_e2e_public gcp terraform successfully")
+        logger.debug(stdout)
+
+        e2e_progress.update(task_id, description="E2E test complete!", completed=100)
 
 
 if __name__ == "__main__":
@@ -519,6 +592,20 @@ if __name__ == "__main__":
     branch_name = args.branchName
     local_path = args.localPath
 
+    e2e_progress = Progress(
+        TimeElapsedColumn(),
+        BarColumn(),
+        TextColumn("[bold blue]{task.description}"),
+    )
+    step_progress = Progress(
+        SpinnerColumn(),
+        TimeElapsedColumn(),
+        BarColumn(),
+        TextColumn("[bold blue]{task.description}"),
+    )
+
+    progress_group = Group(step_progress, e2e_progress)
+    live = Live(progress_group, refresh_per_second=10)
     if cloud_provider == "aws":
         start_aws_test(branch_name, local_path)
     elif cloud_provider == "gcp":
