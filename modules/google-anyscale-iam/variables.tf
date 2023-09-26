@@ -129,6 +129,27 @@ variable "anyscale_access_role_binding_permissions" {
   default     = ["roles/iam.serviceAccountTokenCreator"]
 }
 
+
+variable "existing_workload_identity_provider_name" {
+  description = <<-EOF
+    (Optional) The name of an existing workload identity provider to use.
+
+    If provided, will skip creating the workload identity pool and provider.
+
+    You can retrieve the name of an existing Workload Identity Provider by running the following command:
+    ```
+    gcloud iam workload-identity-pools providers list --location global --workload-identity-pool anyscale-access-pool
+    ```
+
+    ex:
+    ```
+    existing_workload_identity_provider_name = "projects/1234567890/locations/global/workloadIdentityPools/anyscale-access-pool/providers/anyscale-access-provider"
+    ```
+    ```
+  EOF
+  type        = string
+  default     = null
+}
 variable "workload_identity_pool_name" {
   description = "(Optional) The name of the workload identity pool. If it is not provided, the Anyscale Access role name is used. Default is `null`."
   type        = string

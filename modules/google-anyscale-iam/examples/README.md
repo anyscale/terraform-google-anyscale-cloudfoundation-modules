@@ -31,6 +31,7 @@ No resources.
 |------|-------------|------|---------|:--------:|
 | <a name="input_anyscale_deploy_env"></a> [anyscale\_deploy\_env](#input\_anyscale\_deploy\_env) | (Required) Anyscale deploy environment. Used in resource names and tags. | `string` | n/a | yes |
 | <a name="input_anyscale_organization_id"></a> [anyscale\_organization\_id](#input\_anyscale\_organization\_id) | (Required) Anyscale Organization ID | `string` | n/a | yes |
+| <a name="input_existing_workload_identity_provider_name"></a> [existing\_workload\_identity\_provider\_name](#input\_existing\_workload\_identity\_provider\_name) | (Optional) Existing Workload Identity Provider Name.<br><br>The name of an existing Workload Identity Provider that you'd like to use. This can be in a different project.<br>If provided, this will skip creating a new Workload Identity Provider with the Anyscale IAM module.<br><br>ex:<pre>existing_workload_identity_provider_name = "projects/1234567890/locations/global/workloadIdentityPools/anyscale-existing-pool/providers/anyscale-existing-provider"</pre> | `string` | `null` | no |
 | <a name="input_google_project_id"></a> [google\_project\_id](#input\_google\_project\_id) | ID of the Project to put these resources in | `string` | n/a | yes |
 
 ## Outputs

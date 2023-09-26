@@ -17,6 +17,8 @@ locals {
     random_id.random_char_suffix.hex,
   ) : local.anyscale_access_role_name
 
+  existing_provider_provided                    = var.existing_workload_identity_provider_name != null ? true : false
+  create_workload_identity_pool                 = local.anyscale_access_role_enabled && !local.existing_provider_provided ? true : false
   workload_identity_pool_crossacct_rolename     = "gcp_if_${var.anyscale_org_id}"
   workload_identity_pool_name_computed          = coalesce(var.workload_identity_pool_name, local.access_role_name_computed)
   workload_identity_pool_provider_name_computed = coalesce(var.workload_identity_pool_provider_name, local.access_role_name_computed)
@@ -60,8 +62,9 @@ resource "google_service_account_iam_binding" "anyscale_access_role" {
   members            = ["serviceAccount:${google_service_account.anyscale_access_role[0].email}"]
 }
 
+# Identity Pool Resources
 resource "google_iam_workload_identity_pool" "anyscale_pool" {
-  count   = local.anyscale_access_role_enabled ? 1 : 0
+  count   = local.create_workload_identity_pool ? 1 : 0
   project = var.anyscale_project_id
 
   display_name = var.workload_identity_pool_display_name
@@ -71,7 +74,7 @@ resource "google_iam_workload_identity_pool" "anyscale_pool" {
 }
 
 resource "google_iam_workload_identity_pool_provider" "anyscale_pool" {
-  count   = local.anyscale_access_role_enabled ? 1 : 0
+  count   = local.create_workload_identity_pool ? 1 : 0
   project = var.anyscale_project_id
 
   workload_identity_pool_id          = google_iam_workload_identity_pool.anyscale_pool[0].workload_identity_pool_id
@@ -93,13 +96,17 @@ resource "google_iam_workload_identity_pool_provider" "anyscale_pool" {
   }
 }
 
+locals {
+  existing_workload_identity_pool_name = local.existing_provider_provided ? regex("(.*)/providers/.*", var.existing_workload_identity_provider_name)[0] : null
+  identity_pool_name                   = local.create_workload_identity_pool ? "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.anyscale_pool[0].name}/*" : local.existing_provider_provided ? "principalSet://iam.googleapis.com/${local.existing_workload_identity_pool_name}/*" : null
+}
 resource "google_service_account_iam_binding" "anyscale_workload_identity_user" {
   count = local.anyscale_access_role_enabled ? 1 : 0
 
   service_account_id = google_service_account.anyscale_access_role[0].name
   role               = "roles/iam.workloadIdentityUser"
   members = [
-    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.anyscale_pool[0].name}/*"
+    local.identity_pool_name
   ]
 }
 

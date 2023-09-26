@@ -16,7 +16,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.82.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.84.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
 
 ## Modules
@@ -58,6 +58,7 @@ No modules.
 | <a name="input_create_anyscale_cluster_node_role"></a> [create\_anyscale\_cluster\_node\_role](#input\_create\_anyscale\_cluster\_node\_role) | (Optional) Determines whether to create the Anyscale cluster role.<br><br>ex:<pre>create_anyscale_cluster_node_role = true</pre> | `bool` | `true` | no |
 | <a name="input_enable_anyscale_cluster_logging_monitoring"></a> [enable\_anyscale\_cluster\_logging\_monitoring](#input\_enable\_anyscale\_cluster\_logging\_monitoring) | (Optional) Determines whether to grant the Cluster Node access to the monitoring and logging.<br><br>ex:<pre>enable_anyscale_cluster_logging_monitoring = true</pre> | `bool` | `false` | no |
 | <a name="input_enable_random_name_suffix"></a> [enable\_random\_name\_suffix](#input\_enable\_random\_name\_suffix) | (Optional) Determines if a suffix of random characters will be added to the Anyscale resources.<br>Default is `true` | `bool` | `true` | no |
+| <a name="input_existing_workload_identity_provider_name"></a> [existing\_workload\_identity\_provider\_name](#input\_existing\_workload\_identity\_provider\_name) | (Optional) The name of an existing workload identity provider to use.<br><br>If provided, will skip creating the workload identity pool and provider.<br><br>You can retrieve the name of an existing Workload Identity Provider by running the following command:<pre>gcloud iam workload-identity-pools providers list --location global --workload-identity-pool anyscale-access-pool</pre>ex:<pre>existing_workload_identity_provider_name = "projects/1234567890/locations/global/workloadIdentityPools/anyscale-access-pool/providers/anyscale-access-provider"</pre><pre></pre> | `string` | `null` | no |
 | <a name="input_google_region"></a> [google\_region](#input\_google\_region) | (Optional) The Google region in which all resources will be created. If it is not provided, the provider region is used. Default is `null`. | `string` | `null` | no |
 | <a name="input_module_enabled"></a> [module\_enabled](#input\_module\_enabled) | (Optional) Determines whether to create the resources inside this module. Default is `true`. | `bool` | `true` | no |
 | <a name="input_random_char_length"></a> [random\_char\_length](#input\_random\_char\_length) | (Optional) Sets the length of random characters to be appended as a suffix.<br>Depends on `random_bucket_suffix` being set to `true`.<br>Must be an even number, and must be at least 4.<br>Default is `4`. | `number` | `4` | no |
