@@ -57,6 +57,7 @@ output "private_subnet_region" {
   description = "The Google VPC private subnet region."
   value       = try(module.google_anyscale_vpc.private_subnet_region, "")
 }
+
 # ------------------------------------
 # VPC Firewall Policy Outputs
 # ------------------------------------
@@ -114,21 +115,21 @@ output "filestore_fileshare_name" {
 # ------------------------------------
 # IAM Resource Outputs
 # ------------------------------------
-output "iam_anyscale_access_role_id" {
-  description = "The Google IAM Anyscale Access Role id."
-  value       = try(module.google_anyscale_iam.iam_anyscale_access_role_id, "")
+output "iam_anyscale_access_service_acct_id" {
+  description = "The Google IAM Anyscale Access Service Account ID."
+  value       = try(module.google_anyscale_iam.iam_anyscale_access_service_acct_id, "")
 }
-output "iam_anyscale_access_role_name" {
-  description = "The Google IAM Anyscale Access Role name."
-  value       = try(module.google_anyscale_iam.iam_anyscale_access_role_name, "")
+output "iam_anyscale_access_service_acct_name" {
+  description = "The Google IAM Anyscale Access Service Account name."
+  value       = try(module.google_anyscale_iam.iam_anyscale_access_service_acct_name, "")
 }
-output "iam_anyscale_access_role_email" {
-  description = "The Google IAM Anyscale Access Role email."
-  value       = try(module.google_anyscale_iam.iam_anyscale_access_role_email, "")
+output "iam_anyscale_access_service_acct_email" {
+  description = "The Google IAM Anyscale Access Service Account email."
+  value       = try(module.google_anyscale_iam.iam_anyscale_access_service_acct_email, "")
 }
-output "iam_anyscale_access_role_unique_id" {
-  description = "The Google IAM Anyscale Access Role unique id."
-  value       = try(module.google_anyscale_iam.iam_anyscale_access_role_unique_id, "")
+output "iam_anyscale_access_service_acct_unique_id" {
+  description = "The Google IAM Anyscale Access Service Account unique id."
+  value       = try(module.google_anyscale_iam.iam_anyscale_access_service_acct_unique_id, "")
 }
 
 output "iam_workload_identity_pool_id" {
@@ -148,21 +149,21 @@ output "iam_workload_identity_provider_name" {
   value       = try(module.google_anyscale_iam.iam_workload_identity_provider_name, "")
 }
 
-output "iam_anyscale_cluster_node_role_id" {
-  description = "The Google IAM Anyscale Cluster Node Role id."
-  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_role_id, "")
+output "iam_anyscale_cluster_node_service_acct_id" {
+  description = "The Google IAM Anyscale Cluster Node Service Account ID."
+  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_id, "")
 }
-output "iam_anyscale_cluster_node_role_name" {
-  description = "The Google IAM Anyscale Cluster Node Role name."
-  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_role_name, "")
+output "iam_anyscale_cluster_node_service_acct_name" {
+  description = "The Google IAM Anyscale Cluster Node Service Accpimt name."
+  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_name, "")
 }
-output "iam_anyscale_cluster_node_role_email" {
-  description = "The Google IAM Anyscale Cluster Node Role email."
-  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_role_email, "")
+output "iam_anyscale_cluster_node_service_acct_email" {
+  description = "The Google IAM Anyscale Cluster Node Service Account email."
+  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_email, "")
 }
-output "iam_anyscale_cluster_node_role_unique_id" {
-  description = "The Google IAM Anyscale Cluster Node Role unique id."
-  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_role_unique_id, "")
+output "iam_anyscale_cluster_node_service_acct_unique_id" {
+  description = "The Google IAM Anyscale Cluster Node Service Account unique id."
+  value       = try(module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_unique_id, "")
 }
 
 # ------------------------------------

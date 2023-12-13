@@ -31,8 +31,64 @@ variable "anyscale_org_id" {
 
 # Project Related Required Variables
 variable "existing_project_id" {
-  description = "(Required) Google project ID to deploy Anyscale resources."
+  description = <<-EOT
+    (Required) Google project ID to deploy Anyscale resources.
+
+    ex:
+    ```
+    existing_project_id = "anyscale-project"
+    ```
+  EOT
   type        = string
+}
+
+variable "existing_vpc_name" {
+  description = <<-EOT
+    (Required) An existing VPC Name.
+
+    If provided, this module will skip creating a new VPC with the Anyscale VPC module.
+    An existing VPC Subnet Name (`existing_vpc_subnet_name`) is also required if this is provided.
+
+    ex:
+    ```
+    existing_vpc_name = "anyscale-vpc"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "existing_vpc_subnet_name" {
+  description = <<-EOT
+    (Required) Existing subnet name to create Anyscale resources in.
+
+    If provided, this will skip creating resources with the Anyscale VPC module.
+    An existing VPC Name (`existing_vpc_name`) is also required if this is provided.
+
+    ex:
+    ```
+    existing_vpc_subnet_name = "anyscale-subnet"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "shared_vpc_project_id" {
+  description = <<-EOT
+    (Required) Google project ID for the Shared VPC.
+
+    If provided, the firewall resources will be created in the Shared VPC Project.
+
+    An existing VPC Name (`existing_vpc_name`) and existing Subnet Name (`existing_vpc_subnet_name`) are also required when this is provided.
+
+    ex:
+    ```
+    shared_vpc_project_id = "anyscale-vpc"
+    ```
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "customer_ingress_cidr_ranges" {
@@ -43,27 +99,6 @@ variable "customer_ingress_cidr_ranges" {
   EOT
   type        = string
 }
-
-# Workload Identity Pool Related Required Variables
-variable "existing_workload_identity_provider_name" {
-  description = <<-EOT
-    (Optional) Existing Workload Identity Provider Name.
-
-    The name of an existing Workload Identity Provider that you'd like to use. This can be in a different project.
-
-    You can retrieve the name of an existing Workload Identity Provider by running the following command:
-    ```
-    gcloud iam workload-identity-pools providers list --location global --workload-identity-pool anyscale-access-pool
-    ```
-
-    ex:
-    ```
-    existing_workload_identity_provider = "projects/1234567890/locations/global/workloadIdentityPools/anyscale-access-pool/providers/anyscale-access-provider"
-    ```
-  EOT
-  type        = string
-}
-
 
 # ------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
@@ -103,4 +138,17 @@ variable "labels" {
     "test" : true,
     "environment" : "test"
   }
+}
+
+variable "enable_anyscale_vpc_firewall" {
+  description = <<-EOT
+    (Optional) Determines if the Anyscale VPC Firewall is created.
+
+    ex:
+    ```
+    enable_anyscale_vpc_firewall = true
+    ```
+  EOT
+  type        = bool
+  default     = true
 }

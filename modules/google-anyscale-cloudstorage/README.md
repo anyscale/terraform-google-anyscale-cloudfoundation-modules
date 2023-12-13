@@ -20,8 +20,8 @@ See the examples folder for how to use.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.82.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.84.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.6.0 |
 
 ## Modules
 
@@ -41,7 +41,6 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_anyscale_bucket_name"></a> [anyscale\_bucket\_name](#input\_anyscale\_bucket\_name) | (Optional - forces new resource)<br>The name of the bucket.<br>Changing this forces creating a new bucket.<br>This overrides the `anyscale_bucket_name_prefix` parameter.<br>Default is `null`. | `string` | `null` | no |
 | <a name="input_anyscale_bucket_name_prefix"></a> [anyscale\_bucket\_name\_prefix](#input\_anyscale\_bucket\_name\_prefix) | (Optional - forces new resource)<br>Creates a unique bucket name beginning with the specified prefix.<br>Changing this forces creating a new bucket.<br>If `anyscale_bucket_name` is provided, it overrides this parameter.<br>Default is `anyscale-`. | `string` | `"anyscale-"` | no |
-| <a name="input_anyscale_cloud_id"></a> [anyscale\_cloud\_id](#input\_anyscale\_cloud\_id) | (Optional) Anyscale Cloud ID. Default is `null`. | `string` | `null` | no |
 | <a name="input_anyscale_project_id"></a> [anyscale\_project\_id](#input\_anyscale\_project\_id) | (Optional) The ID of the project to create the resource in. If not provided, the provider project is used. Default is `null`. | `string` | `null` | no |
 | <a name="input_bucket_encryption_key_name"></a> [bucket\_encryption\_key\_name](#input\_bucket\_encryption\_key\_name) | (Optional) The encryption key name that should be used to encrypt this bucket. Default is `null`. | `string` | `null` | no |
 | <a name="input_bucket_force_destroy"></a> [bucket\_force\_destroy](#input\_bucket\_force\_destroy) | (Optional) Determines if the contents of the bucket will be deleted when a `terraform destroy` command is issued. Default is `false`. | `bool` | `false` | no |

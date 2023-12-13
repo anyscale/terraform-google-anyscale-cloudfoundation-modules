@@ -8,28 +8,6 @@
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
-variable "anyscale_cloud_id" {
-  description = <<-EOT
-    (Optional) Anyscale Cloud ID.
-
-    ex:
-    ```
-    anyscale_cloud_id = "cld_1234567890"
-    ```
-  EOT
-  type        = string
-  default     = null
-  validation {
-    condition = (
-      var.anyscale_cloud_id == null ? true : (
-        length(var.anyscale_cloud_id) > 4 &&
-        substr(var.anyscale_cloud_id, 0, 4) == "cld_"
-      )
-    )
-    error_message = "The anyscale_cloud_id value must start with \"cld_\"."
-  }
-}
-
 variable "module_enabled" {
   description = <<-EOT
     (Optional) Determines whether to create the resources inside this module.

@@ -1,3 +1,27 @@
+## 0.10.0 (Released)
+FEATURES:
+- Support for shared VPC
+  - Example `anyscale-v2-vpc-shared` created to demonstrate this. Please make sure to read the README in the example for additional requirements.
+  - Requires Anyscale CLI v0.5.163 or greater.
+  - Supports creating a Firewall in the Shared VPC Project if an existing firewall is not provided
+- Update VPC Firewall to allow GCP Load Balancer Health Check CIDR ranges.
+  - This rule is required for Anyscale Services
+- Minimal IAM Service Account Roles
+  - Project/Owner or Project/Editor are no longer required for the Anyscale Service Account.
+
+BUG FIXES:
+
+BREAKING CHANGES:
+- Updates to output names for Service Accounts.
+- Changes to IAM Service Account Terraform names
+  - This will replace existing IAM Service Accounts if upgrading.
+  - You will need to create new Anyscale Clouds.
+
+OTHER:
+- TFLint Rules Update
+- Cleanup of unused variables
+- pre-commit update
+
 ## 0.9.0 (Released)
 FEATURES:
 - Support for existing Workload Identify Federation pool and provider

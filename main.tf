@@ -118,6 +118,8 @@ module "google_anyscale_vpc" {
 locals {
   execute_vpc_firewall_sub_module = local.create_new_vpc || var.enable_anyscale_vpc_firewall ? true : false
 
+  firewall_policy_name = coalesce(var.anyscale_vpc_firewall_policy_name, var.existing_vpc_name, var.anyscale_vpc_name, local.common_name, "anyscale-firewall-policy")
+
   vpc_project_id = coalesce(var.shared_vpc_project_id, var.existing_project_id, module.google_anyscale_project.project_id)
 
   google_ui_cidr          = "35.235.240.0/20"
@@ -138,7 +140,8 @@ locals {
     [
       var.anyscale_vpc_public_subnet_cidr,
       var.anyscale_vpc_private_subnet_cidr,
-      try(data.google_compute_subnetwork.existing_vpc_subnet[0].ip_cidr_range, null)
+      try(data.google_compute_subnetwork.existing_vpc_subnet[0].ip_cidr_range, null),
+      try(data.google_compute_subnetwork.shared_vpc_subnet[0].ip_cidr_range, null)
     ]
   )
 }
@@ -153,7 +156,7 @@ module "google_anyscale_vpc_firewall_policy" {
 
   vpc_name = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
 
-  firewall_policy_name        = var.anyscale_vpc_firewall_policy_name
+  firewall_policy_name        = local.firewall_policy_name
   firewall_policy_description = var.anyscale_vpc_firewall_policy_description
 
   ingress_from_cidr_map        = local.ingress_from_cidr_map
@@ -218,11 +221,17 @@ module "google_anyscale_filestore" {
 locals {
   execute_iam_submodule = var.enable_anyscale_iam ? true : false
 
-  iam_access_role_name        = var.anyscale_iam_access_role_name != null ? var.anyscale_iam_access_role_name : local.common_name != null ? "${local.common_name}-access" : null
-  iam_access_role_name_prefix = coalesce(var.anyscale_iam_access_role_name_prefix, var.common_prefix, "anyscale-crossacct-")
+  iam_access_service_acct_name        = var.anyscale_iam_access_service_acct_name != null ? var.anyscale_iam_access_service_acct_name : local.common_name != null ? "${local.common_name}-access" : null
+  iam_access_service_acct_name_prefix = coalesce(var.anyscale_iam_access_service_acct_name_prefix, var.common_prefix, "anyscale-crossacct-")
 
-  iam_cluster_node_role_name        = var.anyscale_cluster_node_role_name != null ? var.anyscale_cluster_node_role_name : local.common_name != null ? "${local.common_name}-cluster" : null
-  iam_cluster_node_role_name_prefix = coalesce(var.anyscale_cluster_node_role_name_prefix, var.common_prefix, "anyscale-cluster-")
+  common_name_underscores   = try(replace(local.common_name, "-", "_"), null)
+  common_prefix_underscores = try(replace(var.common_prefix, "-", "_"), null)
+
+  iam_access_role_id        = var.anyscale_iam_access_role_id != null ? var.anyscale_iam_access_role_id : local.common_name_underscores != null ? "${local.common_name_underscores}_access" : null
+  iam_access_role_id_prefix = coalesce(var.anyscale_iam_access_role_id_prefix, local.common_prefix_underscores, "anyscale_crossacct_")
+
+  iam_cluster_node_service_acct_name        = var.anyscale_cluster_node_service_acct_name != null ? var.anyscale_cluster_node_service_acct_name : local.common_name != null ? "${local.common_name}-cluster" : null
+  iam_cluster_node_service_acct_name_prefix = coalesce(var.anyscale_cluster_node_service_acct_name_prefix, var.common_prefix, "anyscale-cluster-")
 }
 module "google_anyscale_iam" {
   source         = "./modules/google-anyscale-iam"
@@ -233,9 +242,13 @@ module "google_anyscale_iam" {
 
   enable_random_name_suffix = local.enable_module_random_name_suffix
 
-  anyscale_access_role_name        = local.iam_access_role_name
-  anyscale_access_role_name_prefix = local.iam_access_role_name_prefix
-  anyscale_access_role_description = var.anyscale_iam_access_role_description
+  anyscale_access_service_acct_name        = local.iam_access_service_acct_name
+  anyscale_access_service_acct_name_prefix = local.iam_access_service_acct_name_prefix
+  anyscale_access_service_acct_description = var.anyscale_iam_access_service_acct_description
+
+  anyscale_access_role_id          = local.iam_access_role_id
+  anyscale_access_role_id_prefix   = local.iam_access_role_id_prefix
+  anyscale_access_role_description = var.anyscale_access_role_description
 
   existing_workload_identity_provider_name = var.existing_workload_identity_provider_name
   workload_identity_pool_name              = var.anyscale_workload_identity_pool_name
@@ -244,10 +257,10 @@ module "google_anyscale_iam" {
   workload_identity_pool_provider_name     = var.anyscale_workload_identity_pool_provider_name
   workload_anyscale_aws_account_id         = var.anyscale_workload_identity_account_id
 
-  anyscale_cluster_node_role_name            = local.iam_cluster_node_role_name
-  anyscale_cluster_node_role_name_prefix     = local.iam_cluster_node_role_name_prefix
-  anyscale_cluster_node_role_description     = var.anyscale_cluster_node_role_description
-  enable_anyscale_cluster_logging_monitoring = local.enable_cloud_logging_monitoring
+  anyscale_cluster_node_service_acct_name        = local.iam_cluster_node_service_acct_name
+  anyscale_cluster_node_service_acct_name_prefix = local.iam_cluster_node_service_acct_name_prefix
+  anyscale_cluster_node_service_acct_description = var.anyscale_cluster_node_service_acct_description
+  enable_anyscale_cluster_logging_monitoring     = local.enable_cloud_logging_monitoring
 
   anyscale_cloud_id = var.anyscale_cloud_id
 }
@@ -261,7 +274,7 @@ locals {
   bucket_name   = var.anyscale_bucket_name != null ? var.anyscale_bucket_name : local.common_name
   bucket_prefix = coalesce(var.anyscale_bucket_prefix, var.common_prefix, "anyscale-")
 
-  bucket_iam_binding_members = local.execute_iam_submodule ? ["serviceAccount:${module.google_anyscale_iam.iam_anyscale_access_role_email}", "serviceAccount:${module.google_anyscale_iam.iam_anyscale_cluster_node_role_email}"] : []
+  bucket_iam_binding_members = local.execute_iam_submodule ? ["serviceAccount:${module.google_anyscale_iam.iam_anyscale_access_service_acct_email}", "serviceAccount:${module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_email}"] : []
 }
 module "google_anyscale_cloudstorage" {
   source         = "./modules/google-anyscale-cloudstorage"

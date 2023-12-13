@@ -18,8 +18,8 @@ Optional sub-module that creates a Google Memorystore Redis DB.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.82.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.5.1 |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.84.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.6.0 |
 
 ## Modules
 
@@ -37,7 +37,6 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_alternative_google_zone"></a> [alternative\_google\_zone](#input\_alternative\_google\_zone) | (Optional) Alternative Google Cloud Zone<br><br>The alternative Google zone in which resources will be created.<br><br>If `alternative_google_zone is also provided, it must be different from `google\_zone`.<br>If it is not provided, the service will choose two zones for the instances to be created in for protection against zonal failures.<br><br>ex:<br>`<pre>alternative_google_zone = "us-central1-b"</pre> | `string` | `null` | no |
-| <a name="input_anyscale_cloud_id"></a> [anyscale\_cloud\_id](#input\_anyscale\_cloud\_id) | (Optional) Anyscale Cloud ID<br><br>ex:<pre>anyscale_cloud_id = "cld_1234567890"</pre> | `string` | `null` | no |
 | <a name="input_anyscale_memorystore_name"></a> [anyscale\_memorystore\_name](#input\_anyscale\_memorystore\_name) | (Optional) The name of the memorystore to create.<br><br>Conflicts with `anyscale_memorystore_name_prefix`.<br>Must start with a lowercase letter followed by up to 62 lowercase letters, numbers, or hyphens, and cannot end with a hyphen.<br><br>ex:<pre>anyscale_memorystore_name = "anyscale-memorystore"</pre> | `string` | `null` | no |
 | <a name="input_anyscale_memorystore_name_prefix"></a> [anyscale\_memorystore\_name\_prefix](#input\_anyscale\_memorystore\_name\_prefix) | (Optional) The prefix of the memorystore to create.<br><br>Conflicts `with anyscale_memorystore_name`.<br>Must start with a lowercase letter followed by up to 48 lowercase letters, numbers, or hyphens.<br>Because it is the prefix, it can end in a hyphen as it will have a random suffix appended to it.<br><br>Default is `null` but set to `anyscale-memorystore-` in the module.<br><br>ex:<pre>anyscale_memorystore_name_prefix = "anyscale-memorystore-"</pre> | `string` | `null` | no |
 | <a name="input_anyscale_project_id"></a> [anyscale\_project\_id](#input\_anyscale\_project\_id) | (Optional) Google Project ID<br><br>ID of the project to create the resource in. If not provided, the provider project is used.<br><br>ex:<pre>anyscale_project_id = "my-project"</pre> | `string` | `null` | no |

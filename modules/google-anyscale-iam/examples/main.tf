@@ -20,11 +20,10 @@ module "iam_cluster_node_only_role" {
   source         = "../"
   module_enabled = true
 
-  anyscale_org_id                        = var.anyscale_organization_id
-  anyscale_project_id                    = var.google_project_id
-  create_anyscale_access_role            = false
-  create_anyscale_cluster_node_role      = true
-  anyscale_cluster_node_role_name_prefix = "cluster-node-only-"
+  anyscale_org_id                                = var.anyscale_organization_id
+  anyscale_project_id                            = var.google_project_id
+  create_anyscale_access_role                    = false
+  anyscale_cluster_node_service_acct_name_prefix = "cluster-node-only-"
 
   random_char_length = 8
 }
@@ -41,11 +40,10 @@ module "kitchen_sink" {
   anyscale_org_id     = var.anyscale_organization_id
   anyscale_project_id = var.google_project_id
 
-  enable_random_name_suffix                = false
-  anyscale_access_role_name                = "kitchen-sink-role"
-  anyscale_access_role_description         = "Anyscale cross account access role for kitchen sink test"
-  anyscale_access_role_project_permissions = ["roles/editor"]
-  anyscale_access_role_binding_permissions = ["roles/iam.serviceAccountUser"]
+  enable_random_name_suffix                        = false
+  anyscale_access_service_acct_name                = "kitchen-sink-role"
+  anyscale_access_service_acct_description         = "Anyscale cross account access role for kitchen sink test"
+  anyscale_access_service_acct_binding_permissions = ["roles/iam.serviceAccountUser"]
 
   existing_workload_identity_provider_name = var.existing_workload_identity_provider_name
   # workload_identity_pool_name          = "anyscale-kitchen-sink-pool"
@@ -54,9 +52,9 @@ module "kitchen_sink" {
   # workload_identity_pool_provider_name = "anyscale-kitchen-sink-provider"
   # anyscale_access_aws_account_id       = "623395924981"
 
-  anyscale_cluster_node_role_name        = "kitchen-sink-cluster-node-role"
-  anyscale_cluster_node_role_description = "Anyscale cluster node role for kitchen sink test"
-  anyscale_cluster_node_role_permissions = ["roles/compute.instanceAdmin.v1"]
+  anyscale_cluster_node_service_acct_name        = "kitchen-sink-cluster-node-role"
+  anyscale_cluster_node_service_acct_description = "Anyscale cluster node role for kitchen sink test"
+  anyscale_cluster_node_service_acct_permissions = ["roles/compute.instanceAdmin.v1"]
 
   enable_anyscale_cluster_logging_monitoring = true
 }

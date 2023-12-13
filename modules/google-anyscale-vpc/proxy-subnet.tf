@@ -17,9 +17,10 @@ resource "google_compute_subnetwork" "anyscale_proxy_subnet" {
   #checkov:skip=CKV_GCP_26:VPC Flow Logs disabled for Proxy Subnets
   count = local.proxy_subnet_enabled ? 1 : 0
 
-  name          = local.proxy_subnet_name_computed
-  ip_cidr_range = var.proxy_subnet_cidr
-  region        = var.google_region
+  name             = local.proxy_subnet_name_computed
+  ip_cidr_range    = var.proxy_subnet_cidr
+  ipv6_access_type = "INTERNAL"
+  region           = var.google_region
 
   network     = google_compute_network.anyscale_vpc[0].name
   project     = var.anyscale_project_id

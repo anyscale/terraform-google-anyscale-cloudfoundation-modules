@@ -57,18 +57,5 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_anyscale_iam_cluster_node_role_email"></a> [anyscale\_iam\_cluster\_node\_role\_email](#output\_anyscale\_iam\_cluster\_node\_role\_email) | The Anyscale cluster service account email. |
-| <a name="output_anyscale_iam_service_account_email"></a> [anyscale\_iam\_service\_account\_email](#output\_anyscale\_iam\_service\_account\_email) | The Anyscale service account email. |
-| <a name="output_anyscale_iam_workload_identity_provider_id"></a> [anyscale\_iam\_workload\_identity\_provider\_id](#output\_anyscale\_iam\_workload\_identity\_provider\_id) | The Anyscale workload identity provider id. |
-| <a name="output_anyscale_iam_workload_identity_provider_name"></a> [anyscale\_iam\_workload\_identity\_provider\_name](#output\_anyscale\_iam\_workload\_identity\_provider\_name) | The Anyscale workload identity provider name. |
-| <a name="output_cloudstorage_bucket_name"></a> [cloudstorage\_bucket\_name](#output\_cloudstorage\_bucket\_name) | The Google Cloud Storage bucket name. |
-| <a name="output_filestore_instance_id"></a> [filestore\_instance\_id](#output\_filestore\_instance\_id) | The Google Filestore instance id. |
-| <a name="output_filestore_location"></a> [filestore\_location](#output\_filestore\_location) | The Google Filestore location. |
-| <a name="output_firewall_policy_name"></a> [firewall\_policy\_name](#output\_firewall\_policy\_name) | The Google VPC firewall policy name. |
-| <a name="output_memorystore_id"></a> [memorystore\_id](#output\_memorystore\_id) | The memorystore instance ID. |
-| <a name="output_project_name"></a> [project\_name](#output\_project\_name) | The Google Project name. |
 | <a name="output_registration_command"></a> [registration\_command](#output\_registration\_command) | The Anyscale registration command. |
-| <a name="output_subnet_name"></a> [subnet\_name](#output\_subnet\_name) | The Google VPC public subnet name. |
-| <a name="output_subnet_region"></a> [subnet\_region](#output\_subnet\_region) | The Google VPC public subnet region. |
-| <a name="output_vpc_name"></a> [vpc\_name](#output\_vpc\_name) | The Google VPC network name. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

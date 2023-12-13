@@ -50,5 +50,5 @@ module "google_anyscale_v2_privatenetwork" {
   anyscale_bucket_location = "US"
 
   # Memorystore Related
-  # enable_anyscale_memorystore = true
+  enable_anyscale_memorystore = true
 }
