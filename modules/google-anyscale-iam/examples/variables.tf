@@ -8,17 +8,6 @@
 # REQUIRED VARIABLES
 # These variables must be set when using this module.
 # ---------------------------------------------------------------------------------------------------------------------
-variable "anyscale_deploy_env" {
-  description = "(Required) Anyscale deploy environment. Used in resource names and tags."
-  type        = string
-  validation {
-    condition = (
-      var.anyscale_deploy_env == "production" || var.anyscale_deploy_env == "development" || var.anyscale_deploy_env == "test"
-    )
-    error_message = "The anyscale_deploy_env only allows `production`, `test`, or `development`"
-  }
-}
-
 variable "anyscale_organization_id" {
   description = "(Required) Anyscale Organization ID"
   type        = string

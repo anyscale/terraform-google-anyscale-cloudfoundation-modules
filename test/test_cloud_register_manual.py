@@ -32,7 +32,18 @@ import logging
 from anyscale.controllers.cloud_controller import CloudController
 from python_terraform import Terraform, IsFlagged, IsNotFlagged
 
-logging.basicConfig(level=logging.INFO, format="%(message)s", handlers=[RichHandler()])
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(message)s",
+    handlers=[
+        RichHandler(
+            show_path=False,
+            enable_link_path=False,
+            rich_tracebacks=True,
+            tracebacks_suppress=[CloudController, Terraform],
+        )
+    ],
+)
 logger = logging.getLogger("rich")
 
 
@@ -87,7 +98,14 @@ def _terraform_apply(tf: Terraform, expected_time: int, variables: dict):
             var=variables,
         )
 
-        logger.info("  Succesfull: terraform apply")
+        if return_code == 0:
+            logger.info("  Succesfull: terraform apply")
+        else:
+            logger.error("  Failed: terraform apply")
+            logger.error(stdout)
+            logger.error(stderr)
+
+        logger.debug(stdout)
         return return_code, stdout, stderr
     except Exception as e:
         logger.error(f"Terraform apply failed: {e}")
@@ -105,11 +123,38 @@ def _terraform_destroy(tf: Terraform, variables: dict):
             var=variables,
         )
 
-        logger.info("  Succesfull: terraform destroy")
+        if return_code == 0:
+            logger.info("  Succesfull: terraform destroy")
+        else:
+            logger.error("  Failed: terraform destroy")
+            logger.error(stdout)
+            logger.error(stderr)
+
+        logger.debug(stdout)
         return return_code, stdout, stderr
     except Exception as e:
         logger.error(f"Error running terraform destroy: {e}")
         raise e
+
+
+def _anyscale_cloud_verify(cloud_controller: CloudController, cloud_name: str):
+    """Run Functional Verify on the Anyscale Cloud."""
+    logger.info("Starting: Anyscale functional test")
+    try:
+        cloud_controller.verify_cloud(
+            cloud_name=cloud_name,
+            cloud_id=None,
+            strict=True,
+            # Change functional_verify="workspace,service" once service is ready.
+            # Requires user confirmation to proceed or setting yes=True
+            functional_verify="workspace",
+            yes=True,
+        )
+        logger.info("  Completed: Anyscale Cloud verified successfully")
+        return 0
+    except Exception as e:
+        logger.error(f"  Error verifying cloud: {e}")
+        return 1
 
 
 def _anyscale_cloud_delete(cloud_controller: CloudController, cloud_name: str):
@@ -152,7 +197,7 @@ def _parse_registration_command(input_string):
         return None
 
     registration_command = match.group(1)
-    logger.debug(registration_command)
+    logger.debug(f"registration_command: {registration_command}")
     return _parse_options(registration_command)
 
 
@@ -199,8 +244,8 @@ def start_aws_test(branch_name: str, local_path: str):
         task_id = e2e_progress.add_task("", total=100)
 
         e2e_progress.update(task_id, description="Running: terraform init")
-        return_code, stdout, stderr = _terraform_init(tf)
-        if return_code != 0:
+        tf_init_return_code, stdout, stderr = _terraform_init(tf)
+        if tf_init_return_code != 0:
             raise RuntimeError(f"Error initializing terraform: {stderr}")
 
         e2e_progress.update(
@@ -208,132 +253,125 @@ def start_aws_test(branch_name: str, local_path: str):
             description="Running: terraform apply",
             advance=20,
         )
-        return_code, stdout, stderr = _terraform_apply(
+        tf_apply_return_code, stdout, stderr = _terraform_apply(
             tf,
             5,
             _get_terraform_anyscale_v2_e2e_public_vars_aws(),
         )
-        if return_code != 0:
-            logger.error("Error running: terraform apply")
-            logger.error(stderr)
-        logger.debug(stdout)
-
-        logger.info("Applied AWS Terraform: anyscale_v2_e2e_public")
-
-        ## Gather information for registration
-        cloud_name = (
-            f"test_terraform_anyscale_v2_e2e_public_aws_{datetime.now().isoformat()}"
-        )
-        stdout_dict = _parse_registration_command(stdout)
-        s3_bucket_id = stdout_dict.get("s3-bucket-id")
 
         ## Register the cloud.
-        e2e_progress.update(
-            task_id,
-            description="Registering Anyscale AWS cloud...",
-            advance=40,
-        )
-        try:
-            cloud_controller = CloudController()
-            cloud_controller.register_aws_cloud(
-                region=stdout_dict.get("region"),
-                name=cloud_name,
-                vpc_id=stdout_dict.get("vpc-id"),
-                subnet_ids=stdout_dict.get("subnet-ids").split(","),
-                efs_id=stdout_dict.get("efs-id"),
-                anyscale_iam_role_id=stdout_dict.get("anyscale-iam-role-id"),
-                instance_iam_role_id=stdout_dict.get("instance-iam-role-id"),
-                security_group_ids=stdout_dict.get("security-group-ids").split(","),
-                s3_bucket_id=s3_bucket_id,
-                # Changed functional_verify to `None` to
-                # allow Anyscale resources time to be created.
-                functional_verify=None,
-                private_network=False,
-                cluster_management_stack_version="v2",
-                memorydb_cluster_id=None,
-                yes=True,
+        if tf_apply_return_code == 0:
+            logger.info("Applied Terraform: anyscale_v2_e2e_public")
+
+            ## Gather information for registration
+            cloud_name = f"test_terraform_anyscale_v2_e2e_public_aws_{datetime.now().isoformat()}"  # noqa: E501
+            stdout_dict = _parse_registration_command(stdout)
+            s3_bucket_id = stdout_dict.get("s3-bucket-id")
+            logger.info(f"stdout_dict: {stdout_dict}")
+
+            e2e_progress.update(
+                task_id,
+                description="Registering Anyscale AWS cloud...",
+                advance=40,
             )
-            logger.info("  Cloud registered successfully")
-        except Exception as e:
-            logger.error(f"Error registering cloud: {e}")
+            try:
+                cloud_controller = CloudController()
+                cloud_controller.register_aws_cloud(
+                    region=stdout_dict.get("region"),
+                    name=cloud_name,
+                    vpc_id=stdout_dict.get("vpc-id"),
+                    subnet_ids=stdout_dict.get("subnet-ids").split(","),
+                    efs_id=stdout_dict.get("efs-id"),
+                    anyscale_iam_role_id=stdout_dict.get("anyscale-iam-role-id"),
+                    instance_iam_role_id=stdout_dict.get("instance-iam-role-id"),
+                    security_group_ids=stdout_dict.get("security-group-ids").split(","),
+                    s3_bucket_id=s3_bucket_id,
+                    # Changed functional_verify to `None` to
+                    # allow Anyscale resources time to be created.
+                    functional_verify=None,
+                    private_network=False,
+                    cluster_management_stack_version="v2",
+                    memorydb_cluster_id=None,
+                    yes=True,
+                )
+                logger.info("  Cloud registered successfully")
+                register_cloud_return_code = 0
+            except Exception as e:
+                logger.error(f"Error registering cloud: {e}")
+                register_cloud_return_code = 1
 
-        e2e_progress.update(
-            task_id, description="Sleeping: Waiting for Anyscale resources", advance=30
-        )
-        # pause for 3 min to wait for Anyscale to be ready
-        _sleep_timer(60 * 3)
-        e2e_progress.update(
-            task_id,
-            description="Proceeding with Anyscale functional test",
-            completed=100,
-        )
-        e2e_progress.stop_task(task_id)
+        if register_cloud_return_code == 0:
+            e2e_progress.update(
+                task_id,
+                description="Sleeping: Waiting for Anyscale resources",
+                advance=30,
+            )
+            # pause for 3 min to wait for Anyscale to be ready
+            _sleep_timer(60 * 3)
+            e2e_progress.update(
+                task_id,
+                description="Proceeding with Anyscale functional test",
+                completed=100,
+            )
+            e2e_progress.stop_task(task_id)
+            wait_for_cloud_return_code = 0
 
-    logger.info("Starting: Anyscale functional test")
-    try:
-        cloud_controller.verify_cloud(
-            cloud_name=cloud_name,
-            cloud_id=None,
-            strict=True,
-            # Change functional_verify="workspace,service" once service is ready.
-            # Requires user confirmation to proceed or setting yes=True
-            functional_verify="workspace",
-            yes=True,
-        )
-        logger.info("  Completed: AWS Cloud verified successfully")
-    except Exception as e:
-        logger.error(f"Error verifying aws cloud: {e}")
+    if wait_for_cloud_return_code == 0:
+        verify_cloud_return_code = _anyscale_cloud_verify(cloud_controller, cloud_name)
 
     with live:
         task_id = e2e_progress.add_task("", total=100)
 
         ## Delete the cloud.
-        e2e_progress.update(task_id, description="Deleting Anyscale AWS cloud...")
-        _anyscale_cloud_delete(cloud_controller, cloud_name)
-
-        ## Emptying the bucket.
-        e2e_progress.update(
-            task_id,
-            description=f"Emptying bucket {s3_bucket_id}...",
-            advance=30,
-        )
-        s3_client = boto3.client("s3")
-        object_response_paginator = s3_client.get_paginator("list_object_versions")
-        delete_marker_list = []
-        version_list = []
-        for object_response_itr in object_response_paginator.paginate(
-            Bucket=s3_bucket_id
-        ):
-            if "DeleteMarkers" in object_response_itr:
-                for delete_marker in object_response_itr["DeleteMarkers"]:
-                    delete_marker_list.append(
-                        {
-                            "Key": delete_marker["Key"],
-                            "VersionId": delete_marker["VersionId"],
-                        }
-                    )
-
-            if "Versions" in object_response_itr:
-                for version in object_response_itr["Versions"]:
-                    version_list.append(
-                        {"Key": version["Key"], "VersionId": version["VersionId"]}
-                    )
-
-        for i in range(0, len(delete_marker_list), 1000):
-            response = s3_client.delete_objects(
-                Bucket=s3_bucket_id,
-                Delete={"Objects": delete_marker_list[i : i + 1000], "Quiet": True},
+        if register_cloud_return_code == 0:
+            e2e_progress.update(task_id, description="Deleting Anyscale AWS cloud...")
+            delete_cloud_return_code = _anyscale_cloud_delete(
+                cloud_controller, cloud_name
             )
-            logger.debug(response)
 
-        for i in range(0, len(version_list), 1000):
-            response = s3_client.delete_objects(
-                Bucket=s3_bucket_id,
-                Delete={"Objects": version_list[i : i + 1000], "Quiet": True},
+            ## Emptying the bucket.
+            e2e_progress.update(
+                task_id,
+                description=f"Emptying bucket {s3_bucket_id}...",
+                advance=30,
             )
-            logger.debug(response)
+            s3_client = boto3.client("s3")
+            object_response_paginator = s3_client.get_paginator("list_object_versions")
+            delete_marker_list = []
+            version_list = []
+            for object_response_itr in object_response_paginator.paginate(
+                Bucket=s3_bucket_id
+            ):
+                if "DeleteMarkers" in object_response_itr:
+                    for delete_marker in object_response_itr["DeleteMarkers"]:
+                        delete_marker_list.append(
+                            {
+                                "Key": delete_marker["Key"],
+                                "VersionId": delete_marker["VersionId"],
+                            }
+                        )
 
-        logger.info(f"S3 bucket {s3_bucket_id} emptied successfully")
+                if "Versions" in object_response_itr:
+                    for version in object_response_itr["Versions"]:
+                        version_list.append(
+                            {"Key": version["Key"], "VersionId": version["VersionId"]}
+                        )
+
+            for i in range(0, len(delete_marker_list), 1000):
+                response = s3_client.delete_objects(
+                    Bucket=s3_bucket_id,
+                    Delete={"Objects": delete_marker_list[i : i + 1000], "Quiet": True},
+                )
+                logger.debug(response)
+
+            for i in range(0, len(version_list), 1000):
+                response = s3_client.delete_objects(
+                    Bucket=s3_bucket_id,
+                    Delete={"Objects": version_list[i : i + 1000], "Quiet": True},
+                )
+                logger.debug(response)
+
+            logger.info(f"S3 bucket {s3_bucket_id} emptied successfully")
 
         ## Destroy the terraform.
         e2e_progress.update(
@@ -341,17 +379,25 @@ def start_aws_test(branch_name: str, local_path: str):
             description="Running: terraform destroy",
             advance=40,
         )
-        return_code, stdout, stderr = _terraform_destroy(
+        tf_destroy_return_code, stdout, stderr = _terraform_destroy(
             tf, variables=_get_terraform_anyscale_v2_e2e_public_vars_aws()
         )
-        if return_code != 0:
-            logger.error("Error running: terraform destroy")
-            logger.error(stderr)
 
-        logger.info("Destroyed anyscale_v2_e2e_public aws terraform successfully")
+        if tf_destroy_return_code == 0:
+            logger.info("Destroyed anyscale_v2_e2e_public aws terraform successfully")
         logger.debug(stdout)
 
         e2e_progress.update(task_id, description="E2E test complete!", completed=100)
+
+        if (
+            delete_cloud_return_code != 0
+            or wait_for_cloud_return_code != 0
+            or register_cloud_return_code != 0
+            or verify_cloud_return_code != 0
+            or tf_destroy_return_code != 0
+            or tf_apply_return_code != 0
+        ):  # noqa: E501
+            raise RuntimeError("E2E test failed")
 
 
 def start_gcp_test(
@@ -381,8 +427,8 @@ def start_gcp_test(
         task_id = e2e_progress.add_task("", total=100)
 
         e2e_progress.update(task_id, description="Running: terraform init")
-        return_code, stdout, stderr = _terraform_init(tf)
-        if return_code != 0:
+        tf_init_return_code, stdout, stderr = _terraform_init(tf)
+        if tf_init_return_code != 0:
             raise RuntimeError(f"Error initializing terraform: {stderr}")
 
         e2e_progress.update(
@@ -390,7 +436,7 @@ def start_gcp_test(
             description="Running: terraform apply",
             advance=20,
         )
-        return_code, stdout, stderr = _terraform_apply(
+        tf_apply_return_code, stdout, stderr = _terraform_apply(
             tf,
             10,
             _get_terraform_anyscale_v2_e2e_public_vars_gcp(
@@ -399,123 +445,117 @@ def start_gcp_test(
                 root_folder_number=root_folder_number,
             ),
         )
-        if return_code != 0:
-            logger.error("Error running: terraform apply")
-            logger.error(stderr)
 
-        logger.info("Applied GCP Terraform: anyscale_v2_e2e_public")
+        if tf_apply_return_code == 0:
+            logger.info("Applied Terraform: anyscale_v2_e2e_public")
 
-        # pause for GCP to be ready
-        _sleep_timer(60)
-        e2e_progress.update(
-            task_id,
-            description="Registering Anyscale GCP cloud...",
-            completed=10,
-        )
-
-        ## Gather information for registration
-        cloud_name = (
-            f"test_terraform_anyscale_v2_e2e_public_gcp_{datetime.now().isoformat()}"
-        )
-        stdout_dict = _parse_registration_command(stdout)
-        logger.debug(f"Parsed stdout_dict: {stdout_dict}")
-        logger.info("Registering gcp cloud...")
-        bucket_name = stdout_dict.get("cloud-storage-bucket-name")
-
-        try:
-            cloud_controller = CloudController()
-            cloud_controller.register_gcp_cloud(
-                region=stdout_dict.get("region"),
-                name=cloud_name,
-                project_id=stdout_dict.get("project-id"),
-                vpc_name=stdout_dict.get("vpc-name"),
-                subnet_names=stdout_dict.get("subnet-names").split(","),
-                filestore_instance_id=stdout_dict.get("filestore-instance-id"),
-                filestore_location=stdout_dict.get("filestore-location"),
-                anyscale_service_account_email=stdout_dict.get(
-                    "anyscale-service-account-email"
-                ),
-                instance_service_account_email=stdout_dict.get(
-                    "instance-service-account-email"
-                ),
-                provider_id=stdout_dict.get("provider-name"),
-                firewall_policy_names=stdout_dict.get("firewall-policy-names").split(
-                    ","
-                ),
-                cloud_storage_bucket_name=bucket_name,
-                # Changed functional_verify=None to
-                # allow Anyscale Resources time to be created.
-                functional_verify=None,
-                private_network=False,
-                cluster_management_stack_version="v2",
-                memorystore_instance_name=None,
-                yes=True,
+            # pause for GCP to be ready
+            _sleep_timer(60)
+            e2e_progress.update(
+                task_id,
+                description="Registering Anyscale GCP cloud...",
+                completed=10,
             )
-            logger.info("Cloud registered successfully")
-        except Exception as e:
-            logger.info(f"Error registering gcp cloud: {e}")
 
-        e2e_progress.update(
-            task_id, description="Sleeping: Waiting for Anyscale resources", advance=30
-        )
-        # pause for 3 min to wait for Anyscale to be ready
-        _sleep_timer(60 * 3)
-        e2e_progress.update(
-            task_id,
-            description="Proceeding with Anyscale functional test",
-            completed=100,
-        )
-        e2e_progress.stop_task(task_id)
+            ## Gather information for registration
+            cloud_name = f"test_terraform_anyscale_v2_e2e_public_gcp_{datetime.now().isoformat()}"  # noqa: E501
+            stdout_dict = _parse_registration_command(stdout)
+            logger.debug(f"Parsed stdout_dict: {stdout_dict}")
+            logger.info("Registering gcp cloud...")
+            bucket_name = stdout_dict.get("cloud-storage-bucket-name")
+            try:
+                cloud_controller = CloudController()
+                cloud_controller.register_gcp_cloud(
+                    region=stdout_dict.get("region"),
+                    name=cloud_name,
+                    project_id=stdout_dict.get("project-id"),
+                    vpc_name=stdout_dict.get("vpc-name"),
+                    subnet_names=stdout_dict.get("subnet-names").split(","),
+                    filestore_instance_id=stdout_dict.get("filestore-instance-id"),
+                    filestore_location=stdout_dict.get("filestore-location"),
+                    anyscale_service_account_email=stdout_dict.get(
+                        "anyscale-service-account-email"
+                    ),
+                    instance_service_account_email=stdout_dict.get(
+                        "instance-service-account-email"
+                    ),
+                    provider_id=stdout_dict.get("provider-name"),
+                    firewall_policy_names=stdout_dict.get(
+                        "firewall-policy-names"
+                    ).split(","),
+                    cloud_storage_bucket_name=bucket_name,
+                    # Changed functional_verify=None to
+                    # allow Anyscale Resources time to be created.
+                    functional_verify=None,
+                    private_network=False,
+                    cluster_management_stack_version="v2",
+                    memorystore_instance_name=None,
+                    yes=True,
+                )
+                logger.info("Cloud registered successfully")
+                register_cloud_return_code = 0
+            except Exception as e:
+                logger.info(f"Error registering gcp cloud: {e}")
+                register_cloud_return_code = 1
+
+        if register_cloud_return_code == 0:
+            e2e_progress.update(
+                task_id,
+                description="Sleeping: Waiting for Anyscale resources",
+                advance=30,
+            )
+            # pause for 3 min to wait for Anyscale to be ready
+            _sleep_timer(60 * 3)
+            e2e_progress.update(
+                task_id,
+                description="Proceeding with Anyscale functional test",
+                completed=100,
+            )
+            e2e_progress.stop_task(task_id)
+            wait_for_cloud_return_code = 0
 
     ## Verify the cloud.
-    logger.info("Starting: Anyscale functional test")
-    try:
-        cloud_controller.verify_cloud(
-            cloud_name=cloud_name,
-            cloud_id=None,
-            strict=True,
-            functional_verify="workspace",
-            yes=True,
-        )
-        logger.info("GCP Cloud verified successfully")
-    except Exception as e:
-        logger.info(f"Error verifying gcp cloud: {e}")
+    if wait_for_cloud_return_code == 0:
+        verify_cloud_return_code = _anyscale_cloud_verify(cloud_controller, cloud_name)
 
     with live:
         task_id = e2e_progress.add_task("", total=100)
 
         ## Delete the cloud.
-        e2e_progress.update(task_id, description="Deleting Anyscale AWS cloud...")
-        _anyscale_cloud_delete(cloud_controller, cloud_name)
-
-        # ## Emptying bucket
-        e2e_progress.update(
-            task_id,
-            description=f"Emptying bucket {bucket_name}...",
-            advance=30,
-        )
-        try:
-            storage_client = storage.Client()
-            bucket = storage_client.bucket(bucket_name)
-
-            # get all objects and delete them
-            blobs = list(bucket.list_blobs())
-            blobs_count = len(blobs)
-
-            step_task_id = step_progress.add_task(
-                f"Emptying bucket: {bucket_name}", total=blobs_count
+        if register_cloud_return_code == 0:
+            e2e_progress.update(task_id, description="Deleting Anyscale cloud...")
+            delete_cloud_return_code = _anyscale_cloud_delete(
+                cloud_controller, cloud_name
             )
 
-            for blob in blobs:
-                blob.delete()
-                step_progress.update(step_task_id, advance=1)
+            # Emptying bucket
+            e2e_progress.update(
+                task_id,
+                description=f"Emptying bucket {bucket_name}...",
+                advance=30,
+            )
+            try:
+                storage_client = storage.Client()
+                bucket = storage_client.bucket(bucket_name)
 
-            logger.info(f"Bucket {bucket_name} emptied successfully")
-            step_progress.stop_task(step_task_id)
-            step_progress.update(step_task_id, visible=False)
+                # get all objects and delete them
+                blobs = list(bucket.list_blobs())
+                blobs_count = len(blobs)
 
-        except Exception as e:
-            logger.info(f"Error emptying bucket {bucket_name}: {e}")
+                step_task_id = step_progress.add_task(
+                    f"Emptying bucket: {bucket_name}", total=blobs_count
+                )
+
+                for blob in blobs:
+                    blob.delete()
+                    step_progress.update(step_task_id, advance=1)
+
+                logger.info(f"Bucket {bucket_name} emptied successfully")
+                step_progress.stop_task(step_task_id)
+                step_progress.update(step_task_id, visible=False)
+
+            except Exception as e:
+                logger.info(f"Error emptying bucket {bucket_name}: {e}")
 
         # Destroy the terraform.
         e2e_progress.update(
@@ -523,7 +563,7 @@ def start_gcp_test(
             description="Running: terraform destroy",
             advance=40,
         )
-        return_code, stdout, stderr = _terraform_destroy(
+        tf_destroy_return_code, stdout, stderr = _terraform_destroy(
             tf,
             _get_terraform_anyscale_v2_e2e_public_vars_gcp(
                 billing_account_id=gcp_billing_id,
@@ -531,13 +571,21 @@ def start_gcp_test(
                 root_folder_number=root_folder_number,
             ),
         )
-        if return_code != 0:
-            raise RuntimeError(f"Error destroying terraform: {stderr}")
-
-        logger.info("Destroyed anyscale_v2_e2e_public gcp terraform successfully")
+        if tf_destroy_return_code == 0:
+            logger.info("Destroyed anyscale_v2_e2e_public gcp terraform successfully")
         logger.debug(stdout)
 
         e2e_progress.update(task_id, description="E2E test complete!", completed=100)
+
+        if (
+            delete_cloud_return_code != 0
+            or wait_for_cloud_return_code != 0
+            or register_cloud_return_code != 0
+            or verify_cloud_return_code != 0
+            or tf_destroy_return_code != 0
+            or tf_apply_return_code != 0
+        ):  # noqa: E501
+            raise RuntimeError("E2E test failed")
 
 
 if __name__ == "__main__":

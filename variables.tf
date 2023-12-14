@@ -1036,65 +1036,120 @@ variable "enable_anyscale_iam" {
   default     = true
 }
 
-variable "anyscale_iam_access_role_name" {
+variable "anyscale_iam_access_service_acct_name" {
   description = <<-EOT
-    (Optional - forces new resource) IAM Access Role Name
+    (Optional - forces new resource) IAM Access Service Account Name
 
     The name of the IAM role that will be created for Anyscale access.
-    - If left `null`, will default to `anyscale_iam_access_role_name_prefix`.
-    - If provided, overrides the `anyscale_iam_access_role_name_prefix` variable.
+    - If left `null`, will default to `anyscale_iam_access_service_acct_name_prefix`.
+    - If provided, overrides the `anyscale_iam_access_service_acct_name_prefix` variable.
     - It needs to be > 4 chars and < 28 chars.
 
     ex:
     ```
-    anyscale_iam_access_role_name = "anyscale-crossacct-access"
+    anyscale_iam_access_service_acct_name = "anyscale-crossacct-access"
     ```
   EOT
   type        = string
   default     = null
   validation {
-    condition = var.anyscale_iam_access_role_name == null ? true : (
-      can(regex("^(?:[a-z](?:[-a-z0-9]{4,28}[a-z0-9])?)$", var.anyscale_iam_access_role_name))
+    condition = var.anyscale_iam_access_service_acct_name == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,28}[a-z0-9])?)$", var.anyscale_iam_access_service_acct_name))
     )
-    error_message = "`anyscale_iam_access_role_name` must start with a lowercase letter followed by up to 28 lowercase letters, numbers, or hyphens."
+    error_message = "`anyscale_iam_access_service_acct_name` must start with a lowercase letter followed by up to 28 lowercase letters, numbers, or hyphens."
   }
 }
-variable "anyscale_iam_access_role_name_prefix" {
+variable "anyscale_iam_access_service_acct_name_prefix" {
   description = <<-EOT
     (Optional - forces new resource) IAM Access Role Name Prefix
 
-    Creates a unique IAM role name beginning with the specified prefix.
-    - If `anyscale_iam_access_role_name` is provided, it will override this variable.
+    Creates a unique IAM Service Account name beginning with the specified prefix.
+    - If `anyscale_iam_access_service_acct_name` is provided, it will override this variable.
     - The variable `general_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-crossacct-` in a local variable.
     - It needs to be > 4 chars and < 20 chars.
 
     ex:
     ```
-    anyscale_iam_access_role_name_prefix = "anyscale-crossacct-"
+    anyscale_iam_access_service_acct_name_prefix = "anyscale-crossacct-"
     ```
   EOT
   type        = string
   default     = null
   validation {
-    condition = var.anyscale_iam_access_role_name_prefix == null ? true : (
-      can(regex("^(?:[a-z](?:[-a-z0-9]{4,20})?)$", var.anyscale_iam_access_role_name_prefix))
+    condition = var.anyscale_iam_access_service_acct_name_prefix == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,20})?)$", var.anyscale_iam_access_service_acct_name_prefix))
     )
-    error_message = "`anyscale_iam_access_role_name_prefix` must start with a lowercase letter followed by up to 20 lowercase letters, numbers, or hyphens."
+    error_message = "`anyscale_iam_access_service_acct_name_prefix` must start with a lowercase letter followed by up to 20 lowercase letters, numbers, or hyphens."
   }
 }
-variable "anyscale_iam_access_role_description" {
+variable "anyscale_iam_access_service_acct_description" {
   description = <<-EOT
     (Optional) The description of the IAM role that will be created for Anyscale access.
 
     ex:
     ```
-    anyscale_iam_access_role_description = "Anyscale Cross Account Access"
+    anyscale_iam_access_service_acct_description = "Anyscale Cross Account Access"
     ```
   EOT
   type        = string
   default     = null
 }
+
+variable "anyscale_iam_access_role_id" {
+  description = <<-EOT
+    (Optional, forces creation of new resource) The ID of the Anyscale IAM access role.
+
+    Overrides `anyscale_iam_access_role_id_prefix`.
+
+    ex:
+    ```
+    anyscale_iam_access_role_id = "anyscale_access_role"
+    ```
+  EOT
+  type        = string
+  default     = null
+  validation {
+    condition = var.anyscale_iam_access_role_id == null ? true : (
+      can(regex("^[a-zA-Z0-9_]{4,28}$", var.anyscale_iam_access_role_id))
+    )
+    error_message = "`anyscale_iam_access_role_id` must match regex: ^[a-zA-Z0-9_]{4,28}$."
+  }
+}
+variable "anyscale_iam_access_role_id_prefix" {
+  description = <<-EOT
+    (Optional, forces creation of new resource) The prefix of the Anyscale IAM access role.
+
+    If `anyscale_iam_access_role_id` is provided, it will override this variable.
+    If set to `null`, the prefix will be set to \"anyscale_\" in a local variable.
+
+    ex:
+    ```
+    anyscale_iam_access_role_id_prefix = "anyscale_crossacct_role_"
+    ```
+  EOT
+  type        = string
+  default     = "anyscale_crossacct_role_"
+  validation {
+    condition = var.anyscale_iam_access_role_id_prefix == null ? true : (
+      can(regex("^[a-zA-Z0-9_]{4,24}$", var.anyscale_iam_access_role_id_prefix))
+    )
+    error_message = "`anyscale_iam_access_role_id_prefix` must match regex: ^[a-zA-Z0-9_]{4,24}$."
+  }
+}
+variable "anyscale_access_role_description" {
+  description = <<-EOT
+    (Optional) The description of the Anyscale IAM access role.
+
+    ex:
+    ```
+    anyscale_access_role_description = "Anyscale Cross Account Access"
+    ```
+  EOT
+  type        = string
+  default     = "Anyscale Cross Account Access Role"
+}
+
 
 variable "existing_workload_identity_provider_name" {
   description = <<-EOF
@@ -1190,61 +1245,61 @@ variable "anyscale_workload_identity_account_id" {
   default     = null
 }
 
-variable "anyscale_cluster_node_role_name" {
+variable "anyscale_cluster_node_service_acct_name" {
   description = <<-EOT
     (Optional - forces new resource) IAM Cluster Node Role Name
 
     The name of the IAM role that will be created for Anyscale cluster nodes.
-    - If left `null`, will default to anyscale_cluster_node_role_name_prefix.
-    - If provided, overrides the anyscale_cluster_node_role_name_prefix variable.
+    - If left `null`, will default to anyscale_cluster_node_service_acct_name_prefix.
+    - If provided, overrides the anyscale_cluster_node_service_acct_name_prefix variable.
     - It needs to be > 4 chars and < 28 chars.
 
     ex:
     ```
-    anyscale_cluster_node_role_name = "anyscale-cluster-node"
+    anyscale_cluster_node_service_acct_name = "anyscale-cluster-node"
     ```
   EOT
   type        = string
   default     = null
   validation {
-    condition = var.anyscale_cluster_node_role_name == null ? true : (
-      can(regex("^(?:[a-z](?:[-a-z0-9]{4,28}[a-z0-9])?)$", var.anyscale_cluster_node_role_name))
+    condition = var.anyscale_cluster_node_service_acct_name == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,28}[a-z0-9])?)$", var.anyscale_cluster_node_service_acct_name))
     )
-    error_message = "`anyscale_cluster_node_role_name` must start with a lowercase letter followed by up to 28 lowercase letters, numbers, or hyphens."
+    error_message = "`anyscale_cluster_node_service_acct_name` must start with a lowercase letter followed by up to 28 lowercase letters, numbers, or hyphens."
   }
 
 }
-variable "anyscale_cluster_node_role_name_prefix" {
+variable "anyscale_cluster_node_service_acct_name_prefix" {
   description = <<-EOT
     (Optional - forces new resource) IAM Cluster Node Role Name Prefix
 
     Creates a unique IAM role name beginning with the specified prefix.
-    - If `anyscale_cluster_node_role_name` is provided, it will override this variable.
+    - If `anyscale_cluster_node_service_acct_name` is provided, it will override this variable.
     - The variable `general_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-cluster-` in a local variable.
     - It needs to be > 4 chars and < 20 chars.
 
     ex:
     ```
-    anyscale_cluster_node_role_name_prefix = "anyscale-cluster-"
+    anyscale_cluster_node_service_acct_name_prefix = "anyscale-cluster-"
     ```
   EOT
   type        = string
   default     = null
   validation {
-    condition = var.anyscale_cluster_node_role_name_prefix == null ? true : (
-      can(regex("^(?:[a-z](?:[-a-z0-9]{4,20})?)$", var.anyscale_cluster_node_role_name_prefix))
+    condition = var.anyscale_cluster_node_service_acct_name_prefix == null ? true : (
+      can(regex("^(?:[a-z](?:[-a-z0-9]{4,20})?)$", var.anyscale_cluster_node_service_acct_name_prefix))
     )
-    error_message = "`anyscale_cluster_node_role_name_prefix` must start with a lowercase letter followed by up to 20 lowercase letters, numbers, or hyphens."
+    error_message = "`anyscale_cluster_node_service_acct_name_prefix` must start with a lowercase letter followed by up to 20 lowercase letters, numbers, or hyphens."
   }
 }
-variable "anyscale_cluster_node_role_description" {
+variable "anyscale_cluster_node_service_acct_description" {
   description = <<-EOT
     (Optional) The description of the IAM role that will be created for Anyscale access.
 
     ex:
     ```
-    anyscale_cluster_node_role_description = "Anyscale Cluster Node"
+    anyscale_cluster_node_service_acct_description = "Anyscale Cluster Node"
     ```
   EOT
   type        = string

@@ -18,27 +18,27 @@ variable "vpc_name" {
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
-variable "anyscale_cloud_id" {
-  description = <<-EOT
-    (Optional) Anyscale Cloud ID.
+# variable "anyscale_cloud_id" {
+#   description = <<-EOT
+#     (Optional) Anyscale Cloud ID.
 
-    ex:
-    ```
-    anyscale_cloud_id = "cld_1234567890"
-    ```
-  EOT
-  type        = string
-  default     = null
-  validation {
-    condition = (
-      var.anyscale_cloud_id == null ? true : (
-        length(var.anyscale_cloud_id) > 4 &&
-        substr(var.anyscale_cloud_id, 0, 4) == "cld_"
-      )
-    )
-    error_message = "The anyscale_cloud_id value must start with \"cld_\"."
-  }
-}
+#     ex:
+#     ```
+#     anyscale_cloud_id = "cld_1234567890"
+#     ```
+#   EOT
+#   type        = string
+#   default     = null
+#   validation {
+#     condition = (
+#       var.anyscale_cloud_id == null ? true : (
+#         length(var.anyscale_cloud_id) > 4 &&
+#         substr(var.anyscale_cloud_id, 0, 4) == "cld_"
+#       )
+#     )
+#     error_message = "The anyscale_cloud_id value must start with \"cld_\"."
+#   }
+# }
 
 variable "module_enabled" {
   description = <<-EOT
@@ -214,6 +214,33 @@ variable "ingress_from_cidr_map" {
   default     = []
 }
 
+variable "ingress_from_gcp_health_checks" {
+  description = <<-EOT
+    (Optional) List of ingress rules to create to allow GCP health check probes.
+
+    This only uses rules from `predefined_firewall_rules`.
+    More information on GCP health checks can be found here:
+    https://cloud.google.com/load-balancing/docs/health-check-concepts#ip-ranges
+
+    ex:
+    ```
+    ingress_from_gcp_health_checks = [
+      {
+        rule        = "health-checks"
+        cidr_blocks = "35.191.0.0/16, 130.211.0.0/22"
+      }
+    ]
+    ```
+  EOT
+  type        = list(map(string))
+  default = [
+    {
+      rule        = "health-checks"
+      cidr_blocks = "35.191.0.0/16,130.211.0.0/22"
+    }
+  ]
+}
+
 # --------------------
 # Pre-defined rules
 #   These are reuqired
@@ -233,5 +260,7 @@ variable "predefined_firewall_rules" {
     ssh-tcp = [22, "tcp", "SSH", 1003]
     # NFS
     nfs-tcp = [2049, "tcp", "NFS/EFS", 1004]
+    # Health Checks
+    health-checks = [8000, "tcp", "Health Checks", 1005]
   }
 }

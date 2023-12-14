@@ -51,7 +51,7 @@ No resources.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_anyscale_iam_cluster_node_role_email"></a> [anyscale\_iam\_cluster\_node\_role\_email](#output\_anyscale\_iam\_cluster\_node\_role\_email) | The Anyscale cluster service account email. |
+| <a name="output_anyscale_iam_cluster_node_service_account_email"></a> [anyscale\_iam\_cluster\_node\_service\_account\_email](#output\_anyscale\_iam\_cluster\_node\_service\_account\_email) | The Anyscale cluster service account email. |
 | <a name="output_anyscale_iam_service_account_email"></a> [anyscale\_iam\_service\_account\_email](#output\_anyscale\_iam\_service\_account\_email) | The Anyscale service account email. |
 | <a name="output_anyscale_iam_workload_identity_provider_id"></a> [anyscale\_iam\_workload\_identity\_provider\_id](#output\_anyscale\_iam\_workload\_identity\_provider\_id) | The Anyscale workload identity provider id. |
 | <a name="output_anyscale_iam_workload_identity_provider_name"></a> [anyscale\_iam\_workload\_identity\_provider\_name](#output\_anyscale\_iam\_workload\_identity\_provider\_name) | The Anyscale workload identity provider name. |

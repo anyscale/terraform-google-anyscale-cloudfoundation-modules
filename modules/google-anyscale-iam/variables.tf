@@ -73,63 +73,183 @@ variable "random_char_length" {
   }
 }
 # --------------------------------------------------------------
-# Anyscale Cross Acct Access Role
+# Anyscale Cross Acct Access Service Account
 # --------------------------------------------------------------
-variable "create_anyscale_access_role" {
-  description = "(Optional) Determines whether to create the Anyscale access role. Default is `true`."
+variable "create_anyscale_access_service_acct" {
+  description = "(Optional) Determines whether to create the Anyscale access service account. Default is `true`."
   type        = bool
   default     = true
 }
 
-variable "anyscale_access_role_name" {
-  description = "(Optional, forces creation of new resource) The name of the Anyscale IAM access role. Conflicts with anyscale_access_role_name_prefix. Default is `null`."
+variable "anyscale_access_service_acct_name" {
+  description = <<-EOT
+    (Optional, forces creation of new resource)
+    The name of the Anyscale IAM access service account.
+
+    Overrides `anyscale_access_service_acct_name_prefix`.
+
+    ex:
+    ```
+    anyscale_access_service_acct_name = "anyscale-access-service-acct"
+    ```
+  EOT
   type        = string
   default     = null
   validation {
-    condition = var.anyscale_access_role_name == null ? true : (
-      can(regex("^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$", var.anyscale_access_role_name))
+    condition = var.anyscale_access_service_acct_name == null ? true : (
+      can(regex("^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$", var.anyscale_access_service_acct_name))
     )
-    error_message = "`anyscale_access_role_name` must match regex: ^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$."
+    error_message = "`anyscale_access_service_acct_name` must match regex: ^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$."
   }
 }
 
-variable "anyscale_access_role_name_prefix" {
-  description = "(Optional, forces creation of new resource) The prefix of the Anyscale IAM access role. Conflicts with anyscale_access_role_name. Default is `anyscale-iam-role-`."
+variable "anyscale_access_service_acct_name_prefix" {
+  description = <<-EOT
+    (Optional, forces creation of new resource)
+    The prefix of the Anyscale IAM access service account.
+
+    Conflicts with anyscale_access_service_acct_name.
+
+    ex:
+    ```
+    anyscale_access_service_acct_name_prefix = "anyscale-access-"
+    ```
+  EOT
   type        = string
-  default     = "anyscale-crossacct-role-"
+  default     = "anyscale-crossacct-"
   validation {
-    condition = var.anyscale_access_role_name_prefix == null ? true : (
-      can(regex("^[a-z](?:[-a-z0-9]{4,24})$", var.anyscale_access_role_name_prefix))
+    condition = var.anyscale_access_service_acct_name_prefix == null ? true : (
+      can(regex("^[a-z](?:[-a-z0-9]{4,24})$", var.anyscale_access_service_acct_name_prefix))
     )
-    error_message = "`anyscale_access_role_name_prefix` must match regex: ^[a-z](?:[-a-z0-9]{4,24})$."
+    error_message = "`anyscale_access_service_acct_name_prefix` must match regex: ^[a-z](?:[-a-z0-9]{4,24})$."
   }
 }
 
-variable "anyscale_access_role_description" {
-  description = "(Optional) Anyscale IAM access role description. If this is `null` the description will be set to \"Anyscale access role\". Default is `null`."
+variable "anyscale_access_service_acct_description" {
+  description = <<-EOT
+    (Optional) Anyscale IAM access service account description.
+
+    If this is `null` the description will be set to \"Anyscale access service account\" in a local variable.
+
+    ex:
+    ```
+    anyscale_access_service_acct_description = "Anyscale access service account"
+    ```
+  EOT
   type        = string
   default     = null
 }
 
-variable "anyscale_access_role_project_permissions" {
-  description = <<-EOF
-    (Optional) A list of permission roles to grant to the Anyscale IAM access role at the project level.
-    Default is `["roles/owner"]`.
-  EOF
-  type        = list(string)
-  default     = ["roles/owner"]
-}
+# variable "anyscale_access_service_acct_project_permissions" {
+#   description = <<-EOT
+#     (Optional) A list of permission roles
 
-variable "anyscale_access_role_binding_permissions" {
-  description = <<-EOF
-    (Optional) A list of permission roles to grant to the Anyscale IAM access role at the Service Account level.
+#     These permission roles will be granted to the service account at the project level.
+
+#     ex:
+#     ```
+#     anyscale_access_service_acct_project_permissions = ["roles/owner"]
+#     ```
+#   EOT
+#   type        = list(string)
+#   default     = ["roles/owner"]
+# }
+
+variable "anyscale_access_service_acct_binding_permissions" {
+  description = <<-EOT
+    (Optional) A list of permission roles to grant to the Anyscale IAM access service account at the Service Account level.
     Default is `["roles/iam.serviceAccountTokenCreator"]`.
-  EOF
+  EOT
   type        = list(string)
   default     = ["roles/iam.serviceAccountTokenCreator"]
 }
 
+# - Role for Anyscale Cross Account Access
+variable "create_anyscale_access_role" {
+  description = <<-EOT
+    (Optional) Determines whether to create the Anyscale access role.
 
+    ex:
+    ```
+    create_anyscale_access_role = true
+    ```
+  EOT
+  type        = bool
+  default     = true
+}
+
+variable "existing_anyscale_access_role_name" {
+  description = <<-EOT
+    (Optional) The name of an existing Anyscale IAM access role to use.
+
+    If provided, will skip creating the Anyscale access role.
+
+    ex:
+    ```
+    existing_anyscale_access_role_name = "projects/1234567890/roles/anyscale_access_role"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "anyscale_access_role_id" {
+  description = <<-EOT
+    (Optional, forces creation of new resource) The ID of the Anyscale IAM access role.
+
+    Overrides `anyscale_access_role_id_prefix`.
+
+    ex:
+    ```
+    anyscale_access_role_id = "anyscale_access_role"
+    ```
+  EOT
+  type        = string
+  default     = null
+  validation {
+    condition = var.anyscale_access_role_id == null ? true : (
+      can(regex("^[a-zA-Z0-9_]{4,28}$", var.anyscale_access_role_id))
+    )
+    error_message = "`anyscale_access_role_name` must match regex: ^[a-zA-Z0-9_]{4,28}$."
+  }
+}
+
+variable "anyscale_access_role_id_prefix" {
+  description = <<-EOT
+    (Optional, forces creation of new resource) The prefix of the Anyscale IAM access role.
+
+    If `anyscale_access_role_id` is provided, it will override this variable.
+    If set to `null`, the prefix will be set to \"anyscale_\" in a local variable.
+
+    ex:
+    ```
+    anyscale_access_role_id_prefix = "anyscale_crossacct_role_"
+    ```
+  EOT
+  type        = string
+  default     = "anyscale_crossacct_role_"
+  validation {
+    condition = var.anyscale_access_role_id_prefix == null ? true : (
+      can(regex("^[a-zA-Z0-9_]{4,24}$", var.anyscale_access_role_id_prefix))
+    )
+    error_message = "`anyscale_access_role_id_prefix` must match regex: ^[a-zA-Z0-9_]{4,24}$."
+  }
+}
+
+variable "anyscale_access_role_description" {
+  description = <<-EOT
+    (Optional) Anyscale IAM access role description.
+
+    ex:
+    ```
+    anyscale_access_role_description = "Anyscale access role"
+    ```
+  EOT
+  type        = string
+  default     = "Anyscale access role"
+}
+
+# - Workload Identity Pool for Anyscale Cross Account Access
 variable "existing_workload_identity_provider_name" {
   description = <<-EOF
     (Optional) The name of an existing workload identity provider to use.
@@ -151,7 +271,7 @@ variable "existing_workload_identity_provider_name" {
   default     = null
 }
 variable "workload_identity_pool_name" {
-  description = "(Optional) The name of the workload identity pool. If it is not provided, the Anyscale Access role name is used. Default is `null`."
+  description = "(Optional) The name of the workload identity pool. If it is not provided, the Anyscale Access service account name is used. Default is `null`."
   type        = string
   default     = null
 }
@@ -167,7 +287,7 @@ variable "workload_identity_pool_description" {
 }
 
 variable "workload_identity_pool_provider_name" {
-  description = "(Optional) The name of the workload identity pool provider. If it is not provided, the Anyscale Access role name is used. Default is `null`."
+  description = "(Optional) The name of the workload identity pool provider. If it is not provided, the Anyscale Access service account name is used. Default is `null`."
   type        = string
   default     = null
 }
@@ -183,85 +303,89 @@ variable "workload_anyscale_aws_account_id" {
 }
 
 # --------------------------------------------------------------
-# Anyscale Cluster Node Role
+# Anyscale Access Service Account Access Role
 # --------------------------------------------------------------
-variable "create_anyscale_cluster_node_role" {
+
+# --------------------------------------------------------------
+# Anyscale Cluster Node Service Account
+# --------------------------------------------------------------
+variable "create_anyscale_cluster_node_service_acct" {
   description = <<-EOT
-    (Optional) Determines whether to create the Anyscale cluster role.
+    (Optional) Determines whether to create the Anyscale cluster service account.
 
     ex:
     ```
-    create_anyscale_cluster_node_role = true
+    create_anyscale_cluster_node_service_acct = true
     ```
   EOT
   type        = bool
   default     = true
 }
 
-variable "anyscale_cluster_node_role_name" {
+variable "anyscale_cluster_node_service_acct_name" {
   description = <<-EOT
-    (Optional, forces creation of new resource) The name of the Anyscale IAM cluster node role.
+    (Optional, forces creation of new resource) The name of the Anyscale IAM cluster node service account.
 
-    Overrides `anyscale_cluster_node_role_name_prefix`.
+    Overrides `anyscale_cluster_node_service_acct_name_prefix`.
 
     ex:
     ```
-    anyscale_cluster_node_role_name = "anyscale-cluster-node-role"
+    anyscale_cluster_node_service_acct_name = "anyscale-cluster-acct"
     ```
   EOT
   type        = string
   default     = null
   validation {
-    condition = var.anyscale_cluster_node_role_name == null ? true : (
-      can(regex("^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$", var.anyscale_cluster_node_role_name))
+    condition = var.anyscale_cluster_node_service_acct_name == null ? true : (
+      can(regex("^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$", var.anyscale_cluster_node_service_acct_name))
     )
-    error_message = "`anyscale_cluster_node_role_name` must match regex: ^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$."
+    error_message = "`anyscale_cluster_node_service_acct_name` must match regex: ^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$."
   }
 }
 
-variable "anyscale_cluster_node_role_name_prefix" {
+variable "anyscale_cluster_node_service_acct_name_prefix" {
   description = <<-EOT
-    (Optional, forces creation of new resource) The prefix of the Anyscale IAM access role.
+    (Optional, forces creation of new resource) The prefix of the Anyscale IAM cluster service account.
 
-    If `anyscale_cluster_role_node_name` is provided, it will override this variable.
+    If `anyscale_cluster_node_service_acct_name` is provided, it will override this variable.
 
     ex:
     ```
-    anyscale_cluster_node_role_name_prefix = "anyscale-cluster-"
+    anyscale_cluster_node_service_acct_name_prefix = "anyscale-cluster-"
     ```
   EOT
   type        = string
   default     = "anyscale-cluster-"
   validation {
-    condition = var.anyscale_cluster_node_role_name_prefix == null ? true : (
-      can(regex("^[a-z](?:[-a-z0-9]{4,24})$", var.anyscale_cluster_node_role_name_prefix))
+    condition = var.anyscale_cluster_node_service_acct_name_prefix == null ? true : (
+      can(regex("^[a-z](?:[-a-z0-9]{4,24})$", var.anyscale_cluster_node_service_acct_name_prefix))
     )
-    error_message = "`anyscale_cluster_node_role_name_prefix` must match regex: ^[a-z](?:[-a-z0-9]{4,24})$."
+    error_message = "`anyscale_cluster_node_service_acct_name_prefix` must match regex: ^[a-z](?:[-a-z0-9]{4,24})$."
   }
 }
 
-variable "anyscale_cluster_node_role_description" {
+variable "anyscale_cluster_node_service_acct_description" {
   description = <<-EOT
-    (Optional) IAM cluster node role description.
+    (Optional) IAM cluster node service account description.
 
-    If this is `null` the description will be set to `Anyscale cluster node role` in a local variable.
+    If this is `null` the description will be set to `Anyscale cluster node service account` in a local variable.
 
     ex:
     ```
-    anyscale_cluster_node_role_description = "Anyscale cluster node role for cloud"
+    anyscale_cluster_node_service_acct_description = "Anyscale cluster node service account for cloud"
     ```
   EOT
   type        = string
   default     = null
 }
 
-variable "anyscale_cluster_node_role_permissions" {
+variable "anyscale_cluster_node_service_acct_permissions" {
   description = <<-EOT
-    (Optional) A list of permission roles to grant to the Anyscale IAM cluster node role.
+    (Optional) A list of permission roles to grant to the Anyscale IAM cluster node service account.
 
     ex:
     ```
-    anyscale_cluster_node_role_permissions = ["roles/artifactregistry.reader"]
+    anyscale_cluster_node_service_acct_permissions = ["roles/artifactregistry.reader"]
     ```
   EOT
   type        = list(string)

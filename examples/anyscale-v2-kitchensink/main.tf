@@ -90,14 +90,14 @@ module "google_anyscale_v2_kitchensink" {
 
   # IAM Related
   enable_anyscale_iam                          = true
-  anyscale_iam_access_role_name_prefix         = "anyscale-tf-ks-acct-"
-  anyscale_iam_access_role_description         = "Anyscale Terraform KitchenSink IAM Access Role"
+  anyscale_iam_access_service_acct_name_prefix = "anyscale-tf-ks-acct-"
+  anyscale_iam_access_service_acct_description = "Anyscale Terraform KitchenSink IAM Access Role"
   anyscale_workload_identity_pool_name         = "anyscale-tf-ks-workload-id-pool"
   anyscale_workload_identity_pool_display_name = "Anyscale TF KS Identity Pool"
   anyscale_workload_identity_pool_description  = "Anyscale Terraform KitchenSink Workload Identity Pool"
 
-  anyscale_cluster_node_role_name        = "anyscale-tf-ks-cluster"
-  anyscale_cluster_node_role_description = "Anyscale Terraform KitchenSink IAM Cluster Node Role"
+  anyscale_cluster_node_service_acct_name        = "anyscale-tf-ks-cluster"
+  anyscale_cluster_node_service_acct_description = "Anyscale Terraform KitchenSink IAM Cluster Node Role"
 
   # Memorystore Related
   enable_anyscale_memorystore       = true

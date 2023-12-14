@@ -1,31 +1,31 @@
 locals {
   random_char_length = var.random_char_length >= 4 && var.random_char_length % 2 == 0 ? var.random_char_length / 2 : 0
 
-  anyscale_aws_account_id      = var.workload_anyscale_aws_account_id != null ? var.workload_anyscale_aws_account_id : var.anyscale_access_aws_account_id
-  anyscale_access_role_enabled = var.module_enabled && var.create_anyscale_access_role ? true : false
+  anyscale_aws_account_id = var.workload_anyscale_aws_account_id != null ? var.workload_anyscale_aws_account_id : var.anyscale_access_aws_account_id
 
-  anyscale_access_role_desc_cloud = try("Anyscale access role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}", "Anyscale access role for cloud ${var.anyscale_cloud_id}", null)
-  anyscale_access_role_desc = coalesce(
-    var.anyscale_access_role_description,
-    local.anyscale_access_role_desc_cloud,
-    "Anyscale access role"
+  anyscale_access_service_acct_enabled    = var.module_enabled && var.create_anyscale_access_service_acct ? true : false
+  anyscale_access_service_acct_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale access service account for cloud ${var.anyscale_cloud_id} in region ${var.google_region}" : null
+  anyscale_access_service_acct_desc = coalesce(
+    var.anyscale_access_service_acct_description,
+    local.anyscale_access_service_acct_desc_cloud,
+    "Anyscale access service account"
   )
-  anyscale_access_role_name = coalesce(var.anyscale_access_role_name, var.anyscale_access_role_name_prefix, "anyscale-")
-  access_role_name_computed = var.enable_random_name_suffix ? format(
+  anyscale_access_service_acct_name = coalesce(var.anyscale_access_service_acct_name, var.anyscale_access_service_acct_name_prefix, "anyscale-")
+  access_acct_name_computed = var.enable_random_name_suffix ? format(
     "%s%s",
-    local.anyscale_access_role_name,
+    local.anyscale_access_service_acct_name,
     random_id.random_char_suffix.hex,
-  ) : local.anyscale_access_role_name
+  ) : local.anyscale_access_service_acct_name
 
   existing_provider_provided                    = var.existing_workload_identity_provider_name != null ? true : false
-  create_workload_identity_pool                 = local.anyscale_access_role_enabled && !local.existing_provider_provided ? true : false
+  create_workload_identity_pool                 = local.anyscale_access_service_acct_enabled && !local.existing_provider_provided ? true : false
   workload_identity_pool_crossacct_rolename     = "gcp_if_${var.anyscale_org_id}"
-  workload_identity_pool_name_computed          = coalesce(var.workload_identity_pool_name, local.access_role_name_computed)
-  workload_identity_pool_provider_name_computed = coalesce(var.workload_identity_pool_provider_name, local.access_role_name_computed)
+  workload_identity_pool_name_computed          = coalesce(var.workload_identity_pool_name, local.access_acct_name_computed)
+  workload_identity_pool_provider_name_computed = coalesce(var.workload_identity_pool_provider_name, local.access_acct_name_computed)
 }
 
 # --------------------------------------------------------------
-# Random Strings for IAM Role Names
+# Random Strings for IAM Names
 # --------------------------------------------------------------
 resource "random_id" "random_char_suffix" {
   byte_length = local.random_char_length
@@ -38,28 +38,34 @@ resource "random_id" "random_char_suffix" {
 #     serviceAccountTokenCreator
 #     workloadIdentityUser
 # --------------------------------------------------------------
-resource "google_service_account" "anyscale_access_role" {
-  count = local.anyscale_access_role_enabled ? 1 : 0
+resource "google_service_account" "anyscale_access_service_acct" {
+  count = local.anyscale_access_service_acct_enabled ? 1 : 0
 
-  account_id  = local.access_role_name_computed
-  description = local.anyscale_access_role_desc
+  account_id  = local.access_acct_name_computed
+  description = local.anyscale_access_service_acct_desc
   project     = var.anyscale_project_id
 }
 
 #tfsec:ignore:google-iam-no-project-level-service-account-impersonation
-resource "google_project_iam_member" "anyscale_access_role" {
-  for_each = local.anyscale_access_role_enabled ? toset(var.anyscale_access_role_project_permissions) : []
-  role     = each.key
-  project  = var.anyscale_project_id
-  member   = "serviceAccount:${google_service_account.anyscale_access_role[0].email}"
+# resource "google_project_iam_member" "anyscale_access_service_acct" {
+#   for_each = local.anyscale_access_service_acct_enabled ? toset(var.anyscale_access_service_acct_project_permissions) : []
+#   role     = each.key
+#   project  = var.anyscale_project_id
+#   member   = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
+# }
+resource "google_project_iam_member" "anyscale_access_service_acct" {
+  count   = local.anyscale_access_service_acct_enabled ? 1 : 0
+  role    = coalesce(google_project_iam_custom_role.anyscale_access_role[0].name, var.existing_anyscale_access_role_name)
+  project = var.anyscale_project_id
+  member  = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
 }
 
 #tfsec:ignore:google-iam-no-project-level-service-account-impersonation
-resource "google_service_account_iam_binding" "anyscale_access_role" {
-  for_each           = local.anyscale_access_role_enabled ? toset(var.anyscale_access_role_binding_permissions) : []
+resource "google_service_account_iam_binding" "anyscale_access_service_acct" {
+  for_each           = local.anyscale_access_service_acct_enabled ? toset(var.anyscale_access_service_acct_binding_permissions) : []
   role               = each.key
-  service_account_id = google_service_account.anyscale_access_role[0].name
-  members            = ["serviceAccount:${google_service_account.anyscale_access_role[0].email}"]
+  service_account_id = google_service_account.anyscale_access_service_acct[0].name
+  members            = ["serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"]
 }
 
 # Identity Pool Resources
@@ -101,9 +107,9 @@ locals {
   identity_pool_name                   = local.create_workload_identity_pool ? "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.anyscale_pool[0].name}/*" : local.existing_provider_provided ? "principalSet://iam.googleapis.com/${local.existing_workload_identity_pool_name}/*" : null
 }
 resource "google_service_account_iam_binding" "anyscale_workload_identity_user" {
-  count = local.anyscale_access_role_enabled ? 1 : 0
+  count = local.anyscale_access_service_acct_enabled ? 1 : 0
 
-  service_account_id = google_service_account.anyscale_access_role[0].name
+  service_account_id = google_service_account.anyscale_access_service_acct[0].name
   role               = "roles/iam.workloadIdentityUser"
   members = [
     local.identity_pool_name
@@ -115,40 +121,47 @@ resource "google_service_account_iam_binding" "anyscale_workload_identity_user" 
 #   Permission: storage admin, artifact registry read
 # --------------------------------------------------------------
 locals {
-  cluster_node_role_enabled = var.module_enabled && var.create_anyscale_cluster_node_role ? true : false
+  cluster_node_role_enabled = var.module_enabled && var.create_anyscale_cluster_node_service_acct ? true : false
 
-  anyscale_cluster_node_role_desc_cloud = try("Anyscale cluster node role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}", "Anyscale cluster node role for cloud ${var.anyscale_cloud_id}", null)
-  anyscale_cluster_node_role_desc = coalesce(
-    var.anyscale_cluster_node_role_description,
-    local.anyscale_cluster_node_role_desc_cloud,
+  anyscale_cluster_node_service_acct_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale cluster node role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}" : null
+  anyscale_cluster_node_service_acct_desc = coalesce(
+    var.anyscale_cluster_node_service_acct_description,
+    local.anyscale_cluster_node_service_acct_desc_cloud,
     "Anyscale cluster node role"
   )
-  anyscale_cluster_node_role_name = coalesce(var.anyscale_cluster_node_role_name, var.anyscale_cluster_node_role_name_prefix, "anyscale-")
+  anyscale_cluster_node_service_acct_name = coalesce(var.anyscale_cluster_node_service_acct_name, var.anyscale_cluster_node_service_acct_name_prefix, "anyscale-")
   cluster_node_role_name_computed = var.enable_random_name_suffix ? format(
     "%s%s",
-    local.anyscale_cluster_node_role_name,
+    local.anyscale_cluster_node_service_acct_name,
     random_id.random_char_suffix.hex,
-  ) : local.anyscale_cluster_node_role_name
+  ) : local.anyscale_cluster_node_service_acct_name
 
   cluster_node_logging_monitoring_enabled = var.module_enabled && var.enable_anyscale_cluster_logging_monitoring ? true : false
   cluster_node_roles = local.cluster_node_logging_monitoring_enabled ? concat([
     "roles/logging.logWriter",
     "roles/monitoring.metricWriter",
-  ], var.anyscale_cluster_node_role_permissions) : var.anyscale_cluster_node_role_permissions
+  ], var.anyscale_cluster_node_service_acct_permissions) : var.anyscale_cluster_node_service_acct_permissions
 }
 
-resource "google_service_account" "anyscale_cluster_node_role" {
+resource "google_service_account" "anyscale_cluster_node_service_acct" {
   count = local.cluster_node_role_enabled ? 1 : 0
 
   account_id  = local.cluster_node_role_name_computed
-  description = local.anyscale_cluster_node_role_desc
+  description = local.anyscale_cluster_node_service_acct_desc
   project     = var.anyscale_project_id
 }
 
-resource "google_project_iam_binding" "anyscale_cluster_node_role" {
+resource "google_project_iam_binding" "anyscale_cluster_node_service_acct" {
   for_each = local.cluster_node_role_enabled ? toset(local.cluster_node_roles) : []
   role     = each.key
   project  = var.anyscale_project_id
-  # service_account_id = google_service_account.anyscale_cluster_node_role[0].name
-  members = ["serviceAccount:${google_service_account.anyscale_cluster_node_role[0].email}"]
+  # service_account_id = google_service_account.anyscale_cluster_node_service_acct[0].name
+  members = ["serviceAccount:${google_service_account.anyscale_cluster_node_service_acct[0].email}"]
+}
+
+resource "google_service_account_iam_member" "anyscale_cluster_node_service_acct" {
+  count              = local.cluster_node_role_enabled && local.anyscale_access_service_acct_enabled ? 1 : 0
+  role               = "roles/iam.serviceAccountUser"
+  service_account_id = google_service_account.anyscale_cluster_node_service_acct[0].name
+  member             = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
 }
