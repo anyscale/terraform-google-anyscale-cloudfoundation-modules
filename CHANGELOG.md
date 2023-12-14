@@ -54,6 +54,7 @@ OTHER:
 - tflint and changelog updates
 - Initial pass at End to End testing integration
 
+
 ## 0.8.1 (Released)
 FEATURES:
 
