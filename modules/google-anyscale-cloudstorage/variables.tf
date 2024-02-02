@@ -152,15 +152,19 @@ variable "cors_rules" {
   description = <<-EOT
     (Optional) List of CORS rules to configure.
     Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#cors except max_age_seconds should be a number.
-    Default is:
+
+    ex:
+    ```
+    cors_rules =
     [
       {
-        origins          = ["https://console.anyscale.com"]
-        methods          = ["GET"]
+        origins          = ["https://*.anyscale.com"]
+        methods          = ["GET","PUT"]
         response_headers = ["*"]
         max_age_seconds  = 3600
       }
     ]
+    ```
   EOT
 
   type = set(object({
@@ -176,8 +180,8 @@ variable "cors_rules" {
   }))
   default = [
     {
-      origins          = ["https://console.anyscale.com"]
-      methods          = ["GET"]
+      origins          = ["https://*.anyscale.com"]
+      methods          = ["GET", "PUT"]
       response_headers = ["*"]
       max_age_seconds  = 3600
     }
