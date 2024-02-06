@@ -781,7 +781,7 @@ variable "anyscale_bucket_cors_rules" {
     anyscale_bucket_cors_rules = [
       {
         origins          = ["https://*.anyscale.com"]
-        methods          = ["GET", "PUT"]
+        methods          = ["GET", "HEAD, "PUT", "POST", "DELETE"]
         response_headers = ["*"]
         max_age_seconds  = 3600
       }
@@ -802,7 +802,7 @@ variable "anyscale_bucket_cors_rules" {
   default = [
     {
       origins          = ["https://*.anyscale.com"]
-      methods          = ["GET", "PUT"]
+      methods          = ["GET", "POST", "PUT", "HEAD", "DELETE"]
       response_headers = ["*"]
       max_age_seconds  = 3600
     }

@@ -159,7 +159,7 @@ variable "cors_rules" {
     [
       {
         origins          = ["https://*.anyscale.com"]
-        methods          = ["GET","PUT"]
+        methods          = ["GET", "POST", "PUT", "HEAD", "DELETE"]
         response_headers = ["*"]
         max_age_seconds  = 3600
       }
@@ -181,7 +181,7 @@ variable "cors_rules" {
   default = [
     {
       origins          = ["https://*.anyscale.com"]
-      methods          = ["GET", "PUT"]
+      methods          = ["GET", "POST", "PUT", "HEAD", "DELETE"]
       response_headers = ["*"]
       max_age_seconds  = 3600
     }
