@@ -29,7 +29,7 @@ module "google_anyscale_v2_commonname" {
 
   anyscale_workload_identity_account_id = var.workload_identity_account_id
 
-  common_prefix   = "anyscale-tf-"
+  common_prefix   = "anyscale-tftst-"
   use_common_name = true
   # Project Related
   anyscale_project_billing_account = var.billing_account_id
