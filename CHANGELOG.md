@@ -1,3 +1,14 @@
+## 0.10.1 (Released)
+FEATURES:
+- Bucket CORS Rules updates to support additional Anyscale UI functionality
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Documentation updates
+
 ## 0.10.0 (Released)
 FEATURES:
 - Support for shared VPC
