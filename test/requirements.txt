@@ -1,3 +1,4 @@
 anyscale
+anyscale[gcp]
 rich
 python_terraform

@@ -14,6 +14,18 @@ variable "vpc_name" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = <<-EOT
+    (Required) The ID of the VPC to apply the Firewall Policy to.
+
+    ex:
+    ```
+    vpc_id = "projects/anyscale/global/networks/anyscale-network"
+    ```
+  EOT
+  type        = string
+}
+
 # ------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.

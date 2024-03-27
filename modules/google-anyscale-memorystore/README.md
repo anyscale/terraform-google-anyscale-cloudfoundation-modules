@@ -3,7 +3,7 @@
 [![Google Provider Version][badge-tf-google]](https://github.com/terraform-providers/terraform-provider-google/releases)
 # google-anyscale-memorystore
 
-Optional sub-module that creates a Google Memorystore Redis DB.
+This optional sub-module that creates a Google Memorystore Redis DB. It should be used from the [root module](../../README.md).
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -11,7 +11,7 @@ Optional sub-module that creates a Google Memorystore Redis DB.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 4.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 
 ## Providers
@@ -77,5 +77,5 @@ No modules.
 [Issues]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/issues
 [badge-build]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
 [badge-terraform]: https://img.shields.io/badge/terraform-1.x%20-623CE4.svg?logo=terraform
-[badge-tf-google]: https://img.shields.io/badge/GCP-4.+-F8991D.svg?logo=terraform
+[badge-tf-google]: https://img.shields.io/badge/GCP-5.+-F8991D.svg?logo=terraform
 [build-status]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/actions

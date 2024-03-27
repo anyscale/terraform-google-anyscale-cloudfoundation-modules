@@ -8,7 +8,7 @@ locals {
   # existing_prv_rt_count = length(var.existing_public_route_table_ids) > 0 ? length(var.existing_public_route_table_ids) : 0
   public_subnet_name_computed = coalesce(
     var.public_subnet_name,
-    format("${local.computed_anyscale_vpcname}-${local.google_region}-${var.public_subnet_suffix}")
+    "${local.computed_anyscale_vpcname}-${local.google_region}-${var.public_subnet_suffix}"
   )
   # public_route_table_ids = local.existing_prv_rt_count > 0 ? var.existing_public_route_table_ids : local.public_subnet_count > 0 ? aws_route_table.public[*].id : []
 }

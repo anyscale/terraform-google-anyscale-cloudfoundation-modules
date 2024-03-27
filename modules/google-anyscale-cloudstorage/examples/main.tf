@@ -96,8 +96,8 @@ module "kitchen_sink" {
   }
 
   bucket_iam_binding_members = [
-    "serviceAccount:${module.kitchen_sink_iam.iam_anyscale_access_role_email}",
-    "serviceAccount:${module.kitchen_sink_iam.iam_anyscale_cluster_node_role_email}"
+    "serviceAccount:${module.kitchen_sink_iam.iam_anyscale_access_service_acct_email}",
+    "serviceAccount:${module.kitchen_sink_iam.iam_anyscale_cluster_node_service_acct_email}"
   ]
 
   bucket_iam_binding_override_roles = [

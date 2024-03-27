@@ -2,7 +2,7 @@
 default_stages: [commit]
 repos:
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.84.0
+    rev: v1.88.2
     hooks:
       - id: terraform_fmt
       - id: terraform_validate
@@ -12,7 +12,7 @@ repos:
       - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
-      - id: terraform_tfsec
+      - id: terraform_trivy
       - id: terraform_checkov
         args:
           - --args=--quiet
@@ -20,7 +20,7 @@ repos:
       - id: tfupdate
         name: Autoupdate Terraform Google Provider
         args:
-          - --args=provider google -v "~> 4.0"
+          - --args=provider google -v "~> 5.0"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:

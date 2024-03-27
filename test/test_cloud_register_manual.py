@@ -147,7 +147,7 @@ def _anyscale_cloud_verify(cloud_controller: CloudController, cloud_name: str):
             strict=True,
             # Change functional_verify="workspace,service" once service is ready.
             # Requires user confirmation to proceed or setting yes=True
-            functional_verify="workspace",
+            functional_verify="workspace,service",
             yes=True,
         )
         logger.info("  Completed: Anyscale Cloud verified successfully")

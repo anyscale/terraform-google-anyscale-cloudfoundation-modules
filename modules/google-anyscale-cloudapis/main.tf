@@ -42,6 +42,12 @@ resource "google_project_service" "anyscale_optional_apis" {
   service                    = each.value
   disable_on_destroy         = var.disable_services_on_destroy
   disable_dependent_services = var.disable_dependent_services
+
+  lifecycle {
+    ignore_changes = [
+      service, # Ignore changes to the service itself
+    ]
+  }
 }
 
 # **************************************************
