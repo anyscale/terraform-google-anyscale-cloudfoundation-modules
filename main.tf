@@ -80,8 +80,14 @@ module "google_anyscale_cloudapis" {
 # VPC (Networking) Module
 # ------------------------------
 locals {
+  google_region = data.google_client_config.current.region
+
   vpc_name        = var.anyscale_vpc_name != null ? var.anyscale_vpc_name : var.anyscale_vpc_name_prefix != null ? null : local.common_name
   vpc_name_prefix = coalesce(var.anyscale_vpc_name_prefix, var.common_prefix, "anyscale-vpc-")
+
+  public_subnet_name  = coalesce(var.anyscale_vpc_public_subnet_name, try("${local.vpc_name}-${local.google_region}-${var.anyscale_vpc_public_subnet_suffix}", null), "anyscale-vpc-subnet-public")
+  private_subnet_name = coalesce(var.anyscale_vpc_private_subnet_name, try("${local.vpc_name}-${local.google_region}-${var.anyscale_vpc_private_subnet_suffix}", null), "anyscale-vpc-subnet-private")
+  proxy_subnet_name   = coalesce(var.anyscale_vpc_proxy_subnet_name, try("${local.vpc_name}-${local.google_region}-${var.anyscale_vpc_proxy_subnet_suffix}", null), "anyscale-vpc-subnet-proxy")
 
   anyscale_private_subnet_count = var.anyscale_vpc_private_subnet_cidr != null ? 1 : 0
   anyscale_proxy_subnet_count   = var.anyscale_vpc_proxy_subnet_cidr != null ? 1 : 0
@@ -105,9 +111,14 @@ module "google_anyscale_vpc" {
   enable_random_name_suffix = local.enable_module_random_name_suffix
   vpc_description           = var.anyscale_vpc_description
 
-  public_subnet_cidr  = var.anyscale_vpc_public_subnet_cidr
+  public_subnet_cidr = var.anyscale_vpc_public_subnet_cidr
+  public_subnet_name = local.public_subnet_name
+
   private_subnet_cidr = var.anyscale_vpc_private_subnet_cidr
-  proxy_subnet_cidr   = var.anyscale_vpc_proxy_subnet_cidr
+  private_subnet_name = local.private_subnet_name
+
+  proxy_subnet_cidr = var.anyscale_vpc_proxy_subnet_cidr
+  proxy_subnet_name = local.proxy_subnet_name
 
   create_nat = local.create_nat_gw
 }
@@ -155,6 +166,7 @@ module "google_anyscale_vpc_firewall_policy" {
   anyscale_project_id = local.vpc_project_id
 
   vpc_name = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
+  vpc_id   = coalesce(var.existing_vpc_id, module.google_anyscale_vpc.vpc_id)
 
   firewall_policy_name        = local.firewall_policy_name
   firewall_policy_description = var.anyscale_vpc_firewall_policy_description

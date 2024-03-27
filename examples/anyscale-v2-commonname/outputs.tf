@@ -17,3 +17,8 @@ output "registration_command" {
   EOT
 }
 #
+
+output "vpc_id" {
+  description = "The ID of the VPC."
+  value       = module.google_anyscale_v2_commonname.vpc_id
+}

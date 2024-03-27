@@ -2,12 +2,8 @@ locals {
   random_char_length = var.random_char_length >= 4 && var.random_char_length % 2 == 0 ? var.random_char_length / 2 : 0
   google_region      = coalesce(var.google_region, data.google_client_config.current.region)
 
-  anyscale_vpcname = var.anyscale_vpc_name != null ? var.anyscale_vpc_name : var.anyscale_vpc_name_prefix
-  computed_anyscale_vpcname = var.enable_random_name_suffix ? format(
-    "%s%s",
-    local.anyscale_vpcname,
-    random_id.random_char_suffix.hex,
-  ) : local.anyscale_vpcname
+  anyscale_vpcname          = var.anyscale_vpc_name != null ? var.anyscale_vpc_name : var.anyscale_vpc_name_prefix
+  computed_anyscale_vpcname = var.enable_random_name_suffix ? "${local.anyscale_vpcname}${random_id.random_char_suffix.hex}" : local.anyscale_vpcname
 
   # module_labels = merge(
   #   tomap({

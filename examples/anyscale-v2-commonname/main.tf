@@ -42,4 +42,7 @@ module "google_anyscale_v2_commonname" {
 
   # Cloud Storage (Bucket) Related
   anyscale_bucket_location = "US"
+
+  # Enable Cloud Logging on GCP - this will enable sending logs and metrics to GCP Logs and Monitoring
+  enable_cloud_logging_monitoring = "true"
 }

@@ -3,7 +3,7 @@
 [![Google Provider Version][badge-tf-google]](https://github.com/terraform-providers/terraform-provider-google/releases)
 # google-anyscale-vpc-firewall
 
-This sub-module builds Google VPC Firewalls that will work with Anyscale.
+This sub-module builds Google VPC Firewalls that will work with Anyscale. It should be used from the [root module](../../README.md).
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -11,7 +11,7 @@ This sub-module builds Google VPC Firewalls that will work with Anyscale.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 4.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 
 ## Providers
@@ -33,7 +33,6 @@ No modules.
 | [google_compute_network_firewall_policy_rule.ingress_allow_from_cidr_blocks](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network_firewall_policy_rule) | resource |
 | [google_compute_network_firewall_policy_rule.ingress_allow_from_gcp_health_checks](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network_firewall_policy_rule) | resource |
 | [google_compute_network_firewall_policy_rule.ingress_with_self](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_network_firewall_policy_rule) | resource |
-| [google_compute_network.anyscale_vpc](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_network) | data source |
 
 ## Inputs
 
@@ -50,6 +49,7 @@ No modules.
 | <a name="input_ingress_with_self_map"></a> [ingress\_with\_self\_map](#input\_ingress\_with\_self\_map) | (Optional) List of ingress rules to create where 'self' is defined.<br><br>Default rule is `all-all` as this firewall rule is used for all Anyscale resources.<br><br>ex:<pre>ingress_with_self_map = [<br>  {<br>    rule        = "https-443-tcp"<br>  },<br>  {<br>    rule        = "http-80-tcp"<br>  },<br>  {<br>    rule        = "ssh-tcp"<br>  },<br>  {<br>    rule        = "nfs-tcp"<br>  }<br>]</pre> | `list(map(string))` | <pre>[<br>  {<br>    "rule": "all-all"<br>  }<br>]</pre> | no |
 | <a name="input_module_enabled"></a> [module\_enabled](#input\_module\_enabled) | (Optional) Determines whether to create the resources inside this module.<br><br>ex:<pre>module_enabled = true</pre> | `bool` | `true` | no |
 | <a name="input_predefined_firewall_rules"></a> [predefined\_firewall\_rules](#input\_predefined\_firewall\_rules) | (Required) Map of predefined firewall rules. | `map(list(any))` | <pre>{<br>  "all-all": [<br>    "",<br>    "all",<br>    "All protocols",<br>    1000<br>  ],<br>  "health-checks": [<br>    8000,<br>    "tcp",<br>    "Health Checks",<br>    1005<br>  ],<br>  "http-80-tcp": [<br>    80,<br>    "tcp",<br>    "HTTP",<br>    1001<br>  ],<br>  "https-443-tcp": [<br>    443,<br>    "tcp",<br>    "HTTPS",<br>    1002<br>  ],<br>  "nfs-tcp": [<br>    2049,<br>    "tcp",<br>    "NFS/EFS",<br>    1004<br>  ],<br>  "ssh-tcp": [<br>    22,<br>    "tcp",<br>    "SSH",<br>    1003<br>  ]<br>}</pre> | no |
+| <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | (Required) The ID of the VPC to apply the Firewall Policy to.<br><br>ex:<pre>vpc_id = "projects/anyscale/global/networks/anyscale-network"</pre> | `string` | n/a | yes |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | (Required) The name of the VPC to apply the Firewall Policy to.<br><br>ex:<pre>vpc_name = "anyscale-vpc"</pre> | `string` | n/a | yes |
 
 ## Outputs

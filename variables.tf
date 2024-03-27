@@ -345,6 +345,21 @@ variable "existing_vpc_name" {
   type        = string
   default     = null
 }
+variable "existing_vpc_id" {
+  description = <<-EOT
+    (Optional) An existing VPC ID.
+
+    If provided, this module will skip creating a new VPC with the Anyscale VPC module.
+    An existing VPC Subnet Name (`existing_vpc_subnet_name`) is also required if this is provided.
+
+    ex:
+    ```
+    existing_vpc_id = "projects/anyscale/global/networks/anyscale-network"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
 variable "existing_vpc_subnet_name" {
   description = <<-EOT
     (Optional) Existing subnet name to create Anyscale resources in.
@@ -424,6 +439,39 @@ variable "anyscale_vpc_description" {
   default     = "VPC for Anyscale Resources"
 }
 
+# Public Subnet Related
+variable "anyscale_vpc_public_subnet_name" {
+  description = <<-EOT
+    (Optional) The public subnet name.
+
+    This VPC terraform will only create one public subnet in one region.
+    Overrides `anyscale_vpc_public_subnet_suffix` if provided.
+
+    ex:
+    ```
+    anyscale_vpc_public_subnet_name = "anyscale-public-subnet"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "anyscale_vpc_public_subnet_suffix" {
+  description = <<-EOT
+    (Optional) The public subnet suffix.
+
+    Prepended with the VPC name and region to create a unique public subnet name.
+    Overridden by `anyscale_vpc_public_subnet_name`.
+
+    ex:
+    ```
+    anyscale_vpc_public_subnet_suffix = "public"
+    ```
+  EOT
+  type        = string
+  default     = "public"
+}
+
 variable "anyscale_vpc_public_subnet_cidr" {
   description = <<-EOT
     (Optional) The public subnet to create.
@@ -460,6 +508,39 @@ variable "anyscale_vpc_public_subnet_cidr" {
     )
     error_message = "The `anyscale_vpc_public_subnet_cidr` CIDR block must have a prefix length between /8 and /24."
   }
+}
+
+# Private Subnet
+variable "anyscale_vpc_private_subnet_name" {
+  description = <<-EOT
+    (Optional) The private subnet name.
+
+    This VPC terraform will only create one private subnet in one region.
+    Overrides `anyscale_vpc_private_subnet_suffix` if provided.
+
+    ex:
+    ```
+    anyscale_vpc_private_subnet_name = "anyscale-private-subnet"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "anyscale_vpc_private_subnet_suffix" {
+  description = <<-EOT
+    (Optional) The private subnet suffix.
+
+    Prepended with the VPC name and region to create a unique private subnet name.
+    Overriden by `anyscale_vpc_private_subnet_name`.
+
+    ex:
+    ```
+    anyscale_vpc_private_subnet_suffix = "private"
+    ```
+  EOT
+  type        = string
+  default     = "private"
 }
 
 variable "anyscale_vpc_private_subnet_cidr" {
@@ -499,6 +580,41 @@ variable "anyscale_vpc_private_subnet_cidr" {
     )
     error_message = "The `anyscale_vpc_private_subnet_cidr` CIDR block must have a prefix length between /8 and /24."
   }
+}
+
+# Proxy Subnet
+variable "anyscale_vpc_proxy_subnet_name" {
+  description = <<-EOT
+    (Optional) The proxy subnet name.
+
+    Overrides `anyscale_vpc_proxy_subnet_suffix` if provided.
+
+    This VPC terraform will only create one proxy subnet in one region. Proxy-Only subnets are used for Google Cloud Load Balancers.
+    More information can be found in the [Google Cloud Load Balancer Documentation](https://cloud.google.com/load-balancing/docs/proxy-only-subnets).
+
+    ex:
+    ```
+    anyscale_vpc_proxy_subnet_name = "anyscale-proxy-subnet"
+    ```
+  EOT
+  type        = string
+  default     = null
+
+}
+variable "anyscale_vpc_proxy_subnet_suffix" {
+  description = <<-EOT
+    (Optional) The proxy subnet suffix.
+
+    Prepended with the VPC name and region to create a unique proxy subnet name.
+    Overridden by `anyscale_vpc_proxy_subnet_name`.
+
+    ex:
+    ```
+    anyscale_vpc_proxy_subnet_suffix = "proxy"
+    ```
+  EOT
+  type        = string
+  default     = "proxy"
 }
 
 variable "anyscale_vpc_proxy_subnet_cidr" {

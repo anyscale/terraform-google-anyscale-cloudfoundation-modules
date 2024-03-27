@@ -19,7 +19,7 @@ Since this creates a new project, the user/role that is executing this example n
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 4.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
 
 ## Providers
 
@@ -54,4 +54,5 @@ No resources.
 | Name | Description |
 |------|-------------|
 | <a name="output_registration_command"></a> [registration\_command](#output\_registration\_command) | The Anyscale registration command. |
+| <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC. |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

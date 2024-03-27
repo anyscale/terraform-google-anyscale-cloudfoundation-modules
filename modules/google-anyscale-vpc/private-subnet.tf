@@ -7,7 +7,7 @@ locals {
   private_subnet_flow_log_enabled = length(var.private_subnet_flow_log_config) > 0 ? true : false
   private_subnet_name_computed = coalesce(
     var.private_subnet_name,
-    format("${local.computed_anyscale_vpcname}-${local.google_region}-${var.private_subnet_suffix}")
+    "${local.computed_anyscale_vpcname}-${local.google_region}-${var.private_subnet_suffix}"
   )
   # existing_prv_rt_count = length(var.existing_private_route_table_ids) > 0 ? length(var.existing_private_route_table_ids) : 0
 

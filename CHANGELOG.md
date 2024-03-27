@@ -1,4 +1,26 @@
-## 0.10.1 (Released)
+## 0.12.0 (Released)
+FEATURES:
+- Update to GCP Terraform Provider v5
+
+BUG FIXES:
+- VPC Submodule
+  - Proxy Subnet fix for change to GCP APIs related to IPv6
+    - GCP released a change and with v5 of the GCP Terraform Provider, the IPv6 parameter for Proxy Only Subnets is not suported/required.
+  - Subnet Names are now managed by the root module
+    - The previous behavior was causing the replacement of Subnets on any parameter change to the root module.
+- VPC Firewall Submodule
+  - Update to use VPC ID for attachment instead of dynamically identifying from the name.
+    - The previous behavior was causing the replacement of the VPC Firewall on any parameter change to the root module.
+
+BREAKING CHANGES:
+
+OTHER:
+- Change from tfsec to trivy for pre-commit
+- TFLint updated for GCP Ruleset
+- General updates/fixes for all tests in submodule examples for VPC Firewall and CloudStorage
+- pre-commit updates to the latest revisions
+
+## 0.11.0 (Released)
 FEATURES:
 - Bucket CORS Rules updates to support additional Anyscale UI functionality
 
