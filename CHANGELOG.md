@@ -1,3 +1,13 @@
+## 0.12.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- IAM Role fix to support new Anyscale Logging feature.
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.12.0 (Released)
 FEATURES:
 - Update to GCP Terraform Provider v5
