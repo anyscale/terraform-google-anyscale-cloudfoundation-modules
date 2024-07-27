@@ -1,3 +1,16 @@
+## 0.13.0 (Released)
+FEATURES:
+- Optional new sub-module to manage the `_Default` Logging Sink - `syslog` logs are automatically enabled for new Projects and this can lead to unexpected storage costs in Projects with many active Anyscale clusters and nodes.
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- tflint updates
+- pre-commit updates
+- trivy rule update on cloudstorage module
+
 ## 0.12.1 (Released)
 FEATURES:
 
