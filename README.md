@@ -94,8 +94,8 @@ None
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.84.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 5.38.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.6.2 |
 
 ## Modules
 
@@ -105,6 +105,7 @@ None
 | <a name="module_google_anyscale_cloudstorage"></a> [google\_anyscale\_cloudstorage](#module\_google\_anyscale\_cloudstorage) | ./modules/google-anyscale-cloudstorage | n/a |
 | <a name="module_google_anyscale_filestore"></a> [google\_anyscale\_filestore](#module\_google\_anyscale\_filestore) | ./modules/google-anyscale-filestore | n/a |
 | <a name="module_google_anyscale_iam"></a> [google\_anyscale\_iam](#module\_google\_anyscale\_iam) | ./modules/google-anyscale-iam | n/a |
+| <a name="module_google_anyscale_loggingsink"></a> [google\_anyscale\_loggingsink](#module\_google\_anyscale\_loggingsink) | ./modules/google-anyscale-loggingsink | n/a |
 | <a name="module_google_anyscale_memorystore"></a> [google\_anyscale\_memorystore](#module\_google\_anyscale\_memorystore) | ./modules/google-anyscale-memorystore | n/a |
 | <a name="module_google_anyscale_project"></a> [google\_anyscale\_project](#module\_google\_anyscale\_project) | ./modules/google-anyscale-project | n/a |
 | <a name="module_google_anyscale_vpc"></a> [google\_anyscale\_vpc](#module\_google\_anyscale\_vpc) | ./modules/google-anyscale-vpc | n/a |
@@ -187,6 +188,7 @@ None
 | <a name="input_enable_anyscale_filestore"></a> [enable\_anyscale\_filestore](#input\_enable\_anyscale\_filestore) | (Optional) Determines if the Anyscale Filestore is created.<br><br>ex:<pre>enable_anyscale_filestore = true</pre> | `bool` | `true` | no |
 | <a name="input_enable_anyscale_gcs"></a> [enable\_anyscale\_gcs](#input\_enable\_anyscale\_gcs) | (Optional) Determines if the Anyscale Cloud Storage bucket is created.<br><br>ex:<pre>enable_anyscale_gcs = true</pre> | `bool` | `true` | no |
 | <a name="input_enable_anyscale_iam"></a> [enable\_anyscale\_iam](#input\_enable\_anyscale\_iam) | (Optional) Determines if the Anyscale IAM resources are created.<br><br>ex:<pre>enable_anyscale_iam = true</pre> | `bool` | `true` | no |
+| <a name="input_enable_anyscale_loggingsink"></a> [enable\_anyscale\_loggingsink](#input\_enable\_anyscale\_loggingsink) | (Optional) Determines if the Anyscale Logging Sink is executed.<br><br>This sub-module will disable sending syslog events to the `_Default` Log Sink.<br><br>ex:<pre>enable_anyscale_loggingsink = true</pre> | `bool` | `true` | no |
 | <a name="input_enable_anyscale_memorystore"></a> [enable\_anyscale\_memorystore](#input\_enable\_anyscale\_memorystore) | (Optional) Determines if the Anyscale Memorystore is created.<br><br>ex:<pre>enable_anyscale_memorystore = true</pre> | `bool` | `false` | no |
 | <a name="input_enable_anyscale_vpc_firewall"></a> [enable\_anyscale\_vpc\_firewall](#input\_enable\_anyscale\_vpc\_firewall) | (Optional) Determines if the Anyscale VPC Firewall is created.<br><br>ex:<pre>enable_anyscale_vpc_firewall = true</pre> | `bool` | `true` | no |
 | <a name="input_enable_cloud_logging_monitoring"></a> [enable\_cloud\_logging\_monitoring](#input\_enable\_cloud\_logging\_monitoring) | (Optional) Determines if the Google Cloud Logging and Monitoring APIs are enabled.<br><br>If this is set to `true`, the following APIs will be enabled:<br>  - logging.googleapis.com<br>  - monitoring.googleapis.com<br><br>Additionally, the Anyscale Cluster Role will be granted access to the following roles:<br>  - logging.logWriter<br>  - monitoring.metricWriter<br>  - monitoring.viewer<br><br>ex:<pre>enable_cloud_logging_monitoring = true</pre> | `bool` | `false` | no |

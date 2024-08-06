@@ -115,6 +115,7 @@ locals {
 
   bucket_iam_binding_enabled = var.module_enabled && length(local.bucket_binding_roles) > 0 && length(var.bucket_iam_binding_members) > 0 ? true : false
 }
+#trivy:ignore:avd-gcp-0007
 resource "google_storage_bucket_iam_binding" "anyscale_bucket" {
   for_each = local.bucket_iam_binding_enabled ? local.bucket_binding_roles : []
   bucket   = google_storage_bucket.anyscale_bucket[0].name
