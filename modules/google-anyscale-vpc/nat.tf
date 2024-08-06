@@ -32,9 +32,11 @@ resource "google_compute_router_nat" "main" {
   name                   = local.computed_nat_name
   router                 = google_compute_router.router[0].name
   nat_ip_allocate_option = "AUTO_ONLY"
-  # nat_ips                             = var.nat_ips
+
   source_subnetwork_ip_ranges_to_nat  = var.source_subnetwork_ip_ranges_to_nat
   min_ports_per_vm                    = var.nat_min_ports_per_vm
+  max_ports_per_vm                    = var.nat_max_ports_per_vm
+  enable_dynamic_port_allocation      = var.nat_enable_dynamic_port_allocation
   enable_endpoint_independent_mapping = var.nat_enable_endpoint_independent_mapping
 
   udp_idle_timeout_sec             = var.nat_udp_idle_timeout_sec
