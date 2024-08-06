@@ -337,3 +337,18 @@ module "google_anyscale_memorystore" {
 
   memorystore_vpc_name = local.memorystore_vpc_name
 }
+
+# ------------------------------
+# Google LoggingSink Module
+# ------------------------------
+locals {
+  execute_loggingsink_submodule = var.enable_anyscale_loggingsink ? true : false
+}
+module "google_anyscale_loggingsink" {
+  source              = "./modules/google-anyscale-loggingsink"
+  module_enabled      = local.execute_loggingsink_submodule
+  anyscale_project_id = coalesce(var.existing_project_id, module.google_anyscale_project.project_id)
+  depends_on = [
+    module.google_anyscale_cloudapis
+  ]
+}

@@ -1537,3 +1537,21 @@ variable "anyscale_memorystore_labels" {
   type        = map(string)
   default     = {}
 }
+
+# --------------------------------------------
+# Anyscale LoggingSink Variables
+# --------------------------------------------
+variable "enable_anyscale_loggingsink" {
+  description = <<-EOT
+    (Optional) Determines if the Anyscale Logging Sink is executed.
+
+    This sub-module will disable sending syslog events to the `_Default` Log Sink.
+
+    ex:
+    ```
+    enable_anyscale_loggingsink = true
+    ```
+  EOT
+  type        = bool
+  default     = true
+}
