@@ -596,11 +596,26 @@ variable "nat_min_ports_per_vm" {
 
     ex:
     ```
-    nat_min_ports_per_vm = 64
+    nat_min_ports_per_vm = 32
     ```
   EOT
   type        = string
-  default     = "64"
+  default     = "32"
+}
+
+variable "nat_max_ports_per_vm" {
+  description = <<-EOT
+    (Optional) Maximum number of ports allocated to a VM from this NAT config.
+
+    Changing this forces a new NAT to be created.
+
+    ex:
+    ```
+    nat_max_ports_per_vm = 1024
+    ```
+  EOT
+  type        = string
+  default     = "65536"
 }
 
 variable "source_subnetwork_ip_ranges_to_nat" {
@@ -703,6 +718,19 @@ variable "nat_icmp_idle_timeout_sec" {
     ```
   EOT
   default     = "30"
+}
+
+variable "nat_enable_dynamic_port_allocation" {
+  description = <<-EOT
+    (Optional) Determines if NAT should allocate ports dynamically.
+
+    ex:
+    ```
+    nat_enable_dynamic_port_allocation = true
+    ```
+  EOT
+  type        = bool
+  default     = false
 }
 
 variable "nat_enable_endpoint_independent_mapping" {
