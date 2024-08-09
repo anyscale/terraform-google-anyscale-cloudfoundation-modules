@@ -46,5 +46,6 @@ module "google_anyscale_v2_commonname" {
   # Enable Cloud Logging on GCP - this will enable sending logs and metrics to GCP Logs and Monitoring
   enable_cloud_logging_monitoring = true
 
+  # Disables the Anyscale Logging Sink submodule. Setting this to false will not override the _Default Sink which will then send syslog events to the Default sink.
   enable_anyscale_loggingsink = false
 }
