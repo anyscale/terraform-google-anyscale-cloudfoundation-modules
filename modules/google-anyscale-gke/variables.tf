@@ -493,6 +493,34 @@ variable "enable_client_certificate" {
   default     = false
 }
 
+# -----------------------------
+# Additional Kubernetes/GKE params
+# -----------------------------
+variable "remove_default_node_pool" {
+  description = <<-EOT
+    (Optional) Determines if the default node pool will be removed from the Anyscale GKE cluster.
+
+    ex:
+    ```
+    remove_default_node_pool = true
+    ```
+  EOT
+  type        = bool
+  default     = true
+}
+variable "default_node_pool_initial_node_count" {
+  description = <<-EOT
+    (Optional) The number of nodes to create in this cluster's default node pool.
+
+    ex:
+    ```
+    default_node_pool_initial_node_count = 3
+    ```
+  EOT
+  type        = number
+  default     = 1
+}
+
 variable "enable_tpu" {
   description = <<-EOT
     (Optional) Determines if a TPU will be enabled with the Anyscale GKE cluster.
