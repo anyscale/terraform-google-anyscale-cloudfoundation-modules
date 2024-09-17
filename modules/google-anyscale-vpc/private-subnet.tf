@@ -9,9 +9,18 @@ locals {
     var.private_subnet_name,
     "${local.computed_anyscale_vpcname}-${local.google_region}-${var.private_subnet_suffix}"
   )
-  # existing_prv_rt_count = length(var.existing_private_route_table_ids) > 0 ? length(var.existing_private_route_table_ids) : 0
 
-  # private_route_table_ids = local.existing_prv_rt_count > 0 ? var.existing_private_route_table_ids : local.private_subnet_count > 0 ? aws_route_table.private[*].id : []
+  gke_service_range_enabled = var.gke_services_range_cidr != null && var.private_subnet_cidr != null && var.existing_private_subnet_id == null ? true : false
+  gke_service_range_name_computed = coalesce(
+    var.gke_services_range_name,
+    "${local.computed_anyscale_vpcname}-${local.google_region}-${var.gke_service_range_name_suffix}"
+  )
+  gke_pods_range_enabled = var.gke_pod_range_cidr != null && var.private_subnet_cidr != null && var.existing_private_subnet_id == null ? true : false
+  gke_pods_range_name_computed = coalesce(
+    var.gke_pods_range_name,
+    "${local.computed_anyscale_vpcname}-${local.google_region}-${var.gke_pods_range_name_suffix}"
+  )
+
 }
 
 #tfsec:ignore:google-compute-enable-vpc-flow-logs:VPC Flow Logs can be disabled but are enabled by default.
@@ -39,4 +48,20 @@ resource "google_compute_subnetwork" "anyscale_private_subnet" {
   # role             = lookup(each.value, "role", null)
   stack_type       = var.private_subnet_stack_type
   ipv6_access_type = var.private_subnet_ipv6_type
+
+  dynamic "secondary_ip_range" {
+    for_each = local.gke_service_range_enabled ? [true] : []
+    content {
+      range_name    = local.gke_service_range_name_computed
+      ip_cidr_range = var.gke_services_range_cidr
+    }
+  }
+
+  dynamic "secondary_ip_range" {
+    for_each = local.gke_pods_range_enabled ? [true] : []
+    content {
+      range_name    = local.gke_pods_range_name_computed
+      ip_cidr_range = var.gke_pod_range_cidr
+    }
+  }
 }

@@ -75,3 +75,18 @@ output "private_subnet_region" {
   description = "The Google VPC private subnet region"
   value       = try(google_compute_subnetwork.anyscale_private_subnet[0].region, "")
 }
+
+output "private_subnet_selflink" {
+  description = "The Google VPC private subnet self link"
+  value       = try(google_compute_subnetwork.anyscale_private_subnet[0].self_link, "")
+}
+
+output "private_subnet_gke_services_range_name" {
+  description = "The Google VPC private subnet GKE services range name"
+  value       = try(google_compute_subnetwork.anyscale_private_subnet[0].secondary_ip_range[0].range_name, "")
+}
+
+output "private_subnet_gke_pod_range_name" {
+  description = "The Google VPC private subnet GKE pod range name"
+  value       = try(google_compute_subnetwork.anyscale_private_subnet[0].secondary_ip_range[1].range_name, "")
+}
