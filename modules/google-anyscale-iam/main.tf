@@ -61,11 +61,12 @@ resource "google_project_iam_member" "anyscale_access_service_acct" {
 }
 
 #tfsec:ignore:google-iam-no-project-level-service-account-impersonation
-resource "google_service_account_iam_binding" "anyscale_access_service_acct" {
+# Add permissions to the service account that Anyscale control plane will use
+resource "google_service_account_iam_member" "anyscale_access_service_acct" {
   for_each           = local.anyscale_access_service_acct_enabled ? toset(var.anyscale_access_service_acct_binding_permissions) : []
   role               = each.key
   service_account_id = google_service_account.anyscale_access_service_acct[0].name
-  members            = ["serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"]
+  member             = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
 }
 
 # Identity Pool Resources
@@ -106,14 +107,13 @@ locals {
   existing_workload_identity_pool_name = local.existing_provider_provided ? regex("(.*)/providers/.*", var.existing_workload_identity_provider_name)[0] : null
   identity_pool_name                   = local.create_workload_identity_pool ? "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.anyscale_pool[0].name}/*" : local.existing_provider_provided ? "principalSet://iam.googleapis.com/${local.existing_workload_identity_pool_name}/*" : null
 }
-resource "google_service_account_iam_binding" "anyscale_workload_identity_user" {
-  count = local.anyscale_access_service_acct_enabled ? 1 : 0
 
+# For AWS IAM to "assume" service account
+resource "google_service_account_iam_member" "anyscale_workload_identity_user" {
+  count              = local.anyscale_access_service_acct_enabled ? 1 : 0
   service_account_id = google_service_account.anyscale_access_service_acct[0].name
   role               = "roles/iam.workloadIdentityUser"
-  members = [
-    local.identity_pool_name
-  ]
+  member             = local.identity_pool_name
 }
 
 # --------------------------------------------------------------
@@ -151,12 +151,12 @@ resource "google_service_account" "anyscale_cluster_node_service_acct" {
   project     = var.anyscale_project_id
 }
 
-resource "google_project_iam_binding" "anyscale_cluster_node_service_acct" {
+# Add permissions to the service account that Anyscale dataplane will use
+resource "google_project_iam_member" "anyscale_cluster_node_service_acct" {
   for_each = local.cluster_node_role_enabled ? toset(local.cluster_node_roles) : []
   role     = each.key
   project  = var.anyscale_project_id
-  # service_account_id = google_service_account.anyscale_cluster_node_service_acct[0].name
-  members = ["serviceAccount:${google_service_account.anyscale_cluster_node_service_acct[0].email}"]
+  member   = "serviceAccount:${google_service_account.anyscale_cluster_node_service_acct[0].email}"
 }
 
 resource "google_service_account_iam_member" "anyscale_cluster_node_service_acct" {
