@@ -132,8 +132,11 @@ resource "google_container_cluster" "anyscale_dataplane" {
 
   enable_tpu = var.enable_tpu # Support for TPU
 
-  remove_default_node_pool = var.remove_default_node_pool
-  initial_node_count       = var.default_node_pool_initial_node_count
+  # We can't create a cluster with no node pool defined, but we want to only use
+  # separately managed node pools. So we create the smallest possible default
+  # node pool and immediately delete it.
+  remove_default_node_pool = true
+  initial_node_count       = 1
 
   # Setting timeouts to 45 minutes to allow for the creation of the cluster
   timeouts {
