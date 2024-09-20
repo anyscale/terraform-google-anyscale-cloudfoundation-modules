@@ -1,6 +1,6 @@
 # google-anyscale-iam examples
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -18,6 +18,7 @@ No providers.
 |------|--------|---------|
 | <a name="module_all_defaults"></a> [all\_defaults](#module\_all\_defaults) | ../ | n/a |
 | <a name="module_iam_cluster_node_only_role"></a> [iam\_cluster\_node\_only\_role](#module\_iam\_cluster\_node\_only\_role) | ../ | n/a |
+| <a name="module_iam_gke_cluster_only_role"></a> [iam\_gke\_cluster\_only\_role](#module\_iam\_gke\_cluster\_only\_role) | ../ | n/a |
 | <a name="module_kitchen_sink"></a> [kitchen\_sink](#module\_kitchen\_sink) | ../ | n/a |
 | <a name="module_test_no_resources"></a> [test\_no\_resources](#module\_test\_no\_resources) | ../ | n/a |
 
@@ -62,4 +63,4 @@ No resources.
 | <a name="output_kitchen_sink_cluster_node_service_acct_name"></a> [kitchen\_sink\_cluster\_node\_service\_acct\_name](#output\_kitchen\_sink\_cluster\_node\_service\_acct\_name) | Kitchen Sink - Anyscale cluster node Service Account name |
 | <a name="output_kitchen_sink_cluster_node_service_acct_unique_id"></a> [kitchen\_sink\_cluster\_node\_service\_acct\_unique\_id](#output\_kitchen\_sink\_cluster\_node\_service\_acct\_unique\_id) | Kitchen Sink - Anyscale cluster node Service Account unique ID |
 | <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should be empty |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->

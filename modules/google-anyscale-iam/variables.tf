@@ -404,3 +404,107 @@ variable "enable_anyscale_cluster_logging_monitoring" {
   type        = bool
   default     = false
 }
+
+# --------------------------------------------------------------
+# GKE Cluster Service Account
+# --------------------------------------------------------------
+variable "create_gke_cluster_service_acct" {
+  description = <<-EOT
+    (Optional) Determines whether to create the GKE Cluster service account.
+
+    ex:
+    ```
+    create_gke_cluster_service_acct = true
+    ```
+  EOT
+  type        = bool
+  default     = false
+}
+
+variable "gke_cluster_service_acct_description" {
+  description = <<-EOT
+    (Optional) GKE Cluster service account description.
+
+    If this is `null` the description will be set to `Anyscale GKE cluster Service Account` in a local variable.
+
+    ex:
+    ```
+    gke_cluster_sa_description = "Anyscale GKE cluster Service Account"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "gke_cluster_service_acct_name" {
+  description = <<-EOT
+    (Optional, forces creation of new resource) The name of the GKE Cluster service account.
+
+    Overrides `gke_cluster_service_acct_name_prefix`.
+
+    ex:
+    ```
+    gke_cluster_service_acct_name = "gke-cluster-service-acct"
+    ```
+  EOT
+  type        = string
+  default     = null
+  validation {
+    condition = var.gke_cluster_service_acct_name == null ? true : (
+      can(regex("^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$", var.gke_cluster_service_acct_name))
+    )
+    error_message = "`gke_cluster_service_acct_name` must match regex: ^[a-z](?:[-a-z0-9]{4,28}[a-z0-9])$."
+  }
+}
+
+variable "gke_cluster_service_acct_name_prefix" {
+  description = <<-EOT
+    (Optional, forces creation of new resource) The prefix of the GKE Cluster service account.
+
+    If `gke_cluster_service_acct_name` is provided, it will override this variable.
+
+    ex:
+    ```
+    gke_cluster_service_acct_name_prefix = "gke-cluster-"
+    ```
+  EOT
+  type        = string
+  default     = "gke-cluster-"
+  validation {
+    condition = var.gke_cluster_service_acct_name_prefix == null ? true : (
+      can(regex("^[a-z](?:[-a-z0-9]{4,24})$", var.gke_cluster_service_acct_name_prefix))
+    )
+    error_message = "`gke_cluster_service_acct_name_prefix` must match regex: ^[a-z](?:[-a-z0-9]{4,24})$."
+  }
+}
+
+variable "gke_cluster_service_acct_permissions" {
+  description = <<-EOT
+    (Optional) A list of permission roles to grant to the GKE Cluster service account.
+
+    ex:
+    ```
+    gke_cluster_service_acct_permissions = ["roles/container.defaultNodeServiceAccount"]
+    ```
+  EOT
+  type        = list(string)
+  default = [
+    "roles/container.defaultNodeServiceAccount",
+    "roles/monitoring.metricWriter",
+    "roles/stackdriver.resourceMetadata.writer",
+    "roles/artifactregistry.reader"
+  ]
+}
+
+variable "enable_gke_cluster_logging_monitoring" {
+  description = <<-EOF
+    (Optional) Determines whether to grant the GKE Cluster service account access to the monitoring and logging.
+
+    ex:
+    ```
+    enable_gke_cluster_logging_monitoring = true
+    ```
+  EOF
+  type        = bool
+  default     = false
+}
