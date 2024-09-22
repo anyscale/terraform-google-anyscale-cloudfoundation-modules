@@ -152,6 +152,7 @@ resource "google_project_iam_custom_role" "anyscale_access_role" {
     "compute.zoneOperations.get",
     "compute.zones.list",
     "storage.buckets.get",
-    "storage.objects.get"
+    "storage.objects.get",
+    "storage.objects.list"
   ]
 }
