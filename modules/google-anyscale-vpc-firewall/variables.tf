@@ -16,7 +16,7 @@ variable "vpc_name" {
 
 variable "vpc_id" {
   description = <<-EOT
-    (Required) The ID of the VPC to apply the Firewall Policy to.
+    (Required) The ID or SelfLink of the VPC to apply the Firewall Policy to.
 
     ex:
     ```
@@ -213,10 +213,10 @@ variable "ingress_from_cidr_map" {
       },
       { rule = "nfs-tcp" },
       {
-        ports       = "10-20"
+        ports       = "82-84"
         protocol    = "tcp"
         description = "Service name is TEST"
-        cidr_blocks = "10.100.10.10/32"
+        cidr_blocks = "10.100.10.12/32"
       }
     ]
     ```

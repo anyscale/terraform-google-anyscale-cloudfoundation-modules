@@ -28,7 +28,7 @@ module "all_defaults" {
   module_enabled = true
 
   vpc_name = module.all_defaults_vpc.vpc_name
-  vpc_id   = module.all_defaults_vpc.vpc_id
+  vpc_id   = module.all_defaults_vpc.vpc_selflink
   # vpc_self_link       = module.all_defaults_vpc.vpc_selflink
 }
 
@@ -52,7 +52,7 @@ module "anyscale_firewall_public" {
   module_enabled = true
 
   vpc_name = module.anyscale_firewall_public_vpc.vpc_name
-  vpc_id   = module.anyscale_firewall_public_vpc.vpc_id
+  vpc_id   = module.anyscale_firewall_public_vpc.vpc_selflink
 
   ingress_with_self_cidr_range = [local.public_subnet_cidr]
   ingress_from_cidr_map = [
@@ -87,7 +87,7 @@ module "anyscale_firewall_private" {
   module_enabled = true
 
   vpc_name = module.anyscale_firewall_private_vpc.vpc_name
-  vpc_id   = module.anyscale_firewall_private_vpc.vpc_id
+  vpc_id   = module.anyscale_firewall_private_vpc.vpc_selflink
 
   default_ingress_cidr_range = [var.default_ingress_cidr_range]
   ingress_from_cidr_map = [
@@ -129,7 +129,7 @@ module "kitchen_sink" {
   anyscale_project_id = var.google_project_id
 
   vpc_name = module.kitchen_sink_vpc.vpc_name
-  vpc_id   = module.kitchen_sink_vpc.vpc_id
+  vpc_id   = module.kitchen_sink_vpc.vpc_selflink
 
   firewall_policy_name         = "anyscale-tf-kitchensink-policy"
   firewall_policy_description  = "This is the Anyscale Kitchen Sink Policy"
@@ -144,7 +144,23 @@ module "kitchen_sink" {
 
   default_ingress_cidr_range = compact(concat(["10.100.10.10/32", "10.100.10.11/32"], [var.default_ingress_cidr_range]))
   ingress_from_cidr_map = [
-    { rule = "nfs-tcp" }
+    {
+      rule        = "https-443-tcp"
+      cidr_blocks = "10.100.10.10/32"
+    },
+    { rule = "nfs-tcp" },
+    # {
+    #   ports       = "10,20,30"
+    #   protocol    = "tcp"
+    #   description = "Service name is TEST"
+    #   cidr_blocks = "10.100.10.11/32"
+    # },
+    {
+      ports       = "82-84"
+      protocol    = "tcp"
+      description = "Service name is TEST"
+      cidr_blocks = "10.100.10.12/32"
+    }
   ]
 
 }

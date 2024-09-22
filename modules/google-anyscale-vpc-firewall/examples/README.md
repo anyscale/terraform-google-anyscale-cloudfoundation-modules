@@ -22,7 +22,7 @@ This builds a VPC by passing in as many variables as possible.
 ## test_no_resources
 This should NOT build any cloudstorage resources and is here for unit testing.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -71,7 +71,7 @@ No resources.
 | <a name="output_kitchen_sink_name"></a> [kitchen\_sink\_name](#output\_kitchen\_sink\_name) | kitchen\_sink name |
 | <a name="output_kitchen_sink_selflink"></a> [kitchen\_sink\_selflink](#output\_kitchen\_sink\_selflink) | kitchen\_sink self link |
 | <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should be empty |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 <!-- References -->
 [Terraform]: https://www.terraform.io
