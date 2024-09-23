@@ -554,6 +554,101 @@ variable "proxy_subnet_description" {
   default     = null
 }
 
+#-----------------
+# GKE Subnets
+#-----------------
+variable "gke_services_range_cidr" {
+  description = <<-EOT
+    (Optional) The cidr block for GKE Service Pods.
+
+    This VPC terraform will add this as a secondary range to the Private VPC Subnet if defined.
+    Requires `private_subnet_cidr` to be set.
+
+    ex:
+    ```
+    gke_services_range_cidr = "192.168.1.0/24"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "gke_services_range_name" {
+  description = <<-EOT
+    (Optional) Explicit name for the GKE Service Pods subnet range.
+
+    If empty, the range name for GKE Service Pods will be generated using the `gke_service_range_name_suffix` and VPC Name parameters.
+
+    ex:
+    ```
+    gke_services_subnet_name = "gke-services-range"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "gke_service_range_name_suffix" {
+  description = <<-EOT
+    (Optional) The suffix of the range name for the GKE Service Pods.
+
+    Creates a unique range name ending with the specified suffix.
+
+    ex:
+    ```
+    gke_service_range_name_suffix = "gke-services-range"
+    ```
+  EOT
+  type        = string
+  default     = "gke-services-range"
+}
+
+variable "gke_pod_range_cidr" {
+  description = <<-EOT
+    (Optional) The cidr block for GKE Pods.
+
+    This VPC terraform will add this as a secondary range to the Private VPC Subnet if defined.
+    Requires `private_subnet_cidr` to be set.
+
+    ex:
+    ```
+    gke_pod_range_cidr = "192.168.64.0/22"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "gke_pods_range_name" {
+  description = <<-EOT
+    (Optional) Explicit name for the GKE Pods subnet range.
+
+    If empty, the range name for GKE Pods will be generated using the `gke_pods_range_name_suffix` and VPC Name parameters.
+
+    ex:
+    ```
+    gke_pods_range_name = "gke-pods-range"
+    ```
+  EOT
+  type        = string
+  default     = null
+}
+
+variable "gke_pods_range_name_suffix" {
+  description = <<-EOT
+    (Optional) The suffix of the range name for the GKE Pods.
+
+    Creates a unique range name ending with the specified suffix.
+
+    ex:
+    ```
+    gke_service_range_name_suffix = "gke-pods-range"
+    ```
+  EOT
+  type        = string
+  default     = "gke-pods-range"
+}
+
 # ---------------------
 # NAT & Router Related
 #  This is an opinionated build for a NAT gateway.

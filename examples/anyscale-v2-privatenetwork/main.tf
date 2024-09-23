@@ -36,7 +36,7 @@ module "google_anyscale_v2_privatenetwork" {
 
   # VPC Related
   anyscale_vpc_private_subnet_cidr = "172.26.100.0/22"
-  anyscale_vpc_proxy_subnet_cidr   = "172.26.104.0/22"
+  anyscale_vpc_proxy_subnet_cidr   = "192.168.0.0/22"
 
   # Firewall Related
   anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges

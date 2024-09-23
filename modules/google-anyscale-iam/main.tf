@@ -54,7 +54,7 @@ resource "google_service_account" "anyscale_access_service_acct" {
 #   member   = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
 # }
 resource "google_project_iam_member" "anyscale_access_service_acct" {
-  count   = local.anyscale_access_service_acct_enabled ? 1 : 0
+  count   = local.anyscale_access_service_acct_enabled && (local.anyscale_access_serviceacct_role_enabled || var.existing_anyscale_access_role_name != null) ? 1 : 0
   role    = coalesce(google_project_iam_custom_role.anyscale_access_role[0].name, var.existing_anyscale_access_role_name)
   project = var.anyscale_project_id
   member  = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"

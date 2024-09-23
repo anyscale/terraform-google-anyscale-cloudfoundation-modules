@@ -133,19 +133,25 @@ locals {
 
   vpc_project_id = coalesce(var.shared_vpc_project_id, var.existing_project_id, module.google_anyscale_project.project_id)
 
-  google_ui_cidr          = "35.235.240.0/20"
-  allow_access_from_cidrs = "${var.anyscale_vpc_firewall_allow_access_from_cidrs}${var.allow_ssh_from_google_ui ? ",${local.google_ui_cidr}" : ""}"
+  google_ui_cidr = "35.235.240.0/20"
+  allow_access_from_cidrs = join(",", compact([
+    var.anyscale_vpc_firewall_allow_access_from_cidrs,
+    var.anyscale_vpc_proxy_subnet_cidr != null ? var.anyscale_vpc_proxy_subnet_cidr : null,
+    var.allow_ssh_from_google_ui ? local.google_ui_cidr : null
+  ]))
 
-  ingress_from_cidr_map = [
-    {
-      rule        = "https-443-tcp"
-      cidr_blocks = local.allow_access_from_cidrs
-    },
-    {
-      rule        = "ssh-tcp"
-      cidr_blocks = local.allow_access_from_cidrs
-    }
-  ]
+  ingress_from_cidr_map = concat(
+    [
+      {
+        rule        = "https-443-tcp"
+        cidr_blocks = local.allow_access_from_cidrs
+      },
+      {
+        rule        = "ssh-tcp"
+        cidr_blocks = local.allow_access_from_cidrs
+      }
+    ],
+  )
 
   ingress_from_self_cidr_range = compact(
     [
@@ -155,7 +161,19 @@ locals {
       try(data.google_compute_subnetwork.shared_vpc_subnet[0].ip_cidr_range, null)
     ]
   )
+
+  ingress_from_gcp_health_checks = [
+    {
+      rule = "health-checks"
+      cidr_blocks = join(",", compact([
+        var.anyscale_vpc_proxy_subnet_cidr, # Needs to include the Proxy Subnet to actually send traffic to the health check endpoint
+        "35.191.0.0/16",                    # GCP Health Check IP Range
+        "130.211.0.0/22"                    # GCP Health Check IP Range
+      ]))
+    }
+  ]
 }
+
 module "google_anyscale_vpc_firewall_policy" {
   source         = "./modules/google-anyscale-vpc-firewall"
   module_enabled = local.execute_vpc_firewall_sub_module
@@ -173,6 +191,8 @@ module "google_anyscale_vpc_firewall_policy" {
 
   ingress_from_cidr_map        = local.ingress_from_cidr_map
   ingress_with_self_cidr_range = local.ingress_from_self_cidr_range
+
+  ingress_from_gcp_health_checks = local.ingress_from_gcp_health_checks
 }
 
 # ------------------------------

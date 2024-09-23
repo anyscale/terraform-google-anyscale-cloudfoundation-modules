@@ -19,10 +19,6 @@ variable "anyscale_organization_id" {
     error_message = "The anyscale_organization_id value must start with \"org_\"."
   }
 }
-# variable "google_region" {
-#   description = "The Google region in which all resources will be created."
-#   type        = string
-# }
 
 variable "google_project_id" {
   description = "ID of the Project to put these resources in"
