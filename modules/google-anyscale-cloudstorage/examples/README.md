@@ -1,5 +1,6 @@
 [![Build Status][badge-build]][build-status]
 [![Terraform Version][badge-terraform]](https://github.com/hashicorp/terraform/releases)
+[![OpenTofu Version][badge-opentofu]](https://github.com/opentofu/opentofu/releases)
 [![Google Provider Version][badge-tf-google]](https://github.com/terraform-providers/terraform-provider-google/releases)
 # google-anyscale-cloudstorage examples
 
@@ -22,13 +23,13 @@ This builds a cloudstorage bucket by passing in as many variables as possible. I
 ## test_no_resources
 This should NOT build any cloudstorage resources and is here for unit testing.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0 |
 
 ## Providers
 
@@ -56,7 +57,7 @@ No resources.
 | <a name="input_anyscale_organization_id"></a> [anyscale\_organization\_id](#input\_anyscale\_organization\_id) | (Required) Anyscale Organization ID | `string` | n/a | yes |
 | <a name="input_google_project_id"></a> [google\_project\_id](#input\_google\_project\_id) | ID of the Project to put these resources in. | `string` | n/a | yes |
 | <a name="input_google_region"></a> [google\_region](#input\_google\_region) | The Google region in which all resources will be created. | `string` | n/a | yes |
-| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of tags to all resources that accept tags. | `map(string)` | <pre>{<br>  "environment": "test",<br>  "test": true<br>}</pre> | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of tags to all resources that accept tags. | `map(string)` | <pre>{<br/>  "environment": "test",<br/>  "test": true<br/>}</pre> | no |
 
 ## Outputs
 
@@ -69,12 +70,14 @@ No resources.
 | <a name="output_kitchen_sink_selflink"></a> [kitchen\_sink\_selflink](#output\_kitchen\_sink\_selflink) | The selflink of the kitchen sink anyscale resource. |
 | <a name="output_kitchen_sink_url"></a> [kitchen\_sink\_url](#output\_kitchen\_sink\_url) | The URL of the kitchen sink anyscale resource. |
 | <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should all be empty |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 <!-- References -->
 [Terraform]: https://www.terraform.io
-[Issues]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/issues
-[badge-build]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
+[OpenTofu]: https://opentofu.org/
+[Issues]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/issues
+[badge-build]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
 [badge-terraform]: https://img.shields.io/badge/terraform-1.x%20-623CE4.svg?logo=terraform
-[badge-tf-google]: https://img.shields.io/badge/GCP-4.+-F8991D.svg?logo=terraform
-[build-status]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/actions
+[badge-opentofu]: https://img.shields.io/badge/opentofu-1.x%20-623CE4.svg?logo=terraform
+[badge-tf-google]: https://img.shields.io/badge/Google-6.+-F8991D.svg?logo=terraform
+[build-status]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/actions
