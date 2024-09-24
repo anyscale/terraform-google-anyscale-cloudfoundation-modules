@@ -42,7 +42,7 @@ module "google_anyscale_v2_existingproject" {
   # Filestore Related
   anyscale_filestore_tier        = "ENTERPRISE"
   anyscale_filestore_location    = "us-central1"
-  anyscale_filestore_capacity_gb = 3000
+  anyscale_filestore_capacity_gb = 3072
 
   # Cloud Storage (Bucket) Related
   anyscale_bucket_location = "US"

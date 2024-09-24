@@ -86,7 +86,7 @@ module "google_anyscale_v2_kitchensink" {
   anyscale_filestore_description    = "Anyscale Terraform KitchenSink Filestore"
   anyscale_filestore_tier           = "STANDARD"
   anyscale_filestore_location       = "us-central1-a"
-  anyscale_filestore_capacity_gb    = 2048
+  anyscale_filestore_capacity_gb    = 4096
 
   # IAM Related
   enable_anyscale_iam                          = true

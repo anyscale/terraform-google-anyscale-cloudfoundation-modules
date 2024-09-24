@@ -56,4 +56,4 @@ No resources.
 | Name | Description |
 |------|-------------|
 | <a name="output_registration_command"></a> [registration\_command](#output\_registration\_command) | The Anyscale registration command. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
