@@ -156,9 +156,23 @@ variable "anyscale_filestore_fileshare_name" {
 }
 
 variable "anyscale_filestore_fileshare_capacity_gb" {
-  description = "(Optional) The capacity of the fileshare to create. This must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier. Default is `2560`."
+  description = <<-EOT
+    (Optional) The capacity of the fileshare to create.
+
+    This must be at least 1024 GiB for the standard tier, or 2560 GiB for the premium tier.
+    Must be a multiple of 256 GiB.
+
+    ex:
+    ```
+    anyscale_filestore_fileshare_capacity_gb = 2560
+    ```
+  EOT
   type        = number
   default     = 2560
+  validation {
+    condition     = var.anyscale_filestore_fileshare_capacity_gb >= 1024 && var.anyscale_filestore_fileshare_capacity_gb % 256 == 0
+    error_message = "The `anyscale_filestore_fileshare_capacity_gb` must be at least 1024 GiB and a multiple of 256 GiB."
+  }
 }
 
 variable "filestore_network_modes" {
