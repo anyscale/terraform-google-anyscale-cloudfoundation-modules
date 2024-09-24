@@ -20,7 +20,7 @@ repos:
       - id: tfupdate
         name: Autoupdate Terraform Google Provider
         args:
-          - --args=provider google -v "~> 5.0"
+          - --args=provider google -v "~> 6.0"
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
     hooks:
