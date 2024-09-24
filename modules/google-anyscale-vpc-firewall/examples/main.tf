@@ -29,7 +29,19 @@ module "all_defaults" {
 
   vpc_name = module.all_defaults_vpc.vpc_name
   vpc_id   = module.all_defaults_vpc.vpc_id
-  # vpc_self_link       = module.all_defaults_vpc.vpc_selflink
+
+  ingress_from_cidr_map = concat(
+    [
+      {
+        rule        = "https-443-tcp"
+        cidr_blocks = "10.1.0.0/22"
+      },
+      {
+        rule        = "ssh-tcp"
+        cidr_blocks = "10.1.0.0/22"
+      }
+    ]
+  )
 }
 
 # --------------------------------------------------------------
