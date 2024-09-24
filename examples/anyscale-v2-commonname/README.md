@@ -13,13 +13,13 @@ Creates a v2 stack including:
 
 Since this creates a new project, the user/role that is executing this example needs to have the `roles/billing.user` permission to tie the project to a Billing Account.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0 |
 
 ## Providers
 
@@ -45,8 +45,8 @@ No resources.
 | <a name="input_anyscale_google_zone"></a> [anyscale\_google\_zone](#input\_anyscale\_google\_zone) | (Required) Google zone to deploy Anyscale resources. | `string` | n/a | yes |
 | <a name="input_anyscale_org_id"></a> [anyscale\_org\_id](#input\_anyscale\_org\_id) | (Required) Anyscale Organization ID | `string` | n/a | yes |
 | <a name="input_billing_account_id"></a> [billing\_account\_id](#input\_billing\_account\_id) | (Required) Google billing account ID to deploy Anyscale resources. | `string` | n/a | yes |
-| <a name="input_customer_ingress_cidr_ranges"></a> [customer\_ingress\_cidr\_ranges](#input\_customer\_ingress\_cidr\_ranges) | The IPv4 CIDR blocks that allows access Anyscale clusters.<br>These are added to the firewall and allows port 443 (https) and 22 (ssh) access.<br>ex: `52.1.1.23/32,10.1.0.0/16'<br>` | `string` | n/a | yes |
-| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of labels to all resources that accept labels. | `map(string)` | <pre>{<br>  "environment": "test",<br>  "test": true<br>}</pre> | no |
+| <a name="input_customer_ingress_cidr_ranges"></a> [customer\_ingress\_cidr\_ranges](#input\_customer\_ingress\_cidr\_ranges) | The IPv4 CIDR blocks that allows access Anyscale clusters.<br/>These are added to the firewall and allows port 443 (https) and 22 (ssh) access.<br/>ex: `52.1.1.23/32,10.1.0.0/16'<br/>` | `string` | n/a | yes |
+| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of labels to all resources that accept labels. | `map(string)` | <pre>{<br/>  "environment": "test",<br/>  "test": true<br/>}</pre> | no |
 | <a name="input_root_folder_number"></a> [root\_folder\_number](#input\_root\_folder\_number) | (Required) Google Folder number to deploy Anyscale resources. Will create a new sub-project by default. | `string` | n/a | yes |
 
 ## Outputs
@@ -55,4 +55,4 @@ No resources.
 |------|-------------|
 | <a name="output_registration_command"></a> [registration\_command](#output\_registration\_command) | The Anyscale registration command. |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC. |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
