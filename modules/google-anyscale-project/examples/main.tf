@@ -36,10 +36,11 @@ module "kitchen_sink" {
   folder_id          = var.folder_id
   billing_account_id = var.billing_account_id
 
-  anyscale_project_name = "anyscale-tf-ks-name"
-  anyscale_project_id   = "anyscale-tf-ks-proj"
+  anyscale_project_name = "anyscale-tf-ks-name-ex"
+  anyscale_project_id   = "anyscale-tf-ks-proj-ex"
 
   enable_random_name_suffix = false
+  deletion_policy           = "DELETE"
 
   labels = merge(
     tomap({

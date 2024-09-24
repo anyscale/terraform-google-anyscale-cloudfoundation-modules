@@ -46,6 +46,8 @@ resource "google_project" "anyscale_project" {
 
   auto_create_network = false
 
+  deletion_policy = var.deletion_policy
+
   labels = merge(
     var.labels,
     local.module_labels

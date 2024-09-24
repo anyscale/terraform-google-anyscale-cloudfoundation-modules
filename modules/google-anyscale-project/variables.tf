@@ -17,6 +17,28 @@ variable "module_enabled" {
   default     = true
 }
 
+variable "deletion_policy" {
+  description = <<-EOT
+    (Optional) The deletion policy for the project.
+
+    This can be one of the following:
+    - `DELETE` - The project will be shut down and scheduled for deletion.
+    - `ABANDON` - The project will be marked for deletion, but will remain available for 30 days.
+    - `PREVENT` - The project will be prevented from being deleted
+
+    ex:
+    ```
+    deletion_policy = "ABANDON"
+    ```
+  EOT
+  type        = string
+  default     = "DELETE"
+  validation {
+    condition     = can(regex("^(DELETE|ABANDON|PREVENT)$", var.deletion_policy))
+    error_message = "deletion_policy must be one of DELETE, ABANDON, or PREVENT."
+  }
+}
+
 variable "anyscale_project_name" {
   description = "(Optional) Google Cloud Project name. Default is `null`."
   type        = string

@@ -1,11 +1,12 @@
 [![Build Status][badge-build]][build-status]
 [![Terraform Version][badge-terraform]](https://github.com/hashicorp/terraform/releases)
+[![OpenTofu Version][badge-opentofu]](https://github.com/opentofu/opentofu/releases)
 [![Google Provider Version][badge-tf-google]](https://github.com/terraform-providers/terraform-provider-google/releases)
 # google-anyscale-project
 
 This sub-module creates a new Google Cloud Project for Anyscale Resources. It should be used from the [root module](../../README.md).
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -18,8 +19,8 @@ This sub-module creates a new Google Cloud Project for Anyscale Resources. It sh
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | 4.84.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.6.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 6.4.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.6.3 |
 
 ## Modules
 
@@ -39,14 +40,15 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_anyscale_project_id"></a> [anyscale\_project\_id](#input\_anyscale\_project\_id) | (Optional) Google Cloud Project ID. If not provided, the `project_name_computed` local variable will be used. | `string` | `null` | no |
 | <a name="input_anyscale_project_name"></a> [anyscale\_project\_name](#input\_anyscale\_project\_name) | (Optional) Google Cloud Project name. Default is `null`. | `string` | `null` | no |
-| <a name="input_anyscale_project_name_prefix"></a> [anyscale\_project\_name\_prefix](#input\_anyscale\_project\_name\_prefix) | (Optional) Prefix to be used for the project name.<br>Conflicts with `anyscale_project_name`. If `anyscale_project_name` is provided, it will be used and `anyscale_project_name_prefix` will be ignored.<br>Default is `anyscale-project-`. | `string` | `"anyscale-project-"` | no |
+| <a name="input_anyscale_project_name_prefix"></a> [anyscale\_project\_name\_prefix](#input\_anyscale\_project\_name\_prefix) | (Optional) Prefix to be used for the project name.<br/>Conflicts with `anyscale_project_name`. If `anyscale_project_name` is provided, it will be used and `anyscale_project_name_prefix` will be ignored.<br/>Default is `anyscale-project-`. | `string` | `"anyscale-project-"` | no |
 | <a name="input_billing_account_id"></a> [billing\_account\_id](#input\_billing\_account\_id) | The ID of the billing account to associate this project with. | `string` | n/a | yes |
-| <a name="input_enable_random_name_suffix"></a> [enable\_random\_name\_suffix](#input\_enable\_random\_name\_suffix) | (Optional) Determines if a suffix of random characters will be added to the Anyscale resources.<br>Default is `true` | `bool` | `true` | no |
-| <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | (Optional) The ID of a Google Cloud Folder.<br>Conflicts with `organization_id`. If `folder_id` is provided, it will be used and `organization_id` will be ignored.<br>Changing this forces the project to be migrated to the newly specified folder.<br>Default is `null`. | `string` | `null` | no |
+| <a name="input_deletion_policy"></a> [deletion\_policy](#input\_deletion\_policy) | (Optional) The deletion policy for the project.<br/><br/>This can be one of the following:<br/>- `DELETE` - The project will be shut down and scheduled for deletion.<br/>- `ABANDON` - The project will be marked for deletion, but will remain available for 30 days.<br/>- `PREVENT` - The project will be prevented from being deleted<br/><br/>ex:<pre>deletion_policy = "ABANDON"</pre> | `string` | `"DELETE"` | no |
+| <a name="input_enable_random_name_suffix"></a> [enable\_random\_name\_suffix](#input\_enable\_random\_name\_suffix) | (Optional) Determines if a suffix of random characters will be added to the Anyscale resources.<br/>Default is `true` | `bool` | `true` | no |
+| <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | (Optional) The ID of a Google Cloud Folder.<br/>Conflicts with `organization_id`. If `folder_id` is provided, it will be used and `organization_id` will be ignored.<br/>Changing this forces the project to be migrated to the newly specified folder.<br/>Default is `null`. | `string` | `null` | no |
 | <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of labels to add to all resources that accept labels. | `map(string)` | `{}` | no |
 | <a name="input_module_enabled"></a> [module\_enabled](#input\_module\_enabled) | (Optional) Whether to create the resources inside this module. Default is `true`. | `bool` | `true` | no |
-| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | (Optional) Google Cloud Organization ID.<br>Conflicts with `folder_id`. If `folder_id` is provided, it will be used and `organization_id` will be ignored.<br>Changing this forces the project to be migrated to the newly specified organization.<br>Default is `null`. | `string` | `null` | no |
-| <a name="input_random_char_length"></a> [random\_char\_length](#input\_random\_char\_length) | (Optional) Sets the length of random characters to be appended as a suffix.<br>Depends on `random_bucket_suffix` being set to `true`.<br>Must be an even number, and must be at least 4.<br>Default is `4`. | `number` | `4` | no |
+| <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | (Optional) Google Cloud Organization ID.<br/>Conflicts with `folder_id`. If `folder_id` is provided, it will be used and `organization_id` will be ignored.<br/>Changing this forces the project to be migrated to the newly specified organization.<br/>Default is `null`. | `string` | `null` | no |
+| <a name="input_random_char_length"></a> [random\_char\_length](#input\_random\_char\_length) | (Optional) Sets the length of random characters to be appended as a suffix.<br/>Depends on `random_bucket_suffix` being set to `true`.<br/>Must be an even number, and must be at least 4.<br/>Default is `4`. | `number` | `4` | no |
 
 ## Outputs
 
@@ -55,12 +57,14 @@ No modules.
 | <a name="output_project_id"></a> [project\_id](#output\_project\_id) | ID of the project |
 | <a name="output_project_name"></a> [project\_name](#output\_project\_name) | Name of the project |
 | <a name="output_project_number"></a> [project\_number](#output\_project\_number) | Numeric identifier for the project |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 <!-- References -->
 [Terraform]: https://www.terraform.io
-[Issues]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/issues
-[badge-build]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
+[OpenTofu]: https://opentofu.org/
+[Issues]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/issues
+[badge-build]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
 [badge-terraform]: https://img.shields.io/badge/terraform-1.x%20-623CE4.svg?logo=terraform
-[badge-tf-google]: https://img.shields.io/badge/GCP-5.+-F8991D.svg?logo=terraform
-[build-status]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/actions
+[badge-opentofu]: https://img.shields.io/badge/opentofu-1.x%20-623CE4.svg?logo=terraform
+[badge-tf-google]: https://img.shields.io/badge/Google-6.+-F8991D.svg?logo=terraform
+[build-status]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/actions

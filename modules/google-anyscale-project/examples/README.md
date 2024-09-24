@@ -12,7 +12,7 @@ The kitchen_sink example overrides as many of the default values as make sense.
 
 This example does not create any resources or outputs.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -46,7 +46,7 @@ No resources.
 | <a name="input_billing_account_id"></a> [billing\_account\_id](#input\_billing\_account\_id) | ID of the Billing Account for this Project | `string` | n/a | yes |
 | <a name="input_folder_id"></a> [folder\_id](#input\_folder\_id) | ID of the Google Folder for this Project | `string` | n/a | yes |
 | <a name="input_google_region"></a> [google\_region](#input\_google\_region) | The Google region in which all resources will be created. | `string` | n/a | yes |
-| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of tags to all resources that accept tags. | `map(string)` | <pre>{<br>  "environment": "test",<br>  "test": true<br>}</pre> | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of tags to all resources that accept tags. | `map(string)` | <pre>{<br/>  "environment": "test",<br/>  "test": true<br/>}</pre> | no |
 
 ## Outputs
 
@@ -59,7 +59,7 @@ No resources.
 | <a name="output_kitchen_sink_name"></a> [kitchen\_sink\_name](#output\_kitchen\_sink\_name) | The Name of the anyscale resource. |
 | <a name="output_kitchen_sink_number"></a> [kitchen\_sink\_number](#output\_kitchen\_sink\_number) | The ID of the kitchen sink anyscale resource. |
 | <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should all be empty |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 <!-- References -->
 [Terraform]: https://www.terraform.io
