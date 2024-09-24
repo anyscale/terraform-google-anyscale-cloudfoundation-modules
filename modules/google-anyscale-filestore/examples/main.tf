@@ -1,6 +1,6 @@
 # ---------------------------------------------------------------------------------------------------------------------
-# CREATE Anyscale Google VPC Resources
-# This template creates VPC resources for Anyscale
+# CREATE Anyscale Google Filestore Resources
+# This template creates Filestore resources for Anyscale
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   full_labels = merge(tomap({
@@ -12,8 +12,10 @@ locals {
 }
 # We need APIs and a VPC for all resources below - no need to create a separate module for this
 module "filestore_cloudapis" {
-  source         = "../../google-anyscale-cloudapis"
-  module_enabled = true
+  source = "../../google-anyscale-cloudapis"
+
+  anyscale_activate_optional_apis = ["servicenetworking.googleapis.com"]
+  module_enabled                  = true
 }
 module "filestore_vpc" {
   source         = "../../google-anyscale-vpc"
@@ -30,6 +32,8 @@ module "filestore_vpc" {
 module "all_defaults" {
   source         = "../"
   module_enabled = true
+
+  filestore_location = "us-central1-b"
 
   filestore_vpc_name = module.filestore_vpc.vpc_name
   depends_on = [
@@ -54,9 +58,8 @@ module "kitchen_sink" {
   anyscale_filestore_fileshare_name        = "anys_kitchensink"
   anyscale_filestore_fileshare_capacity_gb = 1024
 
-  filestore_vpc_name            = module.filestore_vpc.vpc_name
-  filestore_network_modes       = ["MODE_IPV4", "ADDRESS_MODE_UNSPECIFIED"]
-  filestore_network_conect_mode = "PRIVATE_SERVICE_ACCESS"
+  filestore_vpc_name      = module.filestore_vpc.vpc_name
+  filestore_network_modes = ["MODE_IPV4"]
 
   depends_on = [
     module.filestore_cloudapis
@@ -75,6 +78,7 @@ module "test_no_resources" {
 
   module_enabled      = false
   anyscale_project_id = var.google_project_id
+  google_zone         = "us-central1-b"
 
   filestore_vpc_name = null
 }
