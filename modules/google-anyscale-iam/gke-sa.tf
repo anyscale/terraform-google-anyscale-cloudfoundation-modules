@@ -35,9 +35,9 @@ resource "google_service_account" "gke_cluster_service_account" {
   project     = var.anyscale_project_id
 }
 
-resource "google_project_iam_binding" "gke_cluster_service_account" {
+resource "google_project_iam_member" "gke_cluster_service_account" {
   for_each = local.gke_cluster_sa_enabled ? toset(local.gke_cluster_roles) : []
   role     = each.key
   project  = var.anyscale_project_id
-  members  = ["serviceAccount:${google_service_account.gke_cluster_service_account[0].email}"]
+  member   = google_service_account.gke_cluster_service_account[0].member
 }

@@ -68,3 +68,26 @@ output "iam_anyscale_cluster_node_service_acct_unique_id" {
   description = "Anyscale cross account cluster node service account unique ID"
   value       = try(google_service_account.anyscale_cluster_node_service_acct[0].unique_id, null)
 }
+
+# -------------------------------------------
+# Anyscale GKE Cluster Service Account
+# -------------------------------------------
+output "iam_gke_cluster_service_acct_id" {
+  description = "Anyscale cross account GKE cluster service account ID"
+  value       = try(google_service_account.gke_cluster_service_account[0].id, null)
+}
+
+output "iam_gke_cluster_service_acct_email" {
+  description = "Anyscale cross account GKE cluster service account email"
+  value       = try(google_service_account.gke_cluster_service_account[0].email, null)
+}
+
+output "iam_gke_cluster_service_acct_name" {
+  description = "Anyscale cross account GKE cluster service account name"
+  value       = try(google_service_account.gke_cluster_service_account[0].name, null)
+}
+
+output "iam_gke_cluster_service_acct_unique_id" {
+  description = "Anyscale cross account GKE cluster service account unique ID"
+  value       = try(google_service_account.gke_cluster_service_account[0].unique_id, null)
+}

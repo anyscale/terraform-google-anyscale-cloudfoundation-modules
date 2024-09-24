@@ -84,6 +84,14 @@ output "iam_cluster_node_only_role_cluster_node_service_acct_unique_id" {
   value       = module.iam_cluster_node_only_role.iam_anyscale_cluster_node_service_acct_unique_id
 }
 
+# -------------------------------------------
+# GKE Cluster Role Test
+# -------------------------------------------
+output "iam_gke_cluster_only_role_outputs" {
+  description = "GKE Cluster Only Outputs"
+  value       = module.iam_gke_cluster_only_role
+}
+
 
 # -------------------------------------------
 # Kitchen Sink Test
