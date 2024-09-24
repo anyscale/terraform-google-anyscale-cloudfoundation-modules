@@ -1,5 +1,6 @@
 [![Build Status][badge-build]][build-status]
 [![Terraform Version][badge-terraform]](https://github.com/hashicorp/terraform/releases)
+[![OpenTofu Version][badge-opentofu]](https://github.com/opentofu/opentofu/releases)
 [![Google Provider Version][badge-tf-google]](https://github.com/terraform-providers/terraform-provider-google/releases)
 # google-anyscale-vpc examples
 
@@ -22,13 +23,13 @@ This builds a VPC by passing in as many variables as possible.
 ## test_no_resources
 This should NOT build any cloudstorage resources and is here for unit testing.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 5.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0 |
 
 ## Providers
 
@@ -74,12 +75,15 @@ No resources.
 | <a name="output_minimum_vpc_public_subnet_id"></a> [minimum\_vpc\_public\_subnet\_id](#output\_minimum\_vpc\_public\_subnet\_id) | minimum\_vpc\_public\_subnet\_id VPC id |
 | <a name="output_minimum_vpc_public_subnet_name"></a> [minimum\_vpc\_public\_subnet\_name](#output\_minimum\_vpc\_public\_subnet\_name) | minimum\_vpc\_public\_subnet\_name VPC name |
 | <a name="output_minimum_vpc_public_subnet_selflink"></a> [minimum\_vpc\_public\_subnet\_selflink](#output\_minimum\_vpc\_public\_subnet\_selflink) | minimum\_vpc\_public\_subnet\_selflink VPC cidr |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+| <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should all be empty |
+<!-- END_TF_DOCS -->
 
 <!-- References -->
 [Terraform]: https://www.terraform.io
-[Issues]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/issues
-[badge-build]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
+[OpenTofu]: https://opentofu.org/
+[Issues]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/issues
+[badge-build]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/workflows/CI/CD%20Pipeline/badge.svg
 [badge-terraform]: https://img.shields.io/badge/terraform-1.x%20-623CE4.svg?logo=terraform
-[badge-tf-google]: https://img.shields.io/badge/GCP-4.+-F8991D.svg?logo=terraform
-[build-status]: https://github.com/anyscale/sa-terraform-google-cloudfoundation-modules/actions
+[badge-opentofu]: https://img.shields.io/badge/opentofu-1.x%20-623CE4.svg?logo=terraform
+[badge-tf-google]: https://img.shields.io/badge/Google-6.+-F8991D.svg?logo=terraform
+[build-status]: https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/actions

@@ -71,5 +71,9 @@ output "minimum_vpc_private_subnet_cidr" {
 }
 
 # -----------------------------------------------------
-# Kitchen Sink Test
+# No Resources Test
 # -----------------------------------------------------
+output "test_no_resources" {
+  description = "The outputs of the no_resource resource - should all be empty"
+  value       = module.test_no_resources
+}
