@@ -93,7 +93,6 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
   count   = local.ingress_from_cidr_blocks_enabled ? length(var.ingress_from_cidr_map) : 0
   project = var.anyscale_project_id
 
-  # name        = "${local.computed_anyscale_vpcname}-ingress-allow-from-cidr-blocks-${count.index}"
   description     = lookup(var.ingress_from_cidr_map[count.index], "description", "Ingress Rule")
   direction       = "INGRESS"
   action          = "allow"
@@ -128,7 +127,7 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
           "tcp"
         )
       )
-      ports = var.predefined_firewall_rules[lookup(var.ingress_from_cidr_map[count.index], "rule", "_")][0] == "" ? null : tolist([
+      ports = lookup(var.ingress_from_cidr_map[count.index], "ports", "") == "" ? null : tolist([
         lookup(
           var.ingress_from_cidr_map[count.index],
           "ports",
@@ -140,14 +139,12 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
       ])
     }
   }
-
 }
 
 resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_gcp_health_checks" {
   count   = local.ingress_from_gcp_health_checks ? length(var.ingress_from_gcp_health_checks) : 0
   project = var.anyscale_project_id
 
-  # name        = "${local.computed_anyscale_vpcname}-ingress-allow-from-cidr-blocks-${count.index}"
   description     = lookup(var.ingress_from_gcp_health_checks[count.index], "description", "Ingress Rule")
   direction       = "INGRESS"
   action          = "allow"
@@ -182,9 +179,9 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_gcp_h
           "tcp"
         )
       )
-      ports = var.predefined_firewall_rules[lookup(var.ingress_from_gcp_health_checks[count.index], "rule", "_")][0] == "" ? null : tolist([
+      ports = lookup(var.ingress_from_gcp_health_checks[count.index], "ports", "") == "" ? null : tolist([
         lookup(
-          var.ingress_from_cidr_map[count.index],
+          var.ingress_from_gcp_health_checks[count.index],
           "ports",
           try(
             var.predefined_firewall_rules[lookup(var.ingress_from_gcp_health_checks[count.index], "rule", "_")][0],
@@ -194,5 +191,4 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_gcp_h
       ])
     }
   }
-
 }
