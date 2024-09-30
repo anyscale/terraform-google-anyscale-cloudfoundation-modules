@@ -52,7 +52,8 @@ module "google_anyscale_v2_kitchensink" {
   anyscale_vpc_firewall_policy_name             = "anyscale-tf-ks-vpc-fw-policy"
   anyscale_vpc_firewall_policy_description      = "Anyscale Terraform KitchenSink VPC Firewall Policy"
   anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges
-  allow_ssh_from_google_ui                      = false
+  allow_ssh_from_google_ui                      = true
+  ingress_from_machine_pool_cidr_ranges         = ["10.100.1.0/24"]
 
   # Cloud Storage (Bucket) Related
   enable_anyscale_gcs           = true

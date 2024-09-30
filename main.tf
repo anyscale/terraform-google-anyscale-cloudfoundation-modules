@@ -127,7 +127,7 @@ module "google_anyscale_vpc" {
 # AnyScale VPC Firewall Module
 # ------------------------------
 locals {
-  execute_vpc_firewall_sub_module = local.create_new_vpc || var.enable_anyscale_vpc_firewall ? true : false
+  execute_vpc_firewall_sub_module = var.enable_anyscale_vpc_firewall ? true : false
 
   firewall_policy_name = coalesce(var.anyscale_vpc_firewall_policy_name, var.existing_vpc_name, var.anyscale_vpc_name, local.common_name, "anyscale-firewall-policy")
 
@@ -193,6 +193,8 @@ module "google_anyscale_vpc_firewall_policy" {
   ingress_with_self_cidr_range = local.ingress_from_self_cidr_range
 
   ingress_from_gcp_health_checks = local.ingress_from_gcp_health_checks
+
+  ingress_from_machine_pool_cidr_ranges = var.ingress_from_machine_pool_cidr_ranges
 }
 
 # ------------------------------
