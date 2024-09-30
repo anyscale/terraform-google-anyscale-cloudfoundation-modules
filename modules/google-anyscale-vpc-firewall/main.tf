@@ -7,6 +7,7 @@ locals {
   ingress_with_self_enabled        = var.module_enabled && length(var.ingress_with_self_map) > 0 && length(var.ingress_with_self_cidr_range) > 0 ? true : false
   ingress_from_cidr_blocks_enabled = var.module_enabled && var.ingress_from_cidr_map != null && length(var.ingress_from_cidr_map) > 0 ? true : false
   ingress_from_gcp_health_checks   = var.module_enabled && var.ingress_from_gcp_health_checks != null ? true : false
+  # ingress_from_machine_pools       = var.module_enabled && var.enable_machine_pools_rule != null ? true : false
 }
 
 #-------------------------------
@@ -127,7 +128,8 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
           "tcp"
         )
       )
-      ports = lookup(var.ingress_from_cidr_map[count.index], "ports", "") == "" ? null : tolist([
+      ports = lookup(var.ingress_from_cidr_map[count.index], "ports", "") == "" ? null : split(
+        ",",
         lookup(
           var.ingress_from_cidr_map[count.index],
           "ports",
@@ -136,7 +138,7 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
             null
           )
         )
-      ])
+      )
     }
   }
 }
@@ -179,16 +181,19 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_gcp_h
           "tcp"
         )
       )
-      ports = lookup(var.ingress_from_gcp_health_checks[count.index], "ports", "") == "" ? null : tolist([
+      ports = lookup(var.ingress_from_gcp_health_checks[count.index], "ports", "") == "" ? tolist([
+        try(
+          var.predefined_firewall_rules[lookup(var.ingress_from_gcp_health_checks[count.index], "rule", "_")][0],
+          null
+        )
+        ]) : split(
+        ",",
         lookup(
           var.ingress_from_gcp_health_checks[count.index],
           "ports",
-          try(
-            var.predefined_firewall_rules[lookup(var.ingress_from_gcp_health_checks[count.index], "rule", "_")][0],
-            null
-          )
+          ""
         )
-      ])
+      )
     }
   }
 }

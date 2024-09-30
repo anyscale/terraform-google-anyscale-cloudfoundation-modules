@@ -30,28 +30,6 @@ variable "vpc_id" {
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
-# variable "anyscale_cloud_id" {
-#   description = <<-EOT
-#     (Optional) Anyscale Cloud ID.
-
-#     ex:
-#     ```
-#     anyscale_cloud_id = "cld_1234567890"
-#     ```
-#   EOT
-#   type        = string
-#   default     = null
-#   validation {
-#     condition = (
-#       var.anyscale_cloud_id == null ? true : (
-#         length(var.anyscale_cloud_id) > 4 &&
-#         substr(var.anyscale_cloud_id, 0, 4) == "cld_"
-#       )
-#     )
-#     error_message = "The anyscale_cloud_id value must start with \"cld_\"."
-#   }
-# }
-
 variable "module_enabled" {
   description = <<-EOT
     (Optional) Determines whether to create the resources inside this module.
@@ -140,6 +118,7 @@ variable "ingress_with_self_cidr_range" {
   type        = list(string)
   default     = []
 }
+
 variable "ingress_with_self_map" {
   description = <<-EOT
     (Optional) List of ingress rules to create where 'self' is defined.
@@ -182,28 +161,11 @@ variable "default_ingress_cidr_range" {
   default     = []
 }
 
-# ex:
-# ingress_from_cidr_map = [
-#   {
-#     rule        = "https-443-tcp"
-#     cidr_blocks = "10.100.10.10/32"
-#   },
-#   { rule = "nfs-tcp" },
-#   {
-#     rule        = "http-80-tcp"
-#     cidr_blocks = "10.100.10.10/32"
-#   },
-#   {
-#     ports       = 10-20
-#     protocol    = 6
-#     description = "Service name is TEST"
-#     cidr_blocks = "10.100.10.10/32"
-#   }
-# ]
 variable "ingress_from_cidr_map" {
   description = <<-EOT
     (Optional) List of ingress rules to create with cidr ranges.
     This can use rules from `predefined_firewall_rules` or custom rules.
+
     ex:
     ```
     ingress_from_cidr_map = [
@@ -212,6 +174,12 @@ variable "ingress_from_cidr_map" {
         cidr_blocks = "10.100.10.10/32"
       },
       { rule = "nfs-tcp" },
+      {
+        ports       = "10,20,30"
+        protocol    = "tcp"
+        description = "Service name is TEST"
+        cidr_blocks = "10.100.10.11/32"
+      },
       {
         ports       = "82-84"
         protocol    = "tcp"
@@ -253,6 +221,32 @@ variable "ingress_from_gcp_health_checks" {
   ]
 }
 
+# variable "enable_machine_pools_rule" {
+#   description = <<-EOT
+#     (Optional) Determines whether to create a rule to allow ingress from machine pools.
+
+#     ex:
+#     ```
+#     enable_machine_pools_rule = true
+#     ```
+#   EOT
+#   type        = bool
+#   default     = false
+# }
+
+# variable "ingress_from_machine_pool_cidr_range" {
+#   description = <<-EOT
+#     (Optional) List of CIDR ranges to allow ingress from machine pools.
+
+#     ex:
+#     ```
+#     ingress_from_machine_pool_cidr_range = ["10.100.10.0/24","10.100.11.0/24"]
+#     ```
+#   EOT
+#   type        = list(string)
+#   default     = []
+# }
+
 # --------------------
 # Pre-defined rules
 #   These are reuqired
@@ -274,5 +268,6 @@ variable "predefined_firewall_rules" {
     nfs-tcp = [2049, "tcp", "NFS/EFS", 1004]
     # Health Checks
     health-checks = [8000, "tcp", "Health Checks", 1005]
+    machine-pools = ["9480,9481,9482", "tcp", "Machine Pools", 1006]
   }
 }
