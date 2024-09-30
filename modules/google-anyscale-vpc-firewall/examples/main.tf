@@ -149,12 +149,12 @@ module "kitchen_sink" {
       cidr_blocks = "10.100.10.10/32"
     },
     { rule = "nfs-tcp" },
-    # {
-    #   ports       = "10,20,30"
-    #   protocol    = "tcp"
-    #   description = "Service name is TEST"
-    #   cidr_blocks = "10.100.10.11/32"
-    # },
+    {
+      ports       = "10,20,30"
+      protocol    = "tcp"
+      description = "Service name is TEST"
+      cidr_blocks = "10.100.10.11/32"
+    },
     {
       ports       = "82-84"
       protocol    = "tcp"
@@ -163,6 +163,12 @@ module "kitchen_sink" {
     }
   ]
 
+  # ingress_from_machine_pools = [
+  #   {
+  #     rule        = "machine-pools"
+  #     cidr_blocks = "10.100.10.0/24,10.100.11.0/24"
+  #   }
+  # ]
 }
 
 # --------------------------------------------------------------
