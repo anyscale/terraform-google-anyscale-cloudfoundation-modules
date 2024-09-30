@@ -221,31 +221,18 @@ variable "ingress_from_gcp_health_checks" {
   ]
 }
 
-# variable "enable_machine_pools_rule" {
-#   description = <<-EOT
-#     (Optional) Determines whether to create a rule to allow ingress from machine pools.
+variable "ingress_from_machine_pool_cidr_ranges" {
+  description = <<-EOT
+    (Optional) List of CIDR ranges to allow ingress from machine pools.
 
-#     ex:
-#     ```
-#     enable_machine_pools_rule = true
-#     ```
-#   EOT
-#   type        = bool
-#   default     = false
-# }
-
-# variable "ingress_from_machine_pool_cidr_range" {
-#   description = <<-EOT
-#     (Optional) List of CIDR ranges to allow ingress from machine pools.
-
-#     ex:
-#     ```
-#     ingress_from_machine_pool_cidr_range = ["10.100.10.0/24","10.100.11.0/24"]
-#     ```
-#   EOT
-#   type        = list(string)
-#   default     = []
-# }
+    ex:
+    ```
+    ingress_from_machine_pool_cidr_ranges = ["10.100.10.0/24", "10.100.11.0/24"]
+    ```
+  EOT
+  type        = list(string)
+  default     = []
+}
 
 # --------------------
 # Pre-defined rules
@@ -254,20 +241,60 @@ variable "ingress_from_gcp_health_checks" {
 variable "predefined_firewall_rules" {
   # tflint-ignore: terraform_standard_module_structure
   description = "(Required) Map of predefined firewall rules."
-  type        = map(list(any))
+  type = map(object({
+    ports       = string
+    protocol    = string
+    description = string
+    priority    = number
+  }))
 
   default = {
-    all-all = ["", "all", "All protocols", 1000]
+    all-all = {
+      ports       = ""
+      protocol    = "all"
+      description = "All protocols"
+      priority    = 1000
+    }
     # HTTP
-    http-80-tcp = [80, "tcp", "HTTP", 1001]
+    http-80-tcp = {
+      ports       = "80"
+      protocol    = "tcp"
+      description = "HTTP"
+      priority    = 1001
+    }
     # HTTPS
-    https-443-tcp = [443, "tcp", "HTTPS", 1002]
+    https-443-tcp = {
+      ports       = "443"
+      protocol    = "tcp"
+      description = "HTTPS"
+      priority    = 1002
+    }
     # SSH
-    ssh-tcp = [22, "tcp", "SSH", 1003]
+    ssh-tcp = {
+      ports       = "22"
+      protocol    = "tcp"
+      description = "SSH"
+      priority    = 1003
+    }
     # NFS
-    nfs-tcp = [2049, "tcp", "NFS/EFS", 1004]
+    nfs-tcp = {
+      ports       = "2049"
+      protocol    = "tcp"
+      description = "NFS/EFS"
+      priority    = 1004
+    }
     # Health Checks
-    health-checks = [8000, "tcp", "Health Checks", 1005]
-    machine-pools = ["9480,9481,9482", "tcp", "Machine Pools", 1006]
+    health-checks = {
+      ports       = "8000"
+      protocol    = "tcp"
+      description = "Health Checks"
+      priority    = 1005
+    }
+    machine-pools = {
+      ports       = "80,443,1010,1012,2222,5555,5903,6379,6822,6823,6824,6826,7878,8000,8076,8085,8201,8265,8266,8686,8687,8912,8999,9090,9092,9100,9478,9479,9480,9481,9482"
+      protocol    = "tcp"
+      description = "Machine Pools"
+      priority    = 1011
+    }
   }
 }

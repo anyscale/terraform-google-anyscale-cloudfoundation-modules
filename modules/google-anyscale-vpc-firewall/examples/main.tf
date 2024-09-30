@@ -163,12 +163,7 @@ module "kitchen_sink" {
     }
   ]
 
-  # ingress_from_machine_pools = [
-  #   {
-  #     rule        = "machine-pools"
-  #     cidr_blocks = "10.100.10.0/24,10.100.11.0/24"
-  #   }
-  # ]
+  ingress_from_machine_pool_cidr_ranges = ["10.100.10.0/24,10.100.11.0/24"]
 }
 
 # --------------------------------------------------------------

@@ -293,6 +293,7 @@ def start_aws_test(branch_name: str, local_path: str):
                     cluster_management_stack_version="v2",
                     memorydb_cluster_id=None,
                     yes=True,
+                    skip_verifications=True,
                 )
                 logger.info("  Cloud registered successfully")
                 register_cloud_return_code = 0
@@ -491,6 +492,7 @@ def start_gcp_test(
                     cluster_management_stack_version="v2",
                     memorystore_instance_name=None,
                     yes=True,
+                    skip_verifications=True,
                 )
                 logger.info("Cloud registered successfully")
                 register_cloud_return_code = 0

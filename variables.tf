@@ -680,6 +680,8 @@ variable "enable_anyscale_vpc_firewall" {
   description = <<-EOT
     (Optional) Determines if the Anyscale VPC Firewall is created.
 
+    The Anyscale VPC Firewall is a Google Cloud VPC Firewall Policy that allows access to Anyscale resources.
+
     ex:
     ```
     enable_anyscale_vpc_firewall = true
@@ -726,6 +728,22 @@ variable "allow_ssh_from_google_ui" {
   EOT
   type        = bool
   default     = true
+}
+
+variable "ingress_from_machine_pool_cidr_ranges" {
+  description = <<-EOT
+    (Optional) CIDR Range for Anyscale Machine Pools.
+
+    If a CIDR range is provided, a firewall rule will be created to support [Anyscale Machine Pools](https://docs.anyscale.com/administration/cloud-deployment/machine-pools/).
+
+    ex:
+    ```
+    ingress_from_machine_pool_cidr_ranges = ["10.100.1.0/24","10.102.1.0/24"]
+    ```
+  EOT
+
+  type    = list(string)
+  default = []
 }
 
 # --------------------------------------------
