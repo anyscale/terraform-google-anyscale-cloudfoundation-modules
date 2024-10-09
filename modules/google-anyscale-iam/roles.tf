@@ -153,6 +153,8 @@ resource "google_project_iam_custom_role" "anyscale_access_role" {
     "compute.zones.list",
     "storage.buckets.get",
     "storage.objects.get",
-    "storage.objects.list"
+    "storage.objects.list",
+    "storage.folders.get",
+    "storage.folders.list",
   ]
 }

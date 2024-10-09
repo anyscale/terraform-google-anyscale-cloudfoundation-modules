@@ -57,7 +57,7 @@ resource "google_project_iam_member" "anyscale_access_service_acct" {
   count   = local.anyscale_access_service_acct_enabled && (local.anyscale_access_serviceacct_role_enabled || var.existing_anyscale_access_role_name != null) ? 1 : 0
   role    = coalesce(google_project_iam_custom_role.anyscale_access_role[0].name, var.existing_anyscale_access_role_name)
   project = var.anyscale_project_id
-  member  = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
+  member  = google_service_account.anyscale_access_service_acct[0].member
 }
 
 #tfsec:ignore:google-iam-no-project-level-service-account-impersonation
@@ -66,7 +66,7 @@ resource "google_service_account_iam_member" "anyscale_access_service_acct" {
   for_each           = local.anyscale_access_service_acct_enabled ? toset(var.anyscale_access_service_acct_binding_permissions) : []
   role               = each.key
   service_account_id = google_service_account.anyscale_access_service_acct[0].name
-  member             = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
+  member             = google_service_account.anyscale_access_service_acct[0].member
 }
 
 # Identity Pool Resources
@@ -156,12 +156,12 @@ resource "google_project_iam_member" "anyscale_cluster_node_service_acct" {
   for_each = local.cluster_node_role_enabled ? toset(local.cluster_node_roles) : []
   role     = each.key
   project  = var.anyscale_project_id
-  member   = "serviceAccount:${google_service_account.anyscale_cluster_node_service_acct[0].email}"
+  member   = google_service_account.anyscale_cluster_node_service_acct[0].member
 }
 
 resource "google_service_account_iam_member" "anyscale_cluster_node_service_acct" {
   count              = local.cluster_node_role_enabled && local.anyscale_access_service_acct_enabled ? 1 : 0
   role               = "roles/iam.serviceAccountUser"
   service_account_id = google_service_account.anyscale_cluster_node_service_acct[0].name
-  member             = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
+  member             = google_service_account.anyscale_access_service_acct[0].member
 }
