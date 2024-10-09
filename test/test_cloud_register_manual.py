@@ -29,7 +29,9 @@ from rich.logging import RichHandler
 from rich.console import Group
 from rich.live import Live
 import logging
+import anyscale
 from anyscale.controllers.cloud_controller import CloudController
+from anyscale.job.models import JobConfig
 from python_terraform import Terraform, IsFlagged, IsNotFlagged
 
 logging.basicConfig(
@@ -154,6 +156,43 @@ def _anyscale_cloud_verify(cloud_controller: CloudController, cloud_name: str):
         return 0
     except Exception as e:
         logger.error(f"  Error verifying cloud: {e}")
+        return 1
+
+
+def _anyscale_job_verify(cloud_name: str):
+    """Run Functional Verify on the Anyscale Cloud."""
+    logger.info("Starting: Anyscale Job - functional test")
+
+    # Define the job configuration
+    config = JobConfig(
+        name="cloud_name",
+        entrypoint="python main-job-test.py",
+        cloud=cloud_name,
+        working_dir="./anyscale-job",
+    )
+
+    try:
+        # Submit the job
+        job_id = anyscale.job.submit(config)
+
+        # Wait for the job to finish
+        anyscale.job.wait(id=job_id)
+
+        # Get the job status
+        job_status = anyscale.job.status(id=job_id)
+
+        # Check if the job succeeded or failed
+        if job_status.state == "SUCCEEDED":
+            logger.info("  Completed: Anyscale Job completed successfully")
+            return 0
+        elif job_status.state == "FAILED":
+            logger.error("  Error: Anyscale Job failed")
+            return 1
+        else:
+            logger.error(f"  Job is in state: {job_status.state}")
+            return 1
+    except Exception as e:
+        logger.error(f"  Error running Anyscale Job: {e}")
         return 1
 
 
@@ -518,7 +557,12 @@ def start_gcp_test(
 
     ## Verify the cloud.
     if wait_for_cloud_return_code == 0:
-        verify_cloud_return_code = _anyscale_cloud_verify(cloud_controller, cloud_name)
+        cloud_verify_return_code = _anyscale_cloud_verify(cloud_controller, cloud_name)
+        job_return_code = _anyscale_job_verify(cloud_name=cloud_name)
+        if cloud_verify_return_code == 1 or job_return_code == 1:
+            verify_cloud_return_code = 1
+        else:
+            verify_cloud_return_code = 0
 
     with live:
         task_id = e2e_progress.add_task("", total=100)
