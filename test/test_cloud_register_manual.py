@@ -165,7 +165,7 @@ def _anyscale_job_verify(cloud_name: str):
 
     # Define the job configuration
     config = JobConfig(
-        name="cloud_name",
+        name="e2e-job-test",
         entrypoint="python main-job-test.py",
         cloud=cloud_name,
         working_dir="./anyscale-job",
@@ -566,7 +566,12 @@ def start_gcp_test(
 
     with live:
         task_id = e2e_progress.add_task("", total=100)
-
+        e2e_progress.update(
+            task_id,
+            description="Sleeping: Waiting for Anyscale resources",
+            advance=10,
+        )
+        _sleep_timer(60 * 1)
         ## Delete the cloud.
         if register_cloud_return_code == 0:
             e2e_progress.update(task_id, description="Deleting Anyscale cloud...")
@@ -578,7 +583,7 @@ def start_gcp_test(
             e2e_progress.update(
                 task_id,
                 description=f"Emptying bucket {bucket_name}...",
-                advance=30,
+                advance=20,
             )
             try:
                 storage_client = storage.Client()
