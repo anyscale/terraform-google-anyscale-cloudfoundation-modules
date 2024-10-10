@@ -206,6 +206,8 @@ def _anyscale_cloud_delete(cloud_controller: CloudController, cloud_name: str):
             skip_confirmation=True,
         )
         logger.info("  Cloud deleted successfully")
+
+        _sleep_timer(60)
         return 0
     except Exception as e:
         logger.info(f"Error deleting anyscale cloud: {e}")
