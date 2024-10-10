@@ -308,7 +308,10 @@ locals {
   bucket_name   = var.anyscale_bucket_name != null ? var.anyscale_bucket_name : local.common_name
   bucket_prefix = coalesce(var.anyscale_bucket_prefix, var.common_prefix, "anyscale-")
 
-  bucket_iam_binding_members = local.execute_iam_submodule ? ["serviceAccount:${module.google_anyscale_iam.iam_anyscale_access_service_acct_email}", "serviceAccount:${module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_email}"] : []
+  bucket_iam_members = local.execute_iam_submodule ? [
+    module.google_anyscale_iam.iam_anyscale_access_service_acct_member,
+    module.google_anyscale_iam.iam_anyscale_cluster_node_service_acct_member
+  ] : []
 }
 module "google_anyscale_cloudstorage" {
   source         = "./modules/google-anyscale-cloudstorage"
@@ -328,8 +331,8 @@ module "google_anyscale_cloudstorage" {
   lifecycle_rules      = var.anyscale_bucket_lifecycle_rules
   cors_rules           = var.anyscale_bucket_cors_rules
 
-  bucket_iam_binding_members        = local.bucket_iam_binding_members
-  bucket_iam_binding_override_roles = var.bucket_iam_binding_override_roles
+  bucket_iam_members                 = local.bucket_iam_members
+  bucket_iam_member_additional_roles = var.bucket_iam_member_additional_roles
 }
 
 # ------------------------------

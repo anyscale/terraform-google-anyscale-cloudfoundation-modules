@@ -1,5 +1,5 @@
 # .pre-commit-config.yaml
-default_stages: [commit]
+default_stages: [pre-commit]
 repos:
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: v1.96.1

@@ -117,23 +117,18 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
     )
 
     layer4_configs {
-      ip_protocol = lookup(
-        var.ingress_from_cidr_map[count.index],
-        "protocol",
+      ip_protocol = try(var.predefined_firewall_rules[lookup(var.ingress_from_cidr_map[count.index], "rule", "")].protocol, "tcp")
+      ports = lookup(var.ingress_from_cidr_map[count.index], "ports", "") == "" ? tolist([
         try(
-          var.predefined_firewall_rules[lookup(var.ingress_from_cidr_map[count.index], "rule", "_")].protocol,
-          "tcp"
+          var.predefined_firewall_rules[lookup(var.ingress_from_cidr_map[count.index], "rule", "_")].ports,
+          null
         )
-      )
-      ports = lookup(var.ingress_from_cidr_map[count.index], "ports", "") == "" ? null : split(
+        ]) : split(
         ",",
         lookup(
           var.ingress_from_cidr_map[count.index],
           "ports",
-          try(
-            var.predefined_firewall_rules[lookup(var.ingress_from_cidr_map[count.index], "rule", "_")].ports,
-            null
-          )
+          ""
         )
       )
     }
