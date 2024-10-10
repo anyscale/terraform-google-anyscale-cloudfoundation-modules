@@ -91,7 +91,7 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_cidr_
   count   = local.ingress_from_cidr_blocks_enabled ? length(var.ingress_from_cidr_map) : 0
   project = var.anyscale_project_id
 
-  description     = lookup(var.ingress_from_cidr_map[count.index], "description", "Ingress Rule")
+  description     = try(var.predefined_firewall_rules[lookup(var.ingress_from_cidr_map[count.index], "rule", "")].description, "Ingress Rule")
   direction       = "INGRESS"
   action          = "allow"
   enable_logging  = var.enable_firewall_rule_logging
@@ -144,7 +144,7 @@ resource "google_compute_network_firewall_policy_rule" "ingress_allow_from_gcp_h
   count   = local.ingress_from_gcp_health_checks ? length(var.ingress_from_gcp_health_checks) : 0
   project = var.anyscale_project_id
 
-  description     = lookup(var.ingress_from_gcp_health_checks[count.index], "description", "Ingress Rule")
+  description     = try(var.predefined_firewall_rules[lookup(var.ingress_from_gcp_health_checks[count.index], "rule", "")].description, "Ingress Rule")
   direction       = "INGRESS"
   action          = "allow"
   enable_logging  = var.enable_firewall_rule_logging
