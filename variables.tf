@@ -727,7 +727,7 @@ variable "allow_ssh_from_google_ui" {
     ```
   EOT
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "ingress_from_machine_pool_cidr_ranges" {
@@ -943,17 +943,17 @@ variable "anyscale_bucket_cors_rules" {
   ]
 }
 
-variable "bucket_iam_binding_override_roles" {
+variable "bucket_iam_member_additional_roles" {
   description = <<-EOT
-    (Optional) List of roles to grant to the Anyscale Service Accounts.
+    (Optional) List of roles to grant to the Anyscale Service Accounts on the storage bucket.
 
-    This allows you to override the defaults in the `google-anyscale-cloudstorage` module.
+    This allows you to append the defaults in the `google-anyscale-cloudstorage` module.
 
-    Default is an empty list but will be populated with the following roles via the module: ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
+    Default is an empty list but will be populated with the following roles via the module: ["roles/storage.objectAdmin", "roles/storage.legacyBucketWriter", "roles/storage.folderAdmin"]
 
     ex:
     ```
-    bucket_iam_binding_override_roles = ["roles/storage.objectAdmin"]
+    bucket_iam_member_additional_roles = ["roles/storage.objectAdmin"]
     ```
   EOT
   type        = list(string)

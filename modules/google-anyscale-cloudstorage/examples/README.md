@@ -22,7 +22,7 @@ This builds a cloudstorage bucket by passing in as many variables as possible. I
 ## test_no_resources
 This should NOT build any cloudstorage resources and is here for unit testing.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -56,7 +56,7 @@ No resources.
 | <a name="input_anyscale_organization_id"></a> [anyscale\_organization\_id](#input\_anyscale\_organization\_id) | (Required) Anyscale Organization ID | `string` | n/a | yes |
 | <a name="input_google_project_id"></a> [google\_project\_id](#input\_google\_project\_id) | ID of the Project to put these resources in. | `string` | n/a | yes |
 | <a name="input_google_region"></a> [google\_region](#input\_google\_region) | The Google region in which all resources will be created. | `string` | n/a | yes |
-| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of tags to all resources that accept tags. | `map(string)` | <pre>{<br>  "environment": "test",<br>  "test": true<br>}</pre> | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of tags to all resources that accept tags. | `map(string)` | <pre>{<br/>  "environment": "test",<br/>  "test": true<br/>}</pre> | no |
 
 ## Outputs
 
@@ -69,7 +69,7 @@ No resources.
 | <a name="output_kitchen_sink_selflink"></a> [kitchen\_sink\_selflink](#output\_kitchen\_sink\_selflink) | The selflink of the kitchen sink anyscale resource. |
 | <a name="output_kitchen_sink_url"></a> [kitchen\_sink\_url](#output\_kitchen\_sink\_url) | The URL of the kitchen sink anyscale resource. |
 | <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should all be empty |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 <!-- References -->
 [Terraform]: https://www.terraform.io

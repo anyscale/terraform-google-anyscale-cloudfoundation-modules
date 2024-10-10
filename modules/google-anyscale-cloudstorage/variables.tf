@@ -27,44 +27,61 @@ variable "labels" {
 }
 
 variable "anyscale_bucket_name" {
-  description = <<-EOF
-    (Optional - forces new resource)
-    The name of the bucket.
+  description = <<-EOT
+    (Optional - forces new resource) The name of the bucket.
     Changing this forces creating a new bucket.
     This overrides the `anyscale_bucket_name_prefix` parameter.
-    Default is `null`.
-  EOF
+
+    ex:
+    ```
+    anyscale_bucket_name = "my-bucket"
+    ```
+  EOT
   type        = string
   default     = null
 }
 
 variable "anyscale_bucket_name_prefix" {
-  description = <<-EOF
-    (Optional - forces new resource)
+  description = <<-EOT
+    (Optional - forces new resource) Prefix for the bucket name.
+
     Creates a unique bucket name beginning with the specified prefix.
     Changing this forces creating a new bucket.
     If `anyscale_bucket_name` is provided, it overrides this parameter.
-    Default is `anyscale-`.
-  EOF
+
+    ex:
+    ```
+    anyscale_bucket_name_prefix = "anyscale-"
+    ```
+  EOT
   type        = string
   default     = "anyscale-"
 }
 
 variable "enable_random_name_suffix" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) Determines if a suffix of random characters will be added to the `anyscale_bucket_prefix` or `anyscale_bucket_name`.
-    Default is `true`
-  EOF
+
+    ex:
+    ```
+    enable_random_name_suffix = true
+    ```
+  EOT
   type        = bool
   default     = true
 }
+
 variable "random_char_length" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) Sets the length of random characters to be appended as a suffix.
     Depends on `random_bucket_suffix` being set to `true`.
     Must be an even number, and must be at least 4.
-    Default is `4`.
-  EOF
+
+    ex:
+    ```
+    random_char_length = 8
+    ```
+  EOT
   type        = number
   default     = 4
   validation {
@@ -74,17 +91,27 @@ variable "random_char_length" {
 }
 
 variable "bucket_location" {
-  description = "(Optional) A valid GCS location to create the bucket in. Default is `US`."
+  description = <<-EOT
+    (Optional) A valid GCS location to create the bucket in.
+
+    ex:
+    ```
+    bucket_location = "US"
+    ```
+  EOT
   type        = string
   default     = "US"
 }
 
 variable "bucket_storage_class" {
   description = <<-EOF
-    (Optional)
-    The bucket storage class.
+    (Optional) The bucket storage class.
     Must be one of: STANDARD, MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE
-    Default is `STANDARD`
+
+    ex:
+    ```
+    bucket_storage_class = "STANDARD"
+    ```
   EOF
   type        = string
   default     = "STANDARD"
@@ -105,7 +132,14 @@ variable "bucket_storage_class" {
 }
 
 variable "bucket_public_access_prevention" {
-  description = "(Optional) Determines if public access prevention is `enforced` or `inherited`. Default is `enforced`."
+  description = <<-EOT
+    (Optional) Determines if public access prevention is `enforced` or `inherited`.
+
+    ex:
+    ```
+    bucket_public_access_prevention = "enforced"
+    ```
+  EOT
   type        = string
   default     = "enforced"
   validation {
@@ -121,13 +155,27 @@ variable "bucket_public_access_prevention" {
 }
 
 variable "bucket_force_destroy" {
-  description = "(Optional) Determines if the contents of the bucket will be deleted when a `terraform destroy` command is issued. Default is `false`."
+  description = <<-EOT
+    (Optional) Determines if the contents of the bucket will be deleted when a `terraform destroy` command is issued.
+
+    ex:
+    ```
+    bucket_force_destroy = true
+    ```
+  EOT
   type        = bool
   default     = false
 }
 
 variable "bucket_uniform_level_access" {
-  description = "(Optional) Determines if the bucket will have uniform bucket-level access. Default is `true`."
+  description = <<-EOT
+    (Optional) Determines if the bucket will have uniform bucket-level access.
+
+    ex:
+    ```
+    bucket_uniform_level_access = true
+    ```
+  EOT
   type        = bool
   default     = true
 }
@@ -136,7 +184,11 @@ variable "bucket_versioning" {
   description = <<-EOT
     (Optional) Determines if object versioning is enabled on the bucket.
     If enabled, consider also using a object lifecycle to remove older versions after a period of time.
-    Default is `false`.
+
+    ex:
+    ```
+    bucket_versioning = true
+    ```
   EOT
   type        = bool
   default     = false
@@ -188,17 +240,18 @@ variable "cors_rules" {
   ]
 }
 
-# Example:
-#
-# retention_policy = {
-#   is_locked = false
-#   retention_period = 40000000
-# }
 variable "retention_policy" {
   description = <<-EOT
-  (Optional)
-  Object containing a retention policy including `is_locked` and `retention_period`.
-  Default is an empty map.
+    (Optional)
+    Object containing a retention policy including `is_locked` and `retention_period`.
+
+    ex:
+    ```
+    retention_policy = {
+      is_locked = false
+      retention_period = 40000000
+    }
+    ```
   EOT
   type        = map(string)
   default     = {}
@@ -268,44 +321,56 @@ variable "lifecycle_rules" {
   default = []
 }
 
-# example:
-#
-# bucket_logging = {
-#   log_bucket = "logging_bucket_name",
-#   log_object_prefix = "/prefix/"
-# }
 variable "bucket_logging" {
   description = <<-EOT
     (Optional) Map of bucket logging config object.
     Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#logging
-    Default is an empty map.
+
+    ex:
+    ```
+    bucket_logging = {
+      log_bucket = "logging_bucket_name",
+      log_object_prefix = "/prefix/"
+    }
   EOT
   type        = any
   default     = {}
 }
 
-variable "bucket_iam_binding_members" {
+variable "bucket_iam_members" {
   description = <<-EOT
     (Optional) List of members to add to the bucket IAM binding.
-    Default is an empty list.
+
+    ex:
+    ```
+    bucket_iam_members = ["user:anyscale-access-7e337e0b@anyscale-gcp-pub.iam.gserviceaccount.com"]
+    ```
   EOT
   type        = list(string)
   default     = []
 }
 
-variable "bucket_iam_binding_roles" {
+variable "bucket_iam_member_roles" {
   description = <<-EOT
-    (Optional) List of roles to add to the bucket IAM binding.
-    Default is `["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]`
+    (Optional) List of roles to add to the bucket IAM members.
+
+    ex:
+    ```
+    bucket_iam_binding_roles = ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
+    ```
   EOT
   type        = list(string)
-  default     = ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
+  default     = ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader", "roles/storage.folderAdmin"]
 }
 
-variable "bucket_iam_binding_override_roles" {
+variable "bucket_iam_member_additional_roles" {
   description = <<-EOT
-    (Optional) List of roles to override in the bucket IAM binding.
-    Default is an empty list.
+    (Optional) List of roles that provide additional roles to the default bucket IAM member roles.
+
+    ex:
+    ```
+    bucket_iam_member_additional_roles = ["roles/storage.folderAdmin", "roles/storage.legacyBucketOwner"]
+    ```
   EOT
   type        = list(string)
   default     = []

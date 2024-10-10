@@ -111,14 +111,26 @@ resource "google_storage_bucket" "anyscale_bucket" {
 }
 
 locals {
-  bucket_binding_roles = length(var.bucket_iam_binding_override_roles) > 0 ? toset(var.bucket_iam_binding_override_roles) : toset(var.bucket_iam_binding_roles)
+  bucket_iam_member_enabled = var.module_enabled && (length(var.bucket_iam_member_roles) > 0 || length(var.bucket_iam_member_additional_roles) > 0) && length(var.bucket_iam_members) > 0
 
-  bucket_iam_binding_enabled = var.module_enabled && length(local.bucket_binding_roles) > 0 && length(var.bucket_iam_binding_members) > 0 ? true : false
+  combined_roles = distinct(concat(var.bucket_iam_member_roles, var.bucket_iam_member_additional_roles))
+
+  role_member_pairs = flatten([
+    for role_index, role in local.combined_roles : [
+      for member_index, member in var.bucket_iam_members : {
+        role   = role
+        member = member
+      }
+    ]
+  ])
+
+  role_member_pairs_map = { for idx, pair in local.role_member_pairs : tostring(idx) => pair }
 }
-#trivy:ignore:avd-gcp-0007
-resource "google_storage_bucket_iam_binding" "anyscale_bucket" {
-  for_each = local.bucket_iam_binding_enabled ? local.bucket_binding_roles : []
-  bucket   = google_storage_bucket.anyscale_bucket[0].name
-  role     = each.value
-  members  = var.bucket_iam_binding_members
+
+resource "google_storage_bucket_iam_member" "anyscale_bucket" {
+  for_each = local.bucket_iam_member_enabled ? local.role_member_pairs_map : {}
+
+  bucket = google_storage_bucket.anyscale_bucket[0].name
+  role   = each.value.role
+  member = each.value.member
 }

@@ -39,7 +39,7 @@ module "kitchen_sink" {
   labels              = local.full_labels
 
   bucket_location           = var.google_region
-  anyscale_bucket_name      = "anyscale-terraform-test-bucket"
+  anyscale_bucket_name      = "anyscale-terraform-kitchensink-bucket"
   enable_random_name_suffix = false
 
   bucket_public_access_prevention = "enforced"
@@ -95,14 +95,14 @@ module "kitchen_sink" {
     log_object_prefix = "/log_test/"
   }
 
-  bucket_iam_binding_members = [
-    "serviceAccount:${module.kitchen_sink_iam.iam_anyscale_access_service_acct_email}",
-    "serviceAccount:${module.kitchen_sink_iam.iam_anyscale_cluster_node_service_acct_email}"
+  bucket_iam_members = [
+    module.kitchen_sink_iam.iam_anyscale_access_service_acct_member,
+    module.kitchen_sink_iam.iam_anyscale_cluster_node_service_acct_member
   ]
 
-  bucket_iam_binding_override_roles = [
-    "roles/storage.objectViewer",
-    "roles/storage.objectCreator"
+  bucket_iam_member_additional_roles = [
+    "roles/storage.folderAdmin",
+    "roles/storage.legacyBucketWriter"
   ]
 }
 
