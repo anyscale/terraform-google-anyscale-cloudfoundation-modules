@@ -19,10 +19,17 @@ No providers.
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_all_defaults"></a> [all\_defaults](#module\_all\_defaults) | ../ | n/a |
-| <a name="module_all_defaults_iam"></a> [all\_defaults\_iam](#module\_all\_defaults\_iam) | ../../google-anyscale-iam | n/a |
 | <a name="module_anyscale_cloudapis"></a> [anyscale\_cloudapis](#module\_anyscale\_cloudapis) | ../../google-anyscale-cloudapis | n/a |
-| <a name="module_anyscale_vpc"></a> [anyscale\_vpc](#module\_anyscale\_vpc) | ../../google-anyscale-vpc | n/a |
+| <a name="module_autopilot_gke"></a> [autopilot\_gke](#module\_autopilot\_gke) | ../ | n/a |
+| <a name="module_autopilot_gke_iam"></a> [autopilot\_gke\_iam](#module\_autopilot\_gke\_iam) | ../../google-anyscale-iam | n/a |
+| <a name="module_autopilot_gke_vpc"></a> [autopilot\_gke\_vpc](#module\_autopilot\_gke\_vpc) | ../../google-anyscale-vpc | n/a |
+| <a name="module_gke_standard_autoscaling"></a> [gke\_standard\_autoscaling](#module\_gke\_standard\_autoscaling) | ../ | n/a |
+| <a name="module_gke_standard_autoscaling_iam"></a> [gke\_standard\_autoscaling\_iam](#module\_gke\_standard\_autoscaling\_iam) | ../../google-anyscale-iam | n/a |
+| <a name="module_gke_standard_autoscaling_vpc"></a> [gke\_standard\_autoscaling\_vpc](#module\_gke\_standard\_autoscaling\_vpc) | ../../google-anyscale-vpc | n/a |
+| <a name="module_standard_gke_no_autoscaling"></a> [standard\_gke\_no\_autoscaling](#module\_standard\_gke\_no\_autoscaling) | ../ | n/a |
+| <a name="module_standard_gke_no_autoscaling_iam"></a> [standard\_gke\_no\_autoscaling\_iam](#module\_standard\_gke\_no\_autoscaling\_iam) | ../../google-anyscale-iam | n/a |
+| <a name="module_standard_gke_no_autoscaling_vpc"></a> [standard\_gke\_no\_autoscaling\_vpc](#module\_standard\_gke\_no\_autoscaling\_vpc) | ../../google-anyscale-vpc | n/a |
+| <a name="module_test_no_resources"></a> [test\_no\_resources](#module\_test\_no\_resources) | ../ | n/a |
 
 ## Resources
 
@@ -41,5 +48,12 @@ No resources.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_autopilot_gke"></a> [autopilot\_gke](#output\_autopilot\_gke) | The outputs from the standard\_gke\_no\_autoscaling example. |
+| <a name="output_gke_standard_autoscaling_cluster_endpoint"></a> [gke\_standard\_autoscaling\_cluster\_endpoint](#output\_gke\_standard\_autoscaling\_cluster\_endpoint) | The endpoint of the anyscale resource. |
+| <a name="output_gke_standard_autoscaling_cluster_id"></a> [gke\_standard\_autoscaling\_cluster\_id](#output\_gke\_standard\_autoscaling\_cluster\_id) | The ID of the all defaults anyscale resource. |
+| <a name="output_gke_standard_autoscaling_cluster_name"></a> [gke\_standard\_autoscaling\_cluster\_name](#output\_gke\_standard\_autoscaling\_cluster\_name) | The name of the anyscale resource. |
+| <a name="output_standard_gke_no_autoscaling_outputs"></a> [standard\_gke\_no\_autoscaling\_outputs](#output\_standard\_gke\_no\_autoscaling\_outputs) | The outputs from the standard\_gke\_no\_autoscaling example. |
+| <a name="output_test_no_resources"></a> [test\_no\_resources](#output\_test\_no\_resources) | The outputs of the no\_resource resource - should all be empty |
 <!-- END_TF_DOCS -->

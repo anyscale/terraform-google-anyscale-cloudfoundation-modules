@@ -590,35 +590,95 @@ variable "enable_client_certificate" {
 # -----------------------------
 # Standard GKE Cluster Autoscaling Config
 # -----------------------------
-variable "enable_gke_autoscaling" {
+variable "gke_autoscaling_config" {
   description = <<-EOT
-    (Optional) Determines if autoscaling is enabled for the Anyscale GKE cluster.
+    (Optional) The autoscaling configuration for the Anyscale GKE cluster.
 
     ex:
     ```
-    enable_gke_autoscaling = true
+    gke_autoscaling_config = {
+      enabled       = true
+      min_cpu_cores = 0
+      max_cpu_cores = 1000000000
+      min_memory_gb = 0
+      max_memory_gb = 1000000000
+      gpu_resources = [
+        {
+          resource_type = "nvidia-tesla-t4"
+          minimum       = 0
+          maximum       = 64
+        }
+      ]
+      auto_repair             = true
+      auto_upgrade            = true
+      disk_size_gb            = 500
+      disk_type               = "pd-balanced"
+      image_type              = "COS_CONTAINERD"
+      autoscaling_profile     = "BALANCED"
+      upgrade_strategy        = "BLUE_GREEN"
+      max_surge               = 1
+      max_unavailable         = 0
+      node_pool_soak_duration = 30m
+      batch_soak_duration     = 30m
+      batch_percentage        = 100
+      batch_node_count        = 1
+      secure_boot_enabled          = true
+      integrity_monitoring_enabled = true
+    }
     ```
   EOT
-  type        = bool
-  default     = true
-}
-
-variable "gke_autoscaling_profile" {
-  description = <<-EOT
-    (Optional) The autoscaling profile for the Anyscale GKE cluster.
-
-    Accepted values are `BALANCED`, `OPTIMISTIC`, and `CONSERVATIVE`.
-
-    ex:
-    ```
-    gke_autoscaling_profile = "BALANCED"
-    ```
-  EOT
-  type        = string
-  default     = "BALANCED"
+  type = object({
+    enabled                      = bool
+    min_cpu_cores                = number
+    max_cpu_cores                = number
+    min_memory_gb                = number
+    max_memory_gb                = number
+    gpu_resources                = list(object({ resource_type = string, minimum = number, maximum = number }))
+    auto_repair                  = optional(bool, true)
+    auto_upgrade                 = optional(bool, true)
+    disk_size_gb                 = optional(number, 500)
+    disk_type                    = optional(string, "pd-balanced")
+    image_type                   = optional(string, "COS_CONTAINERD")
+    autoscaling_profile          = optional(string, "BALANCED")
+    upgrade_strategy             = optional(string, "SURGE")
+    max_surge                    = optional(number, 1)
+    max_unavailable              = optional(number, 0)
+    node_pool_soak_duration      = optional(string, null)
+    batch_soak_duration          = optional(string, null)
+    batch_percentage             = optional(number)
+    batch_node_count             = optional(number)
+    secure_boot_enabled          = optional(bool, true)
+    integrity_monitoring_enabled = optional(bool, true)
+  })
+  default = {
+    enabled       = true
+    min_cpu_cores = 0
+    max_cpu_cores = 1000000000
+    min_memory_gb = 0
+    max_memory_gb = 1000000000
+    gpu_resources = [
+      {
+        resource_type = "nvidia-tesla-t4"
+        minimum       = 0
+        maximum       = 64
+      }
+    ]
+  }
   validation {
-    condition     = contains(["BALANCED", "OPTIMISTIC", "CONSERVATIVE"], var.gke_autoscaling_profile)
-    error_message = "The gke_autoscaling_profile must be one of `BALANCED`, `OPTIMISTIC`, or `CONSERVATIVE`."
+    condition     = contains(["pd-balanced", "pd-ssd", "pd-standard"], var.gke_autoscaling_config.disk_type)
+    error_message = "`gke_autoscaling_config.disk_type` must be one of `pd-balanced`, `pd-ssd`, or `pd-standard`."
+  }
+  validation {
+    condition     = contains(["COS", "COS_CONTAINERD"], var.gke_autoscaling_config.image_type)
+    error_message = "`gke_autoscaling_config.image_type` must be one of `COS` or `COS_CONTAINERD`."
+  }
+  validation {
+    condition     = contains(["BALANCED", "OPTIMAL", "COST_OPTIMIZED"], var.gke_autoscaling_config.autoscaling_profile)
+    error_message = "`gke_autoscaling_config.autoscaling_profile` must be one of `BALANCED`, `OPTIMAL`, or `COST_OPTIMIZED`."
+  }
+  validation {
+    condition     = contains(["BLUE_GREEN", "SURGE"], var.gke_autoscaling_config.upgrade_strategy)
+    error_message = "`gke_autoscaling_config.upgrade_strategy` must be one of `BLUE_GREEN` or `SURGE`."
   }
 }
 
@@ -633,136 +693,6 @@ variable "gke_cluster_gcp_iam_service_account" {
   EOT
   type        = string
   default     = null
-}
-
-variable "gke_cluster_default_disk_config" {
-  description = <<-EOT
-    (Optional) The default disk configuration for the Anyscale GKE cluster.
-
-    ex:
-    ```
-    gke_cluster_default_disk_config = {
-      disk_type = "pd-balanced"
-      disk_size = 100
-    }
-    ```
-  EOT
-  type = object({
-    disk_type = string
-    disk_size = number
-  })
-  default = {
-    disk_type = "pd-balanced"
-    disk_size = 500
-  }
-  validation {
-    condition     = contains(["pd-standard", "pd-balanced", "pd-ssd"], var.gke_cluster_default_disk_config.disk_type)
-    error_message = "The disk type must be one of `pd-standard`, `pd-balanced`, or `pd-ssd`."
-  }
-}
-
-variable "gke_node_image_type" {
-  description = <<-EOT
-    (Optional) The image type for the Anyscale GKE cluster.
-
-    Accepted values are `COS`, `COS_CONTAINERD`, and `UBUNTU`.
-
-    ex:
-    ```
-    gke_node_image_type = "COS"
-    ```
-  EOT
-  type        = string
-  default     = "COS_CONTAINERD"
-  validation {
-    condition     = contains(["COS", "COS_CONTAINERD", "UBUNTU"], var.gke_node_image_type)
-    error_message = "The gke_node_image_type must be one of COS, COS_CONTAINERD, or UBUNTU."
-  }
-}
-
-variable "gke_autoscaling_node_management" {
-  description = <<-EOT
-    (Optional) The management configuration for the Anyscale GKE cluster.
-
-    ex:
-    ```
-    gke_autoscaling_node_management = {
-      auto_repair  = true
-      auto_upgrade = true
-    }
-    ```
-  EOT
-  type = object({
-    auto_repair  = bool
-    auto_upgrade = bool
-  })
-  default = {
-    auto_repair  = true
-    auto_upgrade = true
-  }
-}
-
-variable "gke_autoscaling_upgrade_settings" {
-  description = <<-EOT
-    (Optional) The upgrade settings for the Anyscale GKE cluster.
-
-    ex:
-    ```
-    gke_autoscaling_upgrade_settings = {
-      max_surge       = 1
-      max_unavailable = 0
-      strategy        = "SURGE"
-    }
-    ```
-  EOT
-  type = object({
-    max_surge       = number
-    max_unavailable = number
-    strategy        = string
-  })
-  default = {
-    max_surge       = 1
-    max_unavailable = 0
-    strategy        = "SURGE"
-  }
-  validation {
-    condition     = contains(["SURGE", "REPLACE"], var.gke_autoscaling_upgrade_settings.strategy)
-    error_message = "The upgrade strategy must be one of SURGE or REPLACE."
-  }
-}
-
-variable "gke_autscaling_resource_limits" {
-  description = <<-EOT
-    (Optional) The resource limits for the Anyscale GKE cluster.
-
-    ex:
-    ```
-    gke_autscaling_resource_limits = {
-      memory = {
-        minimum = 0
-        maximum = 1000000000
-      }
-      cpu = {
-        minimum = 0
-        maximum = 1000000000
-      }
-    }
-    ```
-  EOT
-  type = object({
-    memory = object({ minimum = number, maximum = number })
-    cpu    = object({ minimum = number, maximum = number })
-  })
-  default = {
-    memory = {
-      minimum = 0
-      maximum = 1000000000
-    }
-    cpu = {
-      minimum = 0
-      maximum = 1000000000
-    }
-  }
 }
 
 # -----------------------------
@@ -783,6 +713,8 @@ variable "remove_default_node_pool" {
 variable "default_node_pool_initial_node_count" {
   description = <<-EOT
     (Optional) The number of nodes to create in this cluster's default node pool.
+
+    Required, even if `remove_default_node_pool` is set.
 
     ex:
     ```

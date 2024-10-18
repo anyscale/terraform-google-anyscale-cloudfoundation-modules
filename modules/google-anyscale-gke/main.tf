@@ -27,6 +27,23 @@ locals {
   gke_autopilot_cluster_enabled = local.module_enabled && var.gke_cluster_type == "autopilot" ? true : false
   gke_standard_cluster_enabled  = local.module_enabled && var.gke_cluster_type == "standard" ? true : false
 
+  # Autoscaling Configurations
+  autoscaling_resources = var.gke_autoscaling_config.enabled ? concat(
+    [
+      {
+        resource_type = "cpu"
+        minimum       = var.gke_autoscaling_config.min_cpu_cores
+        maximum       = var.gke_autoscaling_config.max_cpu_cores
+      },
+      {
+        resource_type = "memory"
+        minimum       = var.gke_autoscaling_config.min_memory_gb
+        maximum       = var.gke_autoscaling_config.max_memory_gb
+      }
+    ],
+    var.gke_autoscaling_config.gpu_resources
+  ) : []
+
   # Get the latest master version for the region and zone if the version is set to "latest"
   master_version_regional = var.kubernetes_version != "latest" ? var.kubernetes_version : data.google_container_engine_versions.region.latest_master_version
   master_version_zonal    = var.kubernetes_version != "latest" ? var.kubernetes_version : data.google_container_engine_versions.zone.latest_master_version
@@ -64,8 +81,10 @@ resource "random_shuffle" "available_zones" {
 
 
 resource "google_container_cluster" "anyscale_dataplane_standard" {
+  # checkov:skip=CKV_GCP_61: VPC Flow logs not configured in this module
   # checkov:skip=CKV_GCP_65: 'RBAC Controls' not implemented in this module.
-  # checkov:skip=CKV_GCP_24: This check is failing to run
+  # checkov:skip=CKV_GCP_21: Labels are implemented as an optional variable
+  # checkov:skip=CKV_GCP_68: Secure Boot is the default for the autoscaling, but can be configured by the end user
   count = local.gke_standard_cluster_enabled ? 1 : 0
 
   name                = local.gke_name_computed
@@ -178,52 +197,73 @@ resource "google_container_cluster" "anyscale_dataplane_standard" {
     }
   }
 
-  node_config {
-    workload_metadata_config {
-      mode = "GKE_METADATA"
-    }
-    shielded_instance_config {
-      enable_secure_boot          = true
-      enable_integrity_monitoring = true
-    }
-  }
   workload_identity_config {
     workload_pool = local.workload_pool_identity
   }
 
-  dynamic "cluster_autoscaling" {
-    for_each = var.enable_gke_autoscaling ? [true] : []
-    content {
-      enabled = var.enable_gke_autoscaling
-      # https://cloud.google.com/kubernetes-engine/docs/concepts/cluster-autoscaler#autoscaling_profiles
-      # prioritizes keeping more resources readily available for incoming pods
-      autoscaling_profile = var.gke_autoscaling_profile
-      auto_provisioning_defaults {
+  node_config {
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+  }
+
+  cluster_autoscaling {
+
+    enabled = var.gke_autoscaling_config.enabled
+
+    dynamic "auto_provisioning_defaults" {
+      for_each = var.gke_autoscaling_config.enabled ? [true] : []
+      content {
         service_account = var.gke_cluster_gcp_iam_service_account
         oauth_scopes = [
           "https://www.googleapis.com/auth/cloud-platform"
         ]
-        disk_size  = var.gke_cluster_default_disk_config.disk_size
-        disk_type  = var.gke_cluster_default_disk_config.disk_type
-        image_type = var.gke_node_image_type
+
+        disk_size  = coalesce(var.gke_autoscaling_config.disk_size_gb, 500)
+        disk_type  = coalesce(var.gke_autoscaling_config.disk_type, "pd-balanced")
+        image_type = coalesce(var.gke_autoscaling_config.image_type, "COS-CONTAINERD")
+
         management {
-          auto_repair  = var.gke_autoscaling_node_management.auto_repair
-          auto_upgrade = var.gke_autoscaling_node_management.auto_upgrade
+          auto_repair  = var.gke_autoscaling_config.auto_repair
+          auto_upgrade = var.gke_autoscaling_config.auto_upgrade
         }
+
         upgrade_settings {
-          max_surge       = var.gke_autoscaling_upgrade_settings.max_surge
-          max_unavailable = var.gke_autoscaling_upgrade_settings.max_unavailable
-          strategy        = var.gke_autoscaling_upgrade_settings.strategy
+          strategy        = lookup(var.gke_autoscaling_config, "upgrade_strategy", "SURGE")
+          max_surge       = lookup(var.gke_autoscaling_config, "upgrade_strategy", "SURGE") == "SURGE" ? lookup(var.gke_autoscaling_config, "max_surge", 1) : null
+          max_unavailable = lookup(var.gke_autoscaling_config, "upgrade_strategy", "SURGE") == "SURGE" ? lookup(var.gke_autoscaling_config, "max_unavailable", 0) : null
+
+          dynamic "blue_green_settings" {
+            for_each = lookup(var.gke_autoscaling_config, "upgrade_strategy", "SURGE") == "BLUE_GREEN" ? [true] : []
+            content {
+              node_pool_soak_duration = lookup(var.gke_autoscaling_config, "node_pool_soak_duration", null)
+
+              standard_rollout_policy {
+                batch_soak_duration = var.gke_autoscaling_config.batch_soak_duration
+                batch_percentage    = lookup(var.gke_autoscaling_config, "batch_percentage", null)
+                batch_node_count    = lookup(var.gke_autoscaling_config, "batch_node_count", null)
+              }
+            }
+          }
+        }
+
+        shielded_instance_config {
+          enable_secure_boot          = var.gke_autoscaling_config.secure_boot_enabled
+          enable_integrity_monitoring = var.gke_autoscaling_config.integrity_monitoring_enabled
         }
       }
+    }
 
-      dynamic "resource_limits" {
-        for_each = var.gke_autscaling_resource_limits != null ? toset(keys(var.gke_autscaling_resource_limits)) : []
-        content {
-          resource_type = resource_limits.value
-          minimum       = var.gke_autscaling_resource_limits[resource_limits.value].minimum
-          maximum       = var.gke_autscaling_resource_limits[resource_limits.value].maximum
-        }
+    auto_provisioning_locations = var.gke_autoscaling_config.enabled ? local.gke_node_locations : []
+
+    autoscaling_profile = coalesce(var.gke_autoscaling_config.autoscaling_profile, "BALANCED")
+
+    dynamic "resource_limits" {
+      for_each = local.autoscaling_resources
+      content {
+        resource_type = resource_limits.value["resource_type"]
+        minimum       = resource_limits.value["minimum"]
+        maximum       = resource_limits.value["maximum"]
       }
     }
   }
