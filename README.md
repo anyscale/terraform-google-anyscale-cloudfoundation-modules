@@ -12,7 +12,7 @@ This repository's [Terraform] modules build the foundational cloud resources nee
 
 ## Google Cloud Resources
 
-The [Anyscale GCP Deployment Guide](https://docs.anyscale.com/cloud-deployment/gcp/deploy-cloud) details the minimum required resources for deploying Anyscale on GCP. This module can be used to build the resources to support Customer Defined Networking Clouds (diagrammed below) and Direct Networking Clouds.
+The [Anyscale GCP Deployment Guide](https://docs.anyscale.com/administration/cloud-deployment/deploy-gcp-cloud) details the minimum required resources for deploying Anyscale on GCP. This module can be used to build the resources to support Customer Defined Networking Clouds (diagrammed below) and Direct Networking Clouds.
 
 <img src="https://docs.anyscale.com/assets/images/gcp-customer-defined-networking-dc6762cbc8412dfdeb1a7b41361236cc.png" alt="Customer Defined Networking" width="800"/>
 
