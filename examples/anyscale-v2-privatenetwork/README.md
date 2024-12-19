@@ -8,7 +8,7 @@ Creates a v2 stack including:
 - Enabling Cloud APIs on the Project
 - Cloud Storage Bucket - Standard
 - IAM Roles
-- VPC with publicly routed subnets (no internal)
+- VPC with privately routed subnets (no external)
 - VPC Firewall
 - FileStore
 - Memorystore
