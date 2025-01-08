@@ -2,8 +2,6 @@
 # GKE Cluster Service Account
 # --------------------------------------------------------------
 locals {
-  google_region = coalesce(var.google_region, data.google_client_config.current.region)
-
   gke_cluster_sa_enabled = var.module_enabled && var.create_gke_cluster_service_acct ? true : false
 
   gke_cluster_sa_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale GKE cluster Service Account ${var.anyscale_cloud_id} in region ${local.google_region}" : null
