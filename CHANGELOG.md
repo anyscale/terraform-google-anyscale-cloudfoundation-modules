@@ -1,3 +1,136 @@
+## 0.16.2 (Released)
+FEATURES:
+
+BUG FIXES:
+- Fix IAM SA Description when passing in a Cloud ID
+  - When passing in an Cloud ID, the IAM SA description was trying to add var.google_region however this variable was always null. This caused the IAM SA to fail to create.
+
+BREAKING CHANGES:
+
+OTHER:
+- Uupdates to pre-commit-config.yaml to update to the latest hook versions.
+
+## 0.16.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- E2E test - Additional sleeps for cloud resource deletion
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.16.0 (Released)
+FEATURES:
+- Update CloudStorage from binding to member for IAM policies.
+
+BUG FIXES:
+- Fix firewall Port Assignments were not correctly getting pulled in.
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.15.3 (Released)
+FEATURES:
+
+BUG FIXES:
+- Fix Firewall Rule Names
+  - The firewall rule names were not properly getting pulled from the variable when pulling from the predefined_firewall_rules.
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.15.2 (Released)
+FEATURES:
+
+BUG FIXES:
+- Provide additional outputs and roles for K8s deployments
+  - The new Anyscale K8s Operator has additional permission requirements which have been added to this.
+  - Additional changes to support memberoutputs for IAM Service Accounts.
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.15.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- Add additional ports for Anyscale Machine Pools.
+  - Additional ports opened up for AMP in the `google-anyscale-vpc-firewall` module. The initial ports were only for AMP and did not include Ray specific ports.
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.15.0 (Released)
+FEATURES:
+- add: Optional VPC Firewall ingress rule for Anyscale Machine Pools
+  - Anyscale Machine Pools requires a specific set of ports to be open from the AMP Node into (ingress) the head node running in the cloud. This update includes an optional parameter ingress_from_machine_pool_cidr_ranges which, when provided, will create a new Firewall Rule allowing the appropriate ports for Anyscale Machine Pools.
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.14.4 (Released)
+FEATURES:
+
+BUG FIXES:
+- VPC Firewall ingress for GCP Health Check
+  - The GCP Health Check only needs to be valid for port 8000. The previous fix removed that limitation and opened up all TCP ports.
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.14.3 (Released)
+FEATURES:
+
+BUG FIXES:
+- VPC Firewall when using CIDR Ingress Range
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.14.2 (Released)
+FEATURES:
+
+BUG FIXES:
+- VPC Firewall for Proxy-Only Subnet and Subnet Firewall Rule
+  - When the VPC Proxy Subnet was not in the same CIDR range as the rest of the VPC, the firewall rule was not being correctly configured for the proxy subnet. This change fixes the firewall rule to allow traffic from the proxy subnet to the rest of the VPC and provides a test in the `examples/anyscale-v2-privatenetwork` folder.
+
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.14.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- iam: add storage.objects.list to control plane role
+  - The Workspace dependencies tab requires storage.objects.list permissions.
+
+BREAKING CHANGES:
+
+OTHER:
+
+## 0.14.0 (Released)
+FEATURES:
+- IAM change *_iam_binding to *_iam_members
+  - The current use of *_iam_binding resources is authoritative. It doesn't allow users to add or update members. Changed to use *_iam_members which is non-authoritative. This will be more flexbible and easier to integrate for our users.
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.13.1 (Released)
 FEATURES:
 
