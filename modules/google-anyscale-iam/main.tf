@@ -1,10 +1,11 @@
 locals {
   random_char_length = var.random_char_length >= 4 && var.random_char_length % 2 == 0 ? var.random_char_length / 2 : 0
 
+  google_region           = coalesce(var.google_region, data.google_client_config.current.region)
   anyscale_aws_account_id = var.workload_anyscale_aws_account_id != null ? var.workload_anyscale_aws_account_id : var.anyscale_access_aws_account_id
 
   anyscale_access_service_acct_enabled    = var.module_enabled && var.create_anyscale_access_service_acct ? true : false
-  anyscale_access_service_acct_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale access service account for cloud ${var.anyscale_cloud_id} in region ${var.google_region}" : null
+  anyscale_access_service_acct_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale access service account for cloud ${var.anyscale_cloud_id} in region ${local.google_region}" : null
   anyscale_access_service_acct_desc = coalesce(
     var.anyscale_access_service_acct_description,
     local.anyscale_access_service_acct_desc_cloud,
@@ -123,7 +124,7 @@ resource "google_service_account_iam_member" "anyscale_workload_identity_user" {
 locals {
   cluster_node_role_enabled = var.module_enabled && var.create_anyscale_cluster_node_service_acct ? true : false
 
-  anyscale_cluster_node_service_acct_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale cluster node role for cloud ${var.anyscale_cloud_id} in region ${var.google_region}" : null
+  anyscale_cluster_node_service_acct_desc_cloud = var.anyscale_cloud_id != null ? "Anyscale cluster node role for cloud ${var.anyscale_cloud_id} in region ${local.google_region}" : null
   anyscale_cluster_node_service_acct_desc = coalesce(
     var.anyscale_cluster_node_service_acct_description,
     local.anyscale_cluster_node_service_acct_desc_cloud,
