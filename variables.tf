@@ -1070,7 +1070,7 @@ variable "anyscale_filestore_tier" {
   description = <<-EOT
     (Optional) The tier of the filestore to create.
 
-    Must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`.
+    Supported values include `STANDARD`, `PREMIUM`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE`, `ZONAL`, and `REGIONAL`.
 
     ex:
     ```
@@ -1080,8 +1080,8 @@ variable "anyscale_filestore_tier" {
   type        = string
   default     = "STANDARD"
   validation {
-    condition     = contains(["STANDARD", "PREMIUM", "BASIC_HDD", "BASIC_SSD", "HIGH_SCALE_SSD", "ENTERPRISE"], var.anyscale_filestore_tier)
-    error_message = "The `anyscale_filestore_tier` must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`."
+    condition     = contains(["STANDARD", "PREMIUM", "BASIC_HDD", "BASIC_SSD", "HIGH_SCALE_SSD", "ENTERPRISE", "ZONAL", "REGIONAL"], var.anyscale_filestore_tier)
+    error_message = "The `anyscale_filestore_tier` must be one of `STANDARD`, `PREMIUM`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE`, `ZONAL`, or `REGIONAL`."
   }
 }
 
