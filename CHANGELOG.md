@@ -1,3 +1,13 @@
+## 0.16.3 (Released)
+FEATURES:
+
+BUG FIXES:
+- Add missing Filestore Tier types: Regional, Zonal
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.16.2 (Released)
 FEATURES:
 
