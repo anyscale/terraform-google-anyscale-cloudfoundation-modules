@@ -1563,7 +1563,7 @@ variable "enable_anyscale_loggingsink" {
   description = <<-EOT
     (Optional) Determines if the Anyscale Logging Sink sub-module is executed.
 
-    This sub-module will disable sending syslog events to the `_Default` Log Sink.
+    This sub-module will disable sending syslog events to the `_Default` Log Sink which can lead to extra logging costs.
 
     ex:
     ```hcl
