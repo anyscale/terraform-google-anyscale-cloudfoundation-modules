@@ -6,27 +6,26 @@
 # Terraform Modules for Anyscale Cloud Foundations on Google
 This repository's [Terraform] modules build the foundational cloud resources needed to run Anyscale in a cloud environment. This module and sub-modules support Google Cloud.
 
-**THIS IS PROVIDED AS A STARTING POINT**
-
 **USE AT YOUR OWN RISK**
 
 ## Google Cloud Resources
 
-The [Anyscale GCP Deployment Guide](https://docs.anyscale.com/administration/cloud-deployment/deploy-gcp-cloud) details the minimum required resources for deploying Anyscale on GCP. This module can be used to build the resources to support Customer Defined Networking Clouds (diagrammed below) and Direct Networking Clouds.
+The [Anyscale GCP Deployment Guide](https://docs.anyscale.com/administration/cloud-deployment/deploy-gcp-cloud) details the minimum required resources for deploying Anyscale on GCP. This module builds the resources to support Customer Defined Networking Clouds (diagrammed below) and Direct Networking Clouds.
 
 <img src="https://docs.anyscale.com/assets/images/gcp-customer-defined-networking-dc6762cbc8412dfdeb1a7b41361236cc.png" alt="Customer Defined Networking" width="800"/>
 
 To streamline long-term management and enable customization, we've modularized the resources into the following Terraform sub-modules:
+
 * google-anyscale-cloudapis - This enables the Google Cloud APIs necessary for Anyscale to work
-* google-anyscale-cloudstorage - This builds a Cloud Storage bucket, which Anyscale uses to store cluster logs and shared resources.
+* google-anyscale-cloudstorage - This creates a Cloud Storage bucket, which Anyscale uses to store cluster logs and shared resources.
 * google-anyscale-filestore - This builds a FileStore and mount points, which Workspaces use.
-* google-anyscale-iam - This builds IAM roles and policies. One role for cross-account access from the Anyscale Control Plane, and one for compute/clusters to use.
-* google-anyscale-project - This builds a base Google Project
-* google-anyscale-vpc - This builds a rudimentary Google VPC
-* google-anyscale-vpc-firewall - This builds the required Google VPC Firewall Policy
+* google-anyscale-iam - This creates IAM Service Accounts, policies, and roles. One role for cross-account access from the Anyscale Control Plane, and one for compute/clusters to use.
+* google-anyscale-project - This creates a base Google Project
+* google-anyscale-vpc - This creates a rudimentary Google VPC
+* google-anyscale-vpc-firewall - This creates the required Google VPC Firewall Policy
 * google-anyscale-memorystore - This (optional) module creates a Memorystore resource used for Anyscale Services Head Node High Availability. To use, make sure to set `enable_anyscale_memorystore` properly.
 
-These sub-modules should only be called from the root module (current location).
+These sub-modules can be called from this (the root module) or individually.
 
 ### Customization
 
@@ -34,23 +33,45 @@ These modules are designed with best practices in mind, ensuring a secure, effic
 
 If you choose to disable a module, creating and managing that resource shifts to you. This flexibility is ideal if you have existing network setups (e.g., VPCs) or need tailored configurations for Buckets, IAM, Filestore, or other services. The Anyscale GCP Terraform Modules are particularly useful for integrating Anyscale components with pre-existing infrastructure, ensuring a smooth blend between what you already have and need.
 
-### Examples
+## Examples
 The examples folder has several common use cases that have been tested. These include:
 
 * Anyscale v2
-  * anyscale-v2: Build everything with minimal parameters (primarily used for testing)
-  * anyscale-v2-commonname: Build everything, use a common name for all resources
-  * anyscale-v2-privatenetwork: Build everything but with a private network - includes Memorystore resources
-  * anyscale-v2-existingproject: Build everything except the project
-  * anyscale-v2-existingvpc: Build everything except the VPC
-  * anyscale-v2-kitchensink: Build everything with as many parameters as possible
-  * anyscale-v2-vpc-shared: Build evertything but use an existing VPC shared from a different Anyscale Project
+  * [anyscale-v2-commonname](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-commonname): Build everything, use a common name for all resources
+  * [anyscale-v2-privatenetwork](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-privatenetwork): Build everything but with a private network - includes Memorystore resources
+  * [anyscale-v2-existingproject](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-existingproject): Build everything except the project
+  * [anyscale-v2-kitchensink](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-kitchensink): Build everything with as many parameters as possible
+  * [anyscale-v2-vpc-shared](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-vpc-shared): Build evertything but use an existing VPC shared from a different Anyscale Project
+  * [anyscale-v2-existingidentityfederation](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-existingidentityfederation): Use an existing Workload Identity Federation Ressource and Project.
 
 These examples will include an output that can be run with the Anyscale CLI to build an Anyscale Cloud with the Google resources.
 Additional examples can be requested via an [issues] ticket.
 
-Example Cloud Register command for GCP:
+## Usage
+
+The following is the bare-minimum requirements for executing the module. More detailed examples can be found above.
+
+```hcl
+module "google_anyscale_v2" {
+  source = "anyscale/anyscale-cloudfoundation-modules/google"
+
+  # Anyscale Organization ID
+  anyscale_organization_id = "org_zzz1234567890yyy"
+
+  # Google Cloud Project Variables
+  anyscale_project_billing_account = "12345678912"
+  anyscale_project_folder_id       = "project_folder_id"
+
+  # CIDR Range for the VPC
+  anyscale_vpc_public_subnet_cidr = "172.24.100.0/22"
+
+  # Firewall Ingress CIDR Range (Your Public/Private IP Addresses used to access Anyscale)
+  anyscale_vpc_firewall_allow_access_from_cidrs = "10.100.0.0/22"
+}
 ```
+
+Example Anyscale Cloud registration command for GCP:
+```bash
 anyscale cloud register --provider gcp \
 --name gce-anyscale-tf-test-1 \
 --vpc-name anyscale-tf-test-1 \
