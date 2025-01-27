@@ -1,3 +1,33 @@
+## 0.17.2 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Additional root-module Readme and variable definition updates
+
+## 0.17.1 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- General root-module Readme updates
+
+## 0.17.0 (Released)
+FEATURES:
+- Add additional GKE Configuration Options
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.16.3 (Released)
 FEATURES:
 

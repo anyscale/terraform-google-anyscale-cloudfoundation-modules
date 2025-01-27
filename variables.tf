@@ -831,7 +831,7 @@ variable "anyscale_bucket_location" {
 }
 
 variable "anyscale_bucket_storage_class" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) Bucket storage class.
 
     Must be one of: STANDARD, MULTI_REGIONAL, REGIONAL, NEARLINE, COLDLINE, ARCHIVE
@@ -840,7 +840,7 @@ variable "anyscale_bucket_storage_class" {
     ```
     anyscale_bucket_storage_class = "STANDARD"
     ```
-  EOF
+  EOT
   type        = string
   default     = "STANDARD"
   validation {
@@ -863,7 +863,7 @@ variable "anyscale_bucket_lifecycle_rules" {
   description = <<-EOT
     (Optional) List of lifecycle rules to configure.
 
-    Format is the same as described in provider documentation https://www.terraform.io/docs/providers/google/r/storage_bucket.html#lifecycle_rule except condition.matches_storage_class should be a comma delimited string.
+    Format is the same as described in the [GCP provider documentation](https://www.terraform.io/docs/providers/google/r/storage_bucket.html#lifecycle_rule) except `condition.matches_storage_class` should be a comma delimited string.
 
     ex:
     ```
@@ -1286,7 +1286,7 @@ variable "anyscale_access_role_description" {
 
 
 variable "existing_workload_identity_provider_name" {
-  description = <<-EOF
+  description = <<-EOT
     (Optional) The name of an existing workload identity provider to use.
 
     If provided, will skip creating the workload identity pool and provider. The Workload Identity Provider can be in a different project.
@@ -1300,7 +1300,7 @@ variable "existing_workload_identity_provider_name" {
     ```
     existing_workload_identity_provider_name = "projects/1234567890/locations/global/workloadIdentityPools/anyscale-access-pool/providers/anyscale-access-provider"
     ```
-  EOF
+  EOT
   type        = string
   default     = null
 }
@@ -1561,12 +1561,12 @@ variable "anyscale_memorystore_labels" {
 # --------------------------------------------
 variable "enable_anyscale_loggingsink" {
   description = <<-EOT
-    (Optional) Determines if the Anyscale Logging Sink is executed.
+    (Optional) Determines if the Anyscale Logging Sink sub-module is executed.
 
-    This sub-module will disable sending syslog events to the `_Default` Log Sink.
+    This sub-module will disable sending syslog events to the `_Default` Log Sink which can lead to extra logging costs.
 
     ex:
-    ```
+    ```hcl
     enable_anyscale_loggingsink = true
     ```
   EOT
