@@ -83,7 +83,7 @@ variable "labels" {
   description = "(Optional) A map of labels to all resources that accept labels."
   type        = map(string)
   default = {
-    "test" : true,
+    "test" : "true",
     "environment" : "test"
   }
 }

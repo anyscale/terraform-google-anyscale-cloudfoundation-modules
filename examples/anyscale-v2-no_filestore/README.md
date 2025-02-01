@@ -48,7 +48,7 @@ No resources.
 | <a name="input_root_folder_number"></a> [root\_folder\_number](#input\_root\_folder\_number) | (Required) Google Folder number to deploy Anyscale resources. Will create a new sub-project by default. | `string` | n/a | yes |
 | <a name="input_anyscale_cloud_id"></a> [anyscale\_cloud\_id](#input\_anyscale\_cloud\_id) | (Optional) Anyscale Cloud ID. Default is `null`. | `string` | `null` | no |
 | <a name="input_anyscale_deploy_env"></a> [anyscale\_deploy\_env](#input\_anyscale\_deploy\_env) | (Required) Anyscale deploy environment. Used in resource names and tags. | `string` | `"production"` | no |
-| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of labels to all resources that accept labels. | `map(string)` | <pre>{<br/>  "environment": "test",<br/>  "test": true<br/>}</pre> | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | (Optional) A map of labels to all resources that accept labels. | `map(string)` | <pre>{<br/>  "environment": "test",<br/>  "test": "true"<br/>}</pre> | no |
 
 ## Outputs
 
