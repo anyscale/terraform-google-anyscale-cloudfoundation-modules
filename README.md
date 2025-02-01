@@ -43,6 +43,8 @@ The examples folder has several common use cases that have been tested. These in
   * [anyscale-v2-kitchensink](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-kitchensink): Build everything with as many parameters as possible
   * [anyscale-v2-vpc-shared](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-vpc-shared): Build evertything but use an existing VPC shared from a different Anyscale Project
   * [anyscale-v2-existingidentityfederation](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-existingidentityfederation): Use an existing Workload Identity Federation Ressource and Project.
+  * [anyscale-v2-no_filestore](https://github.com/anyscale/terraform-google-anyscale-cloudfoundation-modules/tree/main/examples/anyscale-v2-no_filestore): Build everything except for the Filestore service, use a common name for all resources
+
 
 These examples will include an output that can be run with the Anyscale CLI to build an Anyscale Cloud with the Google resources.
 Additional examples can be requested via an [issues] ticket.
