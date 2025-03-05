@@ -117,12 +117,21 @@ variable "filestore_description" {
 }
 
 variable "filestore_tier" {
-  description = "(Optional) The tier of the filestore to create. Default is `STANDARD`."
+  description = <<-EOT
+    (Optional) The tier of the filestore to create. Default is `STANDARD`.
+
+    Supported values include `STANDARD`, `PREMIUM`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE`, `ZONAL`, and `REGIONAL`.
+
+    ex:
+    ```
+    filestore_tier = "STANDARD"
+    ```
+  EOT
   type        = string
   default     = "STANDARD"
   validation {
-    condition     = contains(["STANDARD", "PREMIUM", "BASIC_HDD", "BASIC_SSD", "HIGH_SCALE_SSD", "ENTERPRISE"], var.filestore_tier)
-    error_message = "The `filestore_tier` must be one of `STANDARD`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE` or `PREMIUM`."
+    condition     = contains(["STANDARD", "PREMIUM", "BASIC_HDD", "BASIC_SSD", "HIGH_SCALE_SSD", "ENTERPRISE", "ZONAL", "REGIONAL"], var.filestore_tier)
+    error_message = "The `filestore_tier` must be one of `STANDARD`, `PREMIUM`, `BASIC_HDD`, `BASIC_SSD`, `HIGH_SCALE_SSD`, `ENTERPRISE`, `ZONAL`, or `REGIONAL`."
   }
 }
 
