@@ -1376,7 +1376,7 @@ variable "anyscale_workload_identity_account_id" {
     ```
   EOT
   type        = string
-  default     = null
+  default     = 623395924981
 }
 
 variable "anyscale_cluster_node_service_acct_name" {
