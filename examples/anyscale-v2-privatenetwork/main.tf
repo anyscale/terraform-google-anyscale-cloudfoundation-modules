@@ -31,7 +31,8 @@ module "google_anyscale_v2_privatenetwork" {
   common_prefix   = "anyscale-prv-"
   use_common_name = true
   # Project Related
-  existing_project_id = var.existing_project_id
+  anyscale_project_billing_account = var.billing_acount_id
+  anyscale_project_folder_id       = var.root_project_id
 
   # VPC Related
   anyscale_vpc_private_subnet_cidr = "172.26.100.0/22"
