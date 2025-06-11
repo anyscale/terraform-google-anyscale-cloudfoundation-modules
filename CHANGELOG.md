@@ -1,3 +1,24 @@
+## 0.18.1 (Released)
+FEATURES:
+
+BUG FIXES:
+- Fixed for deployments where a VPC already exists and users do NOT want to create a Firewall.
+
+BREAKING CHANGES:
+
+OTHER:
+- Example for Anyscale deployments with an Existing VPC.
+
+## 0.18.0 (Released)
+FEATURES:
+- Add permissions to manage Network Endpoint Groups
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+
 ## 0.17.3 (Released)
 FEATURES:
 

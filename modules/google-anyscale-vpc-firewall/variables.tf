@@ -12,6 +12,7 @@ variable "vpc_name" {
     ```
   EOT
   type        = string
+  default     = ""
 }
 
 variable "vpc_id" {
@@ -24,6 +25,7 @@ variable "vpc_id" {
     ```
   EOT
   type        = string
+  default     = ""
 }
 
 # ------------------------------------------------------------------------------

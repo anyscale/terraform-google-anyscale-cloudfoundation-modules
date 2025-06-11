@@ -55,8 +55,8 @@ variable "existing_vpc_name" {
     ```
   EOT
   type        = string
-  default     = null
 }
+
 
 variable "existing_vpc_subnet_name" {
   description = <<-EOT
@@ -71,41 +71,30 @@ variable "existing_vpc_subnet_name" {
     ```
   EOT
   type        = string
-  default     = null
 }
 
-variable "shared_vpc_project_id" {
+variable "existing_firewall_policy_name" {
   description = <<-EOT
-    (Required) Google project ID for the Shared VPC.
+    (Required) An existing firewall policy name.
 
-    If provided, the firewall resources will be created in the Shared VPC Project.
-
-    An existing VPC Name (`existing_vpc_name`) and existing Subnet Name (`existing_vpc_subnet_name`) are also required when this is provided.
+    If provided, this will be used in the cloud registration output.
+    This example expects an existing VPC and Firewall meeting [Anyscale Requirements](https://docs.anyscale.com/administration/cloud-deployment/deploy-gcp-cloud#3-choose-an-anyscale-cloud-deployment-method).
 
     ex:
     ```
-    shared_vpc_project_id = "anyscale-vpc"
+    existing_firewall_policy_name = "anyscale-firewall-policy"
     ```
   EOT
   type        = string
-  default     = null
 }
 
-variable "customer_ingress_cidr_ranges" {
-  description = <<-EOT
-    The IPv4 CIDR blocks that allows access Anyscale clusters.
-    These are added to the firewall and allows port 443 (https) and 22 (ssh) access.
-    ex: `52.1.1.23/32,10.1.0.0/16'
-  EOT
-  type        = string
-}
 
 # ------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
 variable "anyscale_deploy_env" {
-  description = "(Optional) Anyscale deploy environment. Used in resource names and tags."
+  description = "(Required) Anyscale deploy environment. Used in resource names and tags."
   type        = string
   validation {
     condition = (
@@ -138,17 +127,4 @@ variable "labels" {
     "test" : true,
     "environment" : "test"
   }
-}
-
-variable "enable_anyscale_vpc_firewall" {
-  description = <<-EOT
-    (Optional) Determines if the Anyscale VPC Firewall is created.
-
-    ex:
-    ```
-    enable_anyscale_vpc_firewall = true
-    ```
-  EOT
-  type        = bool
-  default     = true
 }
