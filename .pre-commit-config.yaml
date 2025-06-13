@@ -12,9 +12,9 @@ repos:
       - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
-      # - id: terraform_trivy
-      #   args:
-      #     - --args=--quiet
+      - id: terraform_trivy # Known issues with trivy v0.62+ due to null values in some parameters
+        args:
+          - --args=--quiet
       - id: terraform_checkov
         args:
           - --args=--quiet
