@@ -53,7 +53,7 @@ variable "customer_ingress_cidr_ranges" {
 # These variables have defaults, but may be overridden.
 # ------------------------------------------------------------------------------
 variable "anyscale_deploy_env" {
-  description = "(Required) Anyscale deploy environment. Used in resource names and tags."
+  description = "(Optional) Anyscale deploy environment. Used in resource names and tags."
   type        = string
   validation {
     condition = (

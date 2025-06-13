@@ -21,20 +21,6 @@ variable "anyscale_organization_id" {
   }
 }
 
-variable "anyscale_vpc_firewall_allow_access_from_cidrs" {
-  description = <<-EOT
-    (Required) Comma delimited string of IPv4 CIDRs
-
-    CIDR ranges to allow access to Anyscale resources. This should be the list of CIDR ranges that have access to the clusters. Public or private IPs are supported.
-    SSH and HTTPs ports will be opened to these CIDR ranges.
-
-    ex:
-    ```
-    anyscale_vpc_firewall_allow_access_from_cidrs = "10.0.1.0/24,24.1.24.24/32"
-    ```
-  EOT
-  type        = string
-}
 
 # ------------------------------------------------------------------------------
 # OPTIONAL VARIABLES
@@ -689,6 +675,22 @@ variable "enable_anyscale_vpc_firewall" {
   EOT
   type        = bool
   default     = true
+}
+
+variable "anyscale_vpc_firewall_allow_access_from_cidrs" {
+  description = <<-EOT
+    (Optional) Comma delimited string of IPv4 CIDRs
+
+    CIDR ranges to allow access to Anyscale resources. This should be the list of CIDR ranges that have access to the clusters. Public or private IPs are supported.
+    SSH and HTTPs ports will be opened to these CIDR ranges.
+
+    ex:
+    ```
+    anyscale_vpc_firewall_allow_access_from_cidrs = "10.0.1.0/24,24.1.24.24/32"
+    ```
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "anyscale_vpc_firewall_policy_name" {

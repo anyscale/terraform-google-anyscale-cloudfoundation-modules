@@ -78,7 +78,7 @@ module "google_anyscale_v2_kitchensink" {
       max_age_seconds  = 3600
     }
   ]
-  bucket_iam_binding_override_roles = ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
+  # bucket_iam_binding_override_roles = ["roles/storage.objectAdmin", "roles/storage.legacyBucketReader"]
 
   # Filestore Related
   enable_anyscale_filestore         = true

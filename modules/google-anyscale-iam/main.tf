@@ -47,13 +47,6 @@ resource "google_service_account" "anyscale_access_service_acct" {
   project     = var.anyscale_project_id
 }
 
-#tfsec:ignore:google-iam-no-project-level-service-account-impersonation
-# resource "google_project_iam_member" "anyscale_access_service_acct" {
-#   for_each = local.anyscale_access_service_acct_enabled ? toset(var.anyscale_access_service_acct_project_permissions) : []
-#   role     = each.key
-#   project  = var.anyscale_project_id
-#   member   = "serviceAccount:${google_service_account.anyscale_access_service_acct[0].email}"
-# }
 resource "google_project_iam_member" "anyscale_access_service_acct" {
   count   = local.anyscale_access_service_acct_enabled && (local.anyscale_access_serviceacct_role_enabled || var.existing_anyscale_access_role_name != null) ? 1 : 0
   role    = coalesce(google_project_iam_custom_role.anyscale_access_role[0].name, var.existing_anyscale_access_role_name)
@@ -82,6 +75,7 @@ resource "google_iam_workload_identity_pool" "anyscale_pool" {
 }
 
 resource "google_iam_workload_identity_pool_provider" "anyscale_pool" {
+  #checkov:skip=CKV_GCP_125:Not a GithubAction OIDC Provider
   count   = local.create_workload_identity_pool ? 1 : 0
   project = var.anyscale_project_id
 

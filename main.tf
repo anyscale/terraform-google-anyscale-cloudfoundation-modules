@@ -183,8 +183,8 @@ module "google_anyscale_vpc_firewall_policy" {
   ]
   anyscale_project_id = local.vpc_project_id
 
-  vpc_name = coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name)
-  vpc_id   = coalesce(var.existing_vpc_id, module.google_anyscale_vpc.vpc_id)
+  vpc_name = local.execute_vpc_firewall_sub_module ? coalesce(var.existing_vpc_name, module.google_anyscale_vpc.vpc_name) : ""
+  vpc_id   = local.execute_vpc_firewall_sub_module ? coalesce(var.existing_vpc_id, module.google_anyscale_vpc.vpc_id) : ""
 
   firewall_policy_name        = local.firewall_policy_name
   firewall_policy_description = var.anyscale_vpc_firewall_policy_description
