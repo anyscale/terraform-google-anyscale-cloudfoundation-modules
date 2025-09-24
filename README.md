@@ -72,6 +72,10 @@ module "google_anyscale_v2" {
 }
 ```
 
+### Cloud Registration Command
+
+Each example includes an example `anyscale cloud register` command for creating the Cloud.
+
 Example Anyscale Cloud registration command for GCP:
 ```bash
 anyscale cloud register --provider gcp \
@@ -89,6 +93,43 @@ anyscale cloud register --provider gcp \
 --provider-name projects/123456789012/locations/global/workloadIdentityPools/anyscale-tf-test-1/providers/private-cloud
 --memorystore-instance-name anyscale-memorystore
 --private-network
+```
+
+### Cloud Resource Creation Command
+
+All example modules now include an `anyscale_cloud_resource_yaml` output that generates a YAML configuration file compatible with the `anyscale cloud resource create` command to enable multi-resource Clouds.
+
+Once a Cloud is initialized using `anyscale cloud register`, additional resources can be added using the following command:
+
+```bash
+# Save the YAML output to a file
+terraform output -raw anyscale_cloud_resource_yaml > cloud-resource.yaml
+
+# Create the cloud resource using the YAML file
+anyscale cloud resource create --resources-file cloud-resource.yaml
+```
+
+Example Anyscale Cloud resource YAML for GCP:
+```yaml
+name: vm-gcp-us-central1
+provider: GCP
+compute_stack: VM
+region: us-central1
+networking_mode: PUBLIC
+object_storage:
+  bucket_name: gs://anyscale-bucket-name
+file_storage:
+  file_storage_id: projects/my-project/locations/us-central1-a/instances/anyscale-filestore
+gcp_config:
+  project_id: my-project-id
+  vpc_name: anyscale-vpc
+  subnet_names:
+    - anyscale-vpc-public
+  firewall_policy_names:
+    - anyscale-firewall-policy
+  anyscale_service_account_email: anyscale-access@my-project.iam.gserviceaccount.com
+  cluster_service_account_email: anyscale-cluster@my-project.iam.gserviceaccount.com
+  provider_name: projects/123456789012/locations/global/workloadIdentityPools/anyscale-pool/providers/anyscale-provider
 ```
 
 ## Reporting Issues

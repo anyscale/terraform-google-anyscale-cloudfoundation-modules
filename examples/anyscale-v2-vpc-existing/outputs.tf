@@ -17,3 +17,32 @@ output "registration_command" {
     --private-network
   EOT
 }
+
+output "anyscale_cloud_resource_yaml" {
+  description = <<-EOF
+    Anyscale cloud resource YAML configuration for Google Cloud Platform with shared VPC.
+    This output can be saved to a file and used with `anyscale cloud resource create` command.
+    The name is auto-generated as vm-gcp-$${var.anyscale_google_region} but can be updated in the YAML file if needed.
+  EOF
+  value = <<-EOT
+name: vm-gcp-${var.anyscale_google_region}
+provider: GCP
+compute_stack: VM
+region: ${var.anyscale_google_region}
+networking_mode: PRIVATE
+object_storage:
+  bucket_name: gs://${module.google_anyscale_v2_vpc_existing.cloudstorage_bucket_name}
+file_storage:
+  file_storage_id: projects/${var.existing_project_id}/locations/${module.google_anyscale_v2_vpc_existing.filestore_location}/instances/${module.google_anyscale_v2_vpc_existing.filestore_name}
+gcp_config:
+  project_id: ${var.existing_project_id}
+  vpc_name: ${var.existing_vpc_name}
+  subnet_names:
+    - ${var.existing_vpc_subnet_name}
+  firewall_policy_names:
+    - ${var.existing_firewall_policy_name}
+  anyscale_service_account_email: ${module.google_anyscale_v2_vpc_existing.iam_anyscale_access_service_acct_email}
+  cluster_service_account_email: ${module.google_anyscale_v2_vpc_existing.iam_anyscale_cluster_node_service_acct_email}
+  provider_name: ${module.google_anyscale_v2_vpc_existing.iam_workload_identity_provider_name}
+EOT
+}
