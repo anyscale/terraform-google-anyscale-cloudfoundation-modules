@@ -111,6 +111,10 @@ output "filestore_fileshare_name" {
   description = "The Google Filestore fileshare name."
   value       = try(module.google_anyscale_filestore.anyscale_filestore_fileshare_name, "")
 }
+output "filestore_ip_addresses" {
+  description = "The Google Filestore IP addresses."
+  value       = try(module.google_anyscale_filestore.anyscale_filestore_ip_addresses, "")
+}
 
 # ------------------------------------
 # IAM Resource Outputs

@@ -280,6 +280,7 @@ None
 | <a name="output_cloudstorage_bucket_url"></a> [cloudstorage\_bucket\_url](#output\_cloudstorage\_bucket\_url) | The Google Cloud Storage url for the bucket. Will be in the format `gs://<bucket-name>`. |
 | <a name="output_filestore_fileshare_name"></a> [filestore\_fileshare\_name](#output\_filestore\_fileshare\_name) | The Google Filestore fileshare name. |
 | <a name="output_filestore_id"></a> [filestore\_id](#output\_filestore\_id) | The Google Filestore id. |
+| <a name="output_filestore_ip_addresses"></a> [filestore\_ip\_addresses](#output\_filestore\_ip\_addresses) | The Google Filestore IP addresses. |
 | <a name="output_filestore_location"></a> [filestore\_location](#output\_filestore\_location) | The Google Filestore location. |
 | <a name="output_filestore_name"></a> [filestore\_name](#output\_filestore\_name) | The Google Filestore name. |
 | <a name="output_iam_anyscale_access_service_acct_email"></a> [iam\_anyscale\_access\_service\_acct\_email](#output\_iam\_anyscale\_access\_service\_acct\_email) | The Google IAM Anyscale Access Service Account email. |

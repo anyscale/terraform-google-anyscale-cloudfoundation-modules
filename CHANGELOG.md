@@ -1,3 +1,23 @@
+## 0.18.4 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Additional output for FileStore IP addresses
+
+## 0.18.3 (Released)
+FEATURES:
+
+BUG FIXES:
+
+BREAKING CHANGES:
+
+OTHER:
+- Output updates for examples to include cloud resources
+
 ## 0.18.1 (Released)
 FEATURES:
 
