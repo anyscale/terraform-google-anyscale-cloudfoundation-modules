@@ -195,7 +195,7 @@ variable "anyscale_project_name_prefix" {
     (Optional) The name prefix for the project.
 
     If `anyscale_project_name` is provided, it will override this variable.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
+    The variable `common_prefix` is a fall-back prefix if this is not provided.
 
     Default is `null` but is set to `anyscale-project-` in a local variable.
 
@@ -400,7 +400,7 @@ variable "anyscale_vpc_name_prefix" {
 
     Creates a unique VPC name beginning with the specified prefix.
     - If `anyscale_vpc_name` is provided, it will override this variable.
-    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - The variable `common_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-vpc-` in a local variable.
 
     ex:
@@ -807,7 +807,7 @@ variable "anyscale_bucket_prefix" {
 
     Creates a unique bucket name beginning with the specified prefix.
     - If `anyscale_bucket_name` is provided, it will override this variable.
-    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - The variable `common_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-` in a local variable.
 
     ex:
@@ -1017,7 +1017,7 @@ variable "anyscale_filestore_name_prefix" {
 
     Creates a unique filestore instance name beginning with the specified prefix.
     - If `anyscale_filestore_name` is provided, it will override this variable.
-    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - The variable `common_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-` in a local variable.
 
     ex:
@@ -1201,7 +1201,7 @@ variable "anyscale_iam_access_service_acct_name_prefix" {
 
     Creates a unique IAM Service Account name beginning with the specified prefix.
     - If `anyscale_iam_access_service_acct_name` is provided, it will override this variable.
-    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - The variable `common_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-crossacct-` in a local variable.
     - It needs to be > 4 chars and < 20 chars.
 
@@ -1411,7 +1411,7 @@ variable "anyscale_cluster_node_service_acct_name_prefix" {
 
     Creates a unique IAM role name beginning with the specified prefix.
     - If `anyscale_cluster_node_service_acct_name` is provided, it will override this variable.
-    - The variable `general_prefix` is a fall-back prefix if this is not provided.
+    - The variable `common_prefix` is a fall-back prefix if this is not provided.
     - Default is `null` but is set to `anyscale-cluster-` in a local variable.
     - It needs to be > 4 chars and < 20 chars.
 
@@ -1506,7 +1506,7 @@ variable "anyscale_memorystore_name_prefix" {
     If `anyscale_memorystore_name` is provided, it will override this variable.
 
     Because it is the prefix, it can end in a hyphen as it will have a random suffix appended to it.
-    The variable `general_prefix` is a fall-back prefix if this is not provided.
+    The variable `common_prefix` is a fall-back prefix if this is not provided.
 
     ex:
     ```
