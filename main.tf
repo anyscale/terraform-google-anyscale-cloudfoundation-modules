@@ -140,18 +140,17 @@ locals {
     var.allow_ssh_from_google_ui ? local.google_ui_cidr : null
   ]))
 
-  ingress_from_cidr_map = concat(
-    [
-      {
-        rule        = "https-443-tcp"
-        cidr_blocks = local.allow_access_from_cidrs
-      },
-      {
-        rule        = "ssh-tcp"
-        cidr_blocks = local.allow_access_from_cidrs
-      }
-    ],
-  )
+  ingress_from_cidr_map = concat([
+    {
+      rule        = "https-443-tcp"
+      cidr_blocks = local.allow_access_from_cidrs
+    }
+    ], var.security_group_enable_ssh_access ? [
+    {
+      rule        = "ssh-tcp"
+      cidr_blocks = local.allow_access_from_cidrs
+    }
+  ] : [])
 
   ingress_from_self_cidr_range = compact(
     [

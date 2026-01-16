@@ -75,3 +75,9 @@ variable "labels" {
     "environment" : "test"
   }
 }
+
+variable "security_group_enable_ssh_access" {
+  description = "(Optional) Enable SSH access in firewall rules."
+  type        = bool
+  default     = true
+}
