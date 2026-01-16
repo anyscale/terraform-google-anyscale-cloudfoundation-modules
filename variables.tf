@@ -682,7 +682,7 @@ variable "anyscale_vpc_firewall_allow_access_from_cidrs" {
     (Optional) Comma delimited string of IPv4 CIDRs
 
     CIDR ranges to allow access to Anyscale resources. This should be the list of CIDR ranges that have access to the clusters. Public or private IPs are supported.
-    SSH and HTTPs ports will be opened to these CIDR ranges.
+    HTTPS ports will be opened to these CIDR ranges. SSH is controlled by `security_group_enable_ssh_access`.
 
     ex:
     ```
@@ -717,6 +717,22 @@ variable "anyscale_vpc_firewall_policy_description" {
   EOT
   type        = string
   default     = "Anyscale VPC Firewall Policy"
+}
+
+variable "security_group_enable_ssh_access" {
+  description = <<-EOT
+    (Optional) Determines if SSH access is allowed from configured CIDR ranges.
+
+    When set to false, the SSH (port 22) firewall rule is omitted from the
+    ingress CIDR rules.
+
+    ex:
+    ```
+    security_group_enable_ssh_access = true
+    ```
+  EOT
+  type        = bool
+  default     = true
 }
 
 variable "allow_ssh_from_google_ui" {
