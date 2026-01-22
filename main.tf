@@ -90,13 +90,16 @@ locals {
   proxy_subnet_name   = coalesce(var.anyscale_vpc_proxy_subnet_name, try("${local.vpc_name}-${local.google_region}-${var.anyscale_vpc_proxy_subnet_suffix}", null), "anyscale-vpc-subnet-proxy")
 
   anyscale_private_subnet_count = var.anyscale_vpc_private_subnet_cidr != null ? 1 : 0
-  anyscale_proxy_subnet_count   = var.anyscale_vpc_proxy_subnet_cidr != null ? 1 : 0
-  anyscale_public_subnet_count  = var.anyscale_vpc_public_subnet_cidr != null ? 1 : 0
+  # anyscale_proxy_subnet_count   = var.anyscale_vpc_proxy_subnet_cidr != null ? 1 : 0
+  # anyscale_public_subnet_count = var.anyscale_vpc_public_subnet_cidr != null ? 1 : 0
 
-  create_new_vpc         = var.existing_vpc_name == null ? true : false
-  create_vpc_subnets     = local.anyscale_proxy_subnet_count > 0 || local.anyscale_private_subnet_count > 0 || local.anyscale_public_subnet_count > 0 ? true : false
-  create_nat_gw          = local.create_new_vpc && var.anyscale_vpc_create_natgw && local.anyscale_private_subnet_count > 0 ? true : false
-  execute_vpc_sub_module = local.create_new_vpc || local.create_vpc_subnets ? true : false
+  create_new_vpc = var.existing_vpc_name == null && var.existing_vpc_id == null ? true : false
+  # create_vpc_subnets = local.anyscale_proxy_subnet_count > 0 || local.anyscale_private_subnet_count > 0 || local.anyscale_public_subnet_count > 0 ? true : false
+  create_nat_gw = local.create_new_vpc && var.anyscale_vpc_create_natgw && local.anyscale_private_subnet_count > 0 ? true : false
+  # Execute VPC module only when creating a new VPC
+  # If existing_vpc_name or existing_vpc_id is provided, existing_vpc_subnet_name is also required
+  # and we don't create any new VPC resources
+  execute_vpc_sub_module = local.create_new_vpc ? true : false
 }
 module "google_anyscale_vpc" {
   source         = "./modules/google-anyscale-vpc"
