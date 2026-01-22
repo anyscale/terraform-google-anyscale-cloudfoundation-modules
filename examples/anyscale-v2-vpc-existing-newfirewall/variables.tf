@@ -73,21 +73,6 @@ variable "existing_vpc_subnet_name" {
   type        = string
 }
 
-variable "existing_firewall_policy_name" {
-  description = <<-EOT
-    (Required) An existing firewall policy name.
-
-    If provided, this will be used in the cloud registration output.
-    This example expects an existing VPC and Firewall meeting [Anyscale Requirements](https://docs.anyscale.com/administration/cloud-deployment/deploy-gcp-cloud#3-choose-an-anyscale-cloud-deployment-method).
-
-    ex:
-    ```
-    existing_firewall_policy_name = "anyscale-firewall-policy"
-    ```
-  EOT
-  type        = string
-}
-
 
 # ------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
