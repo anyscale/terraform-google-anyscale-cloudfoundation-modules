@@ -44,9 +44,15 @@ module "google_anyscale_v2_vpc_existing" {
   existing_vpc_id          = data.google_compute_network.existing_vpc.id
 
   # Firewall Related
-  enable_anyscale_vpc_firewall                  = true
-  anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges   # VPC Firewall allow access from CIDR (VPN CIDR Range)
-  anyscale_vpc_proxy_subnet_cidr                = var.anyscale_vpc_proxy_subnet_cidr # Existing VPC Proxy subnet CIDR
+  # Set enable_anyscale_vpc_firewall to true to create a new firewall policy
+  enable_anyscale_vpc_firewall = true
+  # Allow ingress access from CIDR (VPN, Direct Connect, etc. CIDR Range)
+  anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges
+  # Existing Google Cloud VPC Proxy subnet CIDR
+  anyscale_vpc_proxy_subnet_cidr = var.anyscale_vpc_proxy_subnet_cidr
+  # Optional - Allow SSH access from the customer ingress CIDR range (default is true)
+  #   Port 22 is no longer required for end users to access the clusters.
+  security_group_enable_ssh_access = false
 
   # Cloud Storage (Bucket) Related
   anyscale_bucket_location = "US"
