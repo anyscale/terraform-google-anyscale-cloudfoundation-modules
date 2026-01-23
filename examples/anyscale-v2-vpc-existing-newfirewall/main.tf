@@ -4,10 +4,12 @@
 #     - Enabling Cloud APIs on the Project
 #     - Cloud Storage Bucket
 #     - IAM Roles
-#     - VPC with public subnets
 #     - VPC Firewall
-#     - FileStore (Standard)
 #   This does NOT create a project.
+#   This does not create a new VPC.
+#
+#   This example should be evaluated for use in a production environment to ensure it meets
+#   all security and compliance requirements.
 # ---------------------------------------------------------------------------------------------------------------------
 locals {
   full_labels = merge(tomap({
