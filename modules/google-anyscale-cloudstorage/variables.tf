@@ -213,6 +213,7 @@ variable "cors_rules" {
         origins          = ["https://*.anyscale.com"]
         methods          = ["GET", "POST", "PUT", "HEAD", "DELETE"]
         response_headers = ["*"]
+        expose_headers   = ["Accept-Ranges", "Content-Range", "Content-Length"]
         max_age_seconds  = 3600
       }
     ]
@@ -235,6 +236,7 @@ variable "cors_rules" {
       origins          = ["https://*.anyscale.com"]
       methods          = ["GET", "POST", "PUT", "HEAD", "DELETE"]
       response_headers = ["*"]
+      expose_headers   = ["Accept-Ranges", "Content-Range", "Content-Length"]
       max_age_seconds  = 3600
     }
   ]
