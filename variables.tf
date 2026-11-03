@@ -877,6 +877,24 @@ variable "anyscale_bucket_storage_class" {
   }
 }
 
+variable "anyscale_bucket_force_destroy" {
+  description = <<-EOT
+    (Optional) Bucket force destroy.
+
+    Determines if objects in the bucket are deleted when the bucket is destroyed.
+    If set to true and the bucket is destroyed, objects are not recoverable.
+
+    Note: With the default of `false`, you need to empty the bucket before `terraform destroy` can complete successfully.
+
+    ex:
+    ```
+    anyscale_bucket_force_destroy = true
+    ```
+  EOT
+  type        = bool
+  default     = false
+}
+
 variable "anyscale_bucket_lifecycle_rules" {
   description = <<-EOT
     (Optional) List of lifecycle rules to configure.

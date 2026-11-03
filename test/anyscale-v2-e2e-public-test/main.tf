@@ -42,5 +42,6 @@ module "google_anyscale_v2_commonname" {
   anyscale_vpc_firewall_allow_access_from_cidrs = var.customer_ingress_cidr_ranges
 
   # Cloud Storage (Bucket) Related
-  anyscale_bucket_location = "US"
+  anyscale_bucket_location      = "US"
+  anyscale_bucket_force_destroy = true
 }
