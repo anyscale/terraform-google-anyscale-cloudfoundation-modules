@@ -330,6 +330,7 @@ module "google_anyscale_cloudstorage" {
 
   bucket_location      = var.anyscale_bucket_location
   bucket_storage_class = var.anyscale_bucket_storage_class
+  bucket_force_destroy = var.anyscale_bucket_force_destroy
   lifecycle_rules      = var.anyscale_bucket_lifecycle_rules
   cors_rules           = var.anyscale_bucket_cors_rules
 
